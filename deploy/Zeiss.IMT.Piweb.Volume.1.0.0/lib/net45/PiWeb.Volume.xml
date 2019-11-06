@@ -1,0 +1,982 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PiWeb.Volume</name>
+    </assembly>
+    <members>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.CompressedVolume">
+            <summary>
+            A compressed volume.
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.CompressedVolume.CompressionOptions">
+            <summary>
+            Information about how the volume has been compressed. Returns <c>null</c> when the volume has not been compressed yet.
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.CompressedVolume.GetCompressionState(Zeiss.IMT.PiWeb.Volume.Direction)">
+            <inheritdoc />
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.CompressedVolume.CreatePreview(System.UInt16,System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.CompressedVolume.Decompress(System.IProgress{System.UInt16},System.Threading.CancellationToken)">
+            <summary>
+            Decompresses the volume
+            </summary>
+            <param name="progress">Progress indicator, which reports the current slice number.</param>
+            <param name="ct">Cancellation token</param>
+            <exception cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException">Error during decoding</exception>
+            <exception cref="T:System.NotSupportedException">The volume has no compressed data</exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.CompressedVolume.GetSliceRanges(System.Collections.Generic.IReadOnlyCollection{Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition},System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <inheritdoc />
+            <exception cref="T:System.NotSupportedException">The volume has no compressed data</exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.CompressedVolume.GetSliceRange(Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition,System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <inheritdoc />
+            <exception cref="T:System.NotSupportedException">The volume has no compressed data</exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.CompressedVolume.GetSlice(Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition,System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <inheritdoc />
+            <exception cref="T:System.NotSupportedException">The volume has no compressed data</exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.CompressedVolume.Save(System.IO.Stream)">
+            <summary>
+            Saves the volume into the specified stream
+            </summary>
+            <param name="stream"></param>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.DataTypeId">
+            <summary>
+            Determines the datatype of a <see cref="T:Zeiss.IMT.PiWeb.Volume.Property"/> instance an.
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.DataTypeId.Integer">
+            <summary>
+            Natural number
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.DataTypeId.Double">
+            <summary>
+            Floating point number
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.DataTypeId.String">
+            <summary>
+            String
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.DataTypeId.DateTime">
+            <summary>
+            Timestamp
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.DataTypeId.TimeSpan">
+            <summary>
+            Timespan
+            </summary>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.Property">
+            <summary>
+            Class to encapsulate metadata with a name, a datatype and a value
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Property.#ctor(System.String,Zeiss.IMT.PiWeb.Volume.DataTypeId,System.Object,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.Property"/> class.
+            </summary>
+            <param name="name">The name.</param>
+            <param name="datatype">The datatype.</param>
+            <param name="value">The value.</param>
+            <param name="description">The description.</param>
+            <exception cref="T:System.ArgumentException">name must not be null or empty</exception>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.Property.Name">
+            <summary>
+            Gets the culture invariant name.
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.Property.DataType">
+            <summary>
+            Gets the datatype.
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.Property.Value">
+            <summary>
+            Gets the value.
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.Property.Description">
+            <summary>
+            Gets a culture invariant description.
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Property.Create(System.String,System.Int64,System.String)">
+            <summary>
+            Creates a <see cref="T:Zeiss.IMT.PiWeb.Volume.Property"/> instance from a <see cref="T:System.Int64"/> value.
+            </summary>
+            <param name="name">The name.</param>
+            <param name="value">The value.</param>
+            <param name="description">The description.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Property.Create(System.String,System.Double,System.String)">
+            <summary>
+            Creates a <see cref="T:Zeiss.IMT.PiWeb.Volume.Property"/> instance from a <see cref="T:System.Double"/> value.
+            </summary>
+            <param name="name">The name.</param>
+            <param name="value">The value.</param>
+            <param name="description">The description.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Property.Create(System.String,System.String,System.String)">
+            <summary>
+            Creates a <see cref="T:Zeiss.IMT.PiWeb.Volume.Property"/> instance from a <see cref="T:System.String"/> value.
+            </summary>
+            <param name="name">The name.</param>
+            <param name="value">The value.</param>
+            <param name="description">The description.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Property.Create(System.String,System.DateTime,System.String)">
+            <summary>
+            Creates a <see cref="T:Zeiss.IMT.PiWeb.Volume.Property"/> instance from a <see cref="T:System.DateTime"/> value.
+            </summary>
+            <param name="name">The name.</param>
+            <param name="value">The value.</param>
+            <param name="description">The description.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Property.Create(System.String,System.TimeSpan,System.String)">
+            <summary>
+            Creates a <see cref="T:Zeiss.IMT.PiWeb.Volume.Property"/> instance from a <see cref="T:System.TimeSpan"/> value.
+            </summary>
+            <param name="name">The name.</param>
+            <param name="value">The value.</param>
+            <param name="description">The description.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Property.TryToDetectTypeAndCreate(System.String,System.String,System.String)">
+            <summary>
+            Creates a <see cref="T:Zeiss.IMT.PiWeb.Volume.Property"/> instance from a <see cref="T:System.String"/> value and tries to detect the real datatype.
+            <para><remarks>Order: <see cref="T:System.DateTime"/> -> <see cref="T:System.Int64"/> -> <see cref="T:System.Double"/> -> <see cref="T:System.TimeSpan"/></remarks></para>
+            </summary>
+            <param name="name">The name.</param>
+            <param name="value">The value.</param>
+            <param name="description">The description.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Property.GetStringValue">
+            <summary>
+            Returns the properties value as string.
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Property.Serialize(System.Xml.XmlWriter)">
+            <summary>
+            Serializes the property.
+            </summary>
+            <param name="writer">The writer.</param>
+            <exception cref="T:System.ArgumentNullException">writer</exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Property.Deserialize(System.Xml.XmlReader)">
+            <summary>
+            Deserializes the property data.
+            </summary>
+            <param name="reader">The reader.</param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException">reader</exception>
+            <exception cref="T:System.NotSupportedException"></exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Property.Equals(Zeiss.IMT.PiWeb.Volume.Property,Zeiss.IMT.PiWeb.Volume.Property)">
+            <summary>
+            Determines, whether the two specified instances are equal.
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Property.GetHashCode">
+            <summary>
+            Returns a hash code for this instance.
+            </summary>
+            <returns>
+            A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+            </returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Property.Equals(System.Object)">
+            <summary>
+            Determines whether the specified <see cref="T:System.Object" />, is equal to this instance.
+            </summary>
+            <param name="obj">The <see cref="T:System.Object" /> to compare with this instance.</param>
+            <returns>
+              <c>true</c> if the specified <see cref="T:System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Property.ToString">
+            <summary>
+            Returns a <see cref="T:System.String" /> that represents this instance.
+            </summary>
+            <returns>
+            A <see cref="T:System.String" /> that represents this instance.
+            </returns>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.Direction">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.Direction.X">
+            <summary>
+            X-Direction
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.Direction.Y">
+            <summary>
+            Y-Direction
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.Direction.Z">
+            <summary>
+            Z-Direction
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.ReaderWriterExtensions.CreateNormalizedEntry(System.IO.Compression.ZipArchive,System.String,System.IO.Compression.CompressionLevel)">
+            <summary>
+            Creates an empty zip entry with the specified <paramref name="entryName"/> and the specified <paramref name="compressionLevel"/>.
+            The <code>LastWriteTime</code> is set to 01-01-1980 instead of the current time. By doing so, two zip archives with the same binary content
+            become binary identical which leads to the same hash, which makes change detection easier.
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.ReaderWriterExtensions.StreamToArray(System.IO.Stream,System.Int32)">
+            <summary>
+            Reads all data from the specified stream and returns it as a byte array.
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Resources.GetResource``1(System.String)">
+            <summary>
+            Gets the resource with the specified name
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="name">The name.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Resources.FormatResource``1(System.String,System.Object[])">
+            <summary>
+            Formats the resource with the specified <paramref name="name"/> with the specified <paramref name="args"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="name">The name.</param>
+            <param name="args">The arguments.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.UncompressedVolume">
+            <summary>
+            TODO: add summary.
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.UncompressedVolume.#ctor(Zeiss.IMT.PiWeb.Volume.VolumeMetadata,System.Byte[][])">
+            <summary>
+            Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.UncompressedVolume" /> class.
+            </summary>
+            <param name="metadata">The metadata.</param>
+            <param name="data">The grayscale slice data.</param>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.UncompressedVolume.Data">
+            <summary>
+            The uncompressed voxel data
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.UncompressedVolume.CheckForIntegrity">
+            <summary>
+            Checks the data for integrity. Works only on decompressed data. Will throw exceptions in case a check failed.
+            </summary>
+            <exception cref="T:System.IndexOutOfRangeException"></exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.UncompressedVolume.Compress(Zeiss.IMT.PiWeb.Volume.VolumeCompressionOptions,System.Boolean,System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <summary>
+            Compresses the volume with the specified compression options.
+            </summary>
+            <param name="options"></param>
+            <param name="multiDirection"></param>
+            <param name="progress">A progress indicator, which reports the current slice number.</param>
+            <param name="ct"></param>
+            <exception cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException">Error during encoding</exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.UncompressedVolume.CompressDirection(Zeiss.IMT.PiWeb.Volume.Direction,Zeiss.IMT.PiWeb.Volume.VolumeCompressionOptions,System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <summary>
+            Compresses the volume with the specified compression options.
+            </summary>
+            <param name="progress">A progress indicator, which reports the current slice number.</param>
+            <param name="ct"></param>
+            <param name="direction"></param>
+            <param name="options">Codec settings</param>
+            <exception cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException">Error during encoding</exception>
+            <exception cref="T:System.NotSupportedException">The volume has no decompressed data</exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.UncompressedVolume.GetCompressionState(Zeiss.IMT.PiWeb.Volume.Direction)">
+            <inheritdoc />
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.UncompressedVolume.CreatePreview(System.UInt16,System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.UncompressedVolume.GetSliceRanges(System.Collections.Generic.IReadOnlyCollection{Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition},System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.UncompressedVolume.GetSliceRange(Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition,System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.UncompressedVolume.GetSlice(Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition,System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.UncompressedVolume.Save(System.IO.Stream,Zeiss.IMT.PiWeb.Volume.VolumeCompressionOptions,System.Boolean,System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <summary>
+            Compresses and saves the volume in the specified stream.
+            </summary>
+            <param name="stream">The stream.</param>
+            <param name="options">The options.</param>
+            <param name="multiDirection">if set to <c>true</c> [multi direction].</param>
+            <param name="progress">The progress.</param>
+            <param name="ct">The ct.</param>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.VolumeSlice">
+            <summary>
+            A single layer of a discrete volume.
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSlice.#ctor(Zeiss.IMT.PiWeb.Volume.Direction,System.UInt16,System.Byte[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeSlice"/> class.
+            </summary>
+            <param name="direction">The direction.</param>
+            <param name="index">The index.</param>
+            <param name="data">The data.</param>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeSlice.Direction">
+            <summary>
+            Gets the direction.
+            </summary>
+            <value>
+            The direction.
+            </value>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeSlice.Index">
+            <summary>
+            Gets the index.
+            </summary>
+            <value>
+            The index.
+            </value>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeSlice.Data">
+            <summary>
+            Gets the data.
+            </summary>
+            <value>
+            The data.
+            </value>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSlice.Extract(Zeiss.IMT.PiWeb.Volume.Direction,System.UInt16,Zeiss.IMT.PiWeb.Volume.VolumeMetadata,System.Byte[][])">
+            <summary>
+            Extracts the specified direction.
+            </summary>
+            <param name="direction">The direction.</param>
+            <param name="index">The index.</param>
+            <param name="volumeMetadata">The volume metadata.</param>
+            <param name="data">The data.</param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">direction - null</exception>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition">
+            <summary>
+            Holds the properties that define a volume slice.
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition.#ctor(Zeiss.IMT.PiWeb.Volume.Direction,System.UInt16)">
+            <summary>
+            Creates a decription of a volume slice.
+            </summary>
+            <param name="direction"></param>
+            <param name="index"></param>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition.Direction">
+            <summary>
+            Direction
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition.Index">
+            <summary>
+            Slice index
+            </summary>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.VolumeSliceRange">
+            <summary>
+            Contains a continous range of slices in a specific direction.
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSliceRange.#ctor(Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition,System.Collections.Generic.IEnumerable{Zeiss.IMT.PiWeb.Volume.VolumeSlice})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeSliceRange"/> class.
+            </summary>
+            <param name="definition">The definition.</param>
+            <param name="slices">The slices.</param>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeSliceRange.Definition">
+            <summary>
+            Gets the definition.
+            </summary>
+            <value>
+            The definition.
+            </value>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSliceRange.Extract(Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition,Zeiss.IMT.PiWeb.Volume.VolumeMetadata,System.Byte[][])">
+            <summary>
+            Extracts the specified definition.
+            </summary>
+            <param name="definition">The definition.</param>
+            <param name="volumeMetadata">The volume metadata.</param>
+            <param name="data">The data.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSliceRange.GetEnumerator">
+            <inheritdoc />
+            <summary>
+            Returns an enumerator that iterates through the collection.
+            </summary>
+            <returns>
+            A <see cref="T:System.Collections.Generic.IEnumerator`1" /> that can be used to iterate through the collection.
+            </returns>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeSliceRange.Count">
+            <inheritdoc />
+            <summary>
+            Gets the number of elements in the collection.
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeSliceRange.Item(System.Int32)">
+            <inheritdoc />
+            <summary>
+            Gets the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeSlice" /> at the specified index.
+            </summary>
+            <value>
+            The <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeSlice" />.
+            </value>
+            <param name="index">The index.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.VolumeSliceCollection">
+            <summary>
+            A collection of volume slices which provides accessibility to single slices and ranges and avoids duplicates.
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSliceCollection.Add(Zeiss.IMT.PiWeb.Volume.VolumeSlice)">
+            <summary>
+            Adds the slice to the collection in case it is not already present.
+            </summary>
+            <param name="slice"></param>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSliceCollection.Add(Zeiss.IMT.PiWeb.Volume.VolumeSliceRange)">
+            <summary>
+            Adds all slices from the specified range to the collection.
+            Slices that are already present in the collection are skipped.
+            </summary>
+            <param name="range"></param>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSliceCollection.Add(Zeiss.IMT.PiWeb.Volume.VolumeSliceCollection)">
+            <summary>
+            Adds all slices of the other collection into this one.
+            Slices that are already present in the collection are skipped.
+            </summary>
+            <param name="other"></param>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSliceCollection.Contains(Zeiss.IMT.PiWeb.Volume.Direction,System.UInt16)">
+            <summary>
+            Determines whether the specified slice is present in the collection
+            </summary>
+            <param name="direction"></param>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSliceCollection.Contains(Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition)">
+            <summary>
+            Determines whether the specified range is present in the collection
+            </summary>
+            <param name="range">Slice range</param>
+            <returns></returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSliceCollection.GetSliceRanges(System.Collections.Generic.IReadOnlyCollection{Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition})">
+            <summary>
+            Returns the specified slice ranges
+            </summary>
+            <param name="definitions"></param>
+            <exception cref="T:System.ArgumentOutOfRangeException">The collection is missing one or more of the requested slices.</exception>
+            <returns></returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSliceCollection.GetSliceRange(Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition)">
+            <summary>
+            Returns the specified slice range
+            </summary>
+            <param name="definition"></param>
+            <exception cref="T:System.ArgumentOutOfRangeException">The collection is missing one or more of the requested slices.</exception>
+            <returns></returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSliceCollection.GetSlice(Zeiss.IMT.PiWeb.Volume.Direction,System.UInt16)">
+            <summary>
+            Returns the specified slice
+            </summary>
+            <param name="direction"></param>
+            <param name="index"></param>
+            <exception cref="T:System.ArgumentOutOfRangeException">The collection does not contain the requested slice.</exception>
+            <returns></returns>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.Volume">
+            <summary>
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.Volume.FileVersion">
+            <summary>
+            The current volume library version. This version is stored in the volume file when it's saved.
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.Volume.Metadata">
+            <summary>
+            Describes the volumes size and resolution
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Volume.CreateUncompressed(Zeiss.IMT.PiWeb.Volume.VolumeMetadata,System.Byte[][])">
+            <summary>
+            Creates a new, decompressed volume from the specified data
+            </summary>
+            <param name="metadata">Describes the volumes size and resolution</param>
+            <param name="data">The decompressed volume as 8-Bit grayscale values. The array dimensions must match the specified <paramref name="metadata"/> (byte[z][x*y]).</param>
+            <exception cref="T:System.IndexOutOfRangeException">The specified data did not match the dimensions of the specified <paramref name="metadata"/>.</exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Volume.CreateCompressed(Zeiss.IMT.PiWeb.Volume.VolumeMetadata,System.Byte[][],Zeiss.IMT.PiWeb.Volume.VolumeCompressionOptions,System.Boolean,System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <summary>
+            Creates a new, decompressed volume from the specified data
+            </summary>
+            <param name="metadata">Describes the volumes size and resolution</param>
+            <param name="data">The decompressed volume as 8-Bit grayscale values. The array dimensions must match the specified <paramref name="metadata"/> (byte[z][x*y]).</param>
+            <param name="multiDirection"></param>
+            <param name="progress">A progress indicator, which reports the current slice number.</param>
+            <param name="options">Codec settings</param>
+            <param name="ct"></param>
+            <exception cref="T:System.IndexOutOfRangeException">The specified data did not match the dimensions of the specified <paramref name="metadata"/>.</exception>
+            <exception cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException">Error during encoding</exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Volume.CreateCompressed(Zeiss.IMT.PiWeb.Volume.VolumeMetadata,System.IO.Stream,Zeiss.IMT.PiWeb.Volume.VolumeCompressionOptions,System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <summary>
+            Creates a new, decompressed volume from the specified data
+            </summary>
+            <param name="metadata">Holds additional information about a volume</param>
+            <param name="stream">A stream to the slice data</param>
+            <param name="options">Codec settings</param>
+            <param name="progress">A progress indicator, which reports the current slice number.</param>
+            <param name="ct"></param>
+            <exception cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException">Error during encoding</exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Volume.GetCompressionState(Zeiss.IMT.PiWeb.Volume.Direction)">
+            <summary>
+            Returns the volumes accessibility in the specified direction.
+            </summary>
+            <param name="direction">The direction</param>
+            <returns></returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Volume.GetSliceRanges(System.Collections.Generic.IReadOnlyCollection{Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition},System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <summary>
+            Extracts the specified slice ranges. This is usually a lot faster than extracting single slices or ranges and consumes less memory than a full decompression.
+            </summary>
+            <param name="ranges">The required slice ranges.</param>
+            <param name="progress">A progress indicator, which reports the current slice number.</param>
+            <param name="ct"></param>
+            <returns>An enumeration of slice ranges or an empty enumeration.</returns>
+            <exception cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException">Error during decoding</exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Volume.GetSliceRange(Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition,System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <summary>
+            Gets the specified slice range. This is usually a lot faster than extracting single slices and consumes less memory than a full decompression.
+            </summary>
+            <param name="range">The requested slice range.</param>
+            <param name="progress">A progress indicator, which reports the current slice number.</param>
+            <param name="ct"></param>
+            <returns></returns>
+            <exception cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException">Error during decoding</exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Volume.GetSlice(Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition,System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <summary>
+            Gets the specified slice. This is the most memory friendly and usually the fastest approach to get a single slice.
+            </summary>
+            <param name="slice">The requested slice.</param>
+            <param name="progress">A progress indicator, which reports the current slice number.</param>
+            <param name="ct"></param>
+            <returns></returns>
+            <exception cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException">Error during decoding</exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Volume.CreatePreview(System.UInt16,System.IProgress{Zeiss.IMT.PiWeb.Volume.VolumeSliceDefinition},System.Threading.CancellationToken)">
+            <summary>
+            Creates a smaller volume from the current volume without performing a full decompression.
+            </summary>
+            <param name="minification">The stride factor in X, Y and Z direction. The size of the preview will be the CompleteSize divided by <paramref name="minification"/> ^ 3</param>
+            <param name="progress">A progress indicator, which reports the current slice number.</param>
+            <param name="ct"></param>
+            <exception cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException">Error during decoding</exception>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.Volume.Load(System.IO.Stream)">
+            <summary>
+            Loads volume data from the specified data stream.
+            </summary>
+            <param name="stream">The stream.</param>
+            <returns></returns>
+            <exception cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException">Error during decoding</exception>
+            <exception cref="T:System.NotSupportedException">The volume has no compressed data</exception>
+            <exception cref="T:System.InvalidOperationException">One or more entries are missing in the archive.</exception>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.VolumeCompressionOptions">
+            <summary>
+            Encapsulates the options for volume compression.
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeCompressionOptions.#ctor(System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.String},System.Int32)">
+            <summary>
+                Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeCompressionOptions" /> class.
+            </summary>
+            <param name="encoder">The encoder.</param>
+            <param name="encoderOptions">The encoder options.</param>
+            <param name="pixelFormat">The pixelformat.</param>
+            <param name="bitrate">The bitrate.</param>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeCompressionOptions.Encoder">
+            <summary>
+            Gets the codec.
+            </summary>
+            <value>
+            The codec.
+            </value>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeCompressionOptions.EncoderOptions">
+            <summary>
+                Gets the codec options.
+            </summary>
+            <value>
+                The codec options.
+            </value>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeCompressionOptions.PixelFormat">
+            <summary>
+            Gets the pixel format
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeCompressionOptions.Bitrate">
+            <summary>
+            Gets the bitrate.
+            </summary>
+            <value>
+            The bitrate.
+            </value>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.VolumeError">
+            <summary>
+            Errors returned by the volume compressor
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.Success">
+            <summary>
+            The success
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.IoContextAllocationFailed">
+            <summary>
+            The io context allocation failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.FormatContextAllocationFailed">
+            <summary>
+            The format context allocation failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.FormatContextOpenFailed">
+            <summary>
+            The format context open failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.FormatContextNoVideoStream">
+            <summary>
+            The format context no video stream
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.FormatContextNoVideoStreamInfo">
+            <summary>
+            The format context no video stream information
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.FormatContextUnsupportedFormat">
+            <summary>
+            The format context unsupported format
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.FormatContextStreamAllocFailed">
+            <summary>
+            The format context stream alloc failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.FormatContextWriteHeaderFailed">
+            <summary>
+            The format context write header failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.FormatContextWriteTailFailed">
+            <summary>
+            The format context write tail failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.FormatContextSeekFailed">
+            <summary>
+            The format context seek failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.CodecContextAllocationFailed">
+            <summary>
+            The codec context allocation failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.CodecInvalidName">
+            <summary>
+            The codec invalid name
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.CodecInvalidOptions">
+            <summary>
+            The specified codec options are invalid.
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.CodecOpenFailed">
+            <summary>
+            Cannot open the specified codec.
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.CodecEncodeFailed">
+            <summary>
+            The encoding failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.CodecDecodeFailed">
+            <summary>
+            The decoding failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.CodecSendPackageFailed">
+            <summary>
+            Error when sending a frame package
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.CodecReceiveFrameFailed">
+            <summary>
+            Error on receiving a frame package
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.CodecWriteInterleavedFrameFailed">
+            <summary>
+            The codec write interleaved frame failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.CodecInvalidPixelFormat">
+            <summary>
+            The specified pixel format is unknown
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.ImageAllocationFailed">
+            <summary>
+            The image allocation failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.FrameAllocationFailed">
+            <summary>
+            The frame allocation failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.FrameBufferAllocationFailed">
+            <summary>
+            The frame buffer allocation failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.FrameNotWritable">
+            <summary>
+            The frame is not writable
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.ScaleContextAllocationFailed">
+            <summary>
+            The scale context allocation failed
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeError.ScaleContextRescaleFailed">
+            <summary>
+            The scale context rescale failed
+            </summary>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.VolumeException">
+            <summary>
+            Exceptions thrown by the volume compressor and decompressor
+            </summary>
+            <seealso cref="T:System.Exception" />
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeException.#ctor(Zeiss.IMT.PiWeb.Volume.VolumeError)">
+            <inheritdoc />
+            <summary>
+            Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException" /> class.
+            </summary>
+            <param name="error">The error.</param>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeException.#ctor(Zeiss.IMT.PiWeb.Volume.VolumeError,System.String)">
+            <inheritdoc />
+            <summary>
+            Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException" /> class.
+            </summary>
+            <param name="error">The error.</param>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeException.#ctor(Zeiss.IMT.PiWeb.Volume.VolumeError,System.String,System.Exception)">
+            <inheritdoc />
+            <summary>
+            Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException" /> class.
+            </summary>
+            <param name="error">The error.</param>
+            <param name="message">The message.</param>
+            <param name="innerException">The inner exception.</param>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeException.Error">
+            <summary>
+            Gets the error code.
+            </summary>
+            <value>
+            The error.
+            </value>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.VolumeMetadata">
+            <summary>
+            Holds additional information about a volume
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeMetadata.#ctor(System.UInt16,System.UInt16,System.UInt16,System.Double,System.Double,System.Double)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeMetadata" /> class.
+            </summary>
+            <param name="sizeX">The size x.</param>
+            <param name="sizeY">The size y.</param>
+            <param name="sizeZ">The size z.</param>
+            <param name="resolutionX">The resolution x.</param>
+            <param name="resolutionY">The resolution y.</param>
+            <param name="resolutionZ">The resolution z.</param>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeMetadata.FileVersion">
+            <summary>
+            Gets the file version.
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeMetadata.SizeX">
+            <summary>
+            The number of Voxels in X-Dimension.
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeMetadata.SizeY">
+            <summary>
+            The number of Voxels in Y-Dimension.
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeMetadata.SizeZ">
+            <summary>
+            The number of Voxels in Z-Dimension.
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeMetadata.ResolutionX">
+            <summary>
+            The size of a Voxel in X-Dimension (mm).
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeMetadata.ResolutionY">
+            <summary>
+            The size of a Voxel in Y-Dimension (mm).
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeMetadata.ResolutionZ">
+            <summary>
+            The size of a Voxel in Z-Dimension (mm).
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeMetadata.Properties">
+            <summary>
+            Gets or sets the metadata.
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeMetadata.GetSize(Zeiss.IMT.PiWeb.Volume.Direction)">
+            <summary>
+            
+            </summary>
+            <param name="direction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeMetadata.GetSliceSize(Zeiss.IMT.PiWeb.Volume.Direction,System.UInt16@,System.UInt16@)">
+            <summary>
+            Returns the size of a slice in the specified direction.
+            </summary>
+            <param name="direction"></param>
+            <param name="width"></param>
+            <param name="height"></param>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeMetadata.Serialize(System.IO.Stream,System.Boolean)">
+            <summary>
+            Serializes the data of this instance and writes it into the specified <paramref name="stream" />.
+            </summary>
+            <param name="stream">The stream.</param>
+            <param name="upgradeVersionNumber">if set to <c>true</c>, the version number is adjusted to match the current version.</param>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition">
+            <summary>
+            Describes a continous range of slices in a specific direction.
+            </summary>
+        </member>
+        <member name="M:Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition.#ctor(Zeiss.IMT.PiWeb.Volume.Direction,System.UInt16,System.UInt16)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition"/> struct.
+            </summary>
+            <param name="direction"></param>
+            <param name="first">The first.</param>
+            <param name="last">The last.</param>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition.Direction">
+            <summary>
+            Gets the direction.
+            </summary>
+            <value>
+            The direction.
+            </value>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition.First">
+            <summary>
+            Gets the inclusive first slice.
+            </summary>
+        </member>
+        <member name="P:Zeiss.IMT.PiWeb.Volume.VolumeSliceRangeDefinition.Last">
+            <summary>
+            Gets the inclusive last slice.
+            </summary>
+        </member>
+        <member name="T:Zeiss.IMT.PiWeb.Volume.VolumeCompressionState">
+            <summary>
+            Describes the compression state of a the volume in a specific direction
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeCompressionState.Decompressed">
+            <summary>
+            The volume is currently decompressed, which allows instant access to slices
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeCompressionState.CompressedInDirection">
+            <summary>
+            The volume is compressed in the requested direction, which allows a relatively fast access to slices
+            </summary>
+        </member>
+        <member name="F:Zeiss.IMT.PiWeb.Volume.VolumeCompressionState.Compressed">
+            <summary>
+            The volume is compressed in a different direction, which means that a slice access will perform a full scan
+            </summary>
+        </member>
+    </members>
+</doc>

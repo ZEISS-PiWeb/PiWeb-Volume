@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29209.62
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PiWeb.Volume.Core", "PiWeb.Volume.Core\PiWeb.Volume.Core.vcxproj", "{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume", "PiWeb.Volume\PiWeb.Volume.csproj", "{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3} = {7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}.Debug|Any CPU.Build.0 = Debug|x64
+		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}.Release|Any CPU.ActiveCfg = Release|x64
+		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}.Release|Any CPU.Build.0 = Release|x64
+		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7166CF48-2680-4020-94B4-211E1852C673}
+	EndGlobalSection
+EndGlobal

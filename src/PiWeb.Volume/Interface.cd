@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Access">
+  <Class Name="Zeiss.IMT.PiWeb.Volume.Volume">
+    <Position X="6.75" Y="0.5" Width="2.75" />
+    <Members>
+      <Method Name="CompressStream" Hidden="true" />
+      <Method Name="CompressVolume" Hidden="true" />
+      <Method Name="DecompressSlices" Hidden="true" />
+      <Method Name="DecompressVolume" Hidden="true" />
+      <Method Name="GetEncodedSliceSize" Hidden="true" />
+      <Method Name="Volume" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAQKAAAAAGAAABAAEgIAAAAAEAAEQAAEAAA=</HashCode>
+      <FileName>Volume.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Zeiss.IMT.PiWeb.Volume.CompressedVolume">
+    <Position X="10" Y="2" Width="2.5" />
+    <Members>
+      <Field Name="_CompressedData" Hidden="true" />
+      <Method Name="CompressedVolume" Hidden="true" />
+      <Method Name="CreatePreview" Hidden="true" />
+      <Method Name="GetCompressionState" Hidden="true" />
+      <Method Name="GetSlice" Hidden="true" />
+      <Method Name="GetSliceRange" Hidden="true" />
+      <Method Name="GetSliceRanges" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAgIAAAAQCAAEAAACAAAAAAAIAAAAAAAAEgAAAAAA=</HashCode>
+      <FileName>CompressedVolume.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Zeiss.IMT.PiWeb.Volume.UncompressedVolume">
+    <Position X="3.75" Y="2" Width="2.5" />
+    <Members>
+      <Method Name="CheckForIntegrity" Hidden="true" />
+      <Method Name="CompressDirection" Hidden="true" />
+      <Method Name="CreatePreview" Hidden="true" />
+      <Method Name="GetCompressionState" Hidden="true" />
+      <Method Name="GetSlice" Hidden="true" />
+      <Method Name="GetSliceRange" Hidden="true" />
+      <Method Name="GetSliceRanges" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAgIAAABQCAAQAAAAAAAAAAAIAABAAAAAGAAAAAAA=</HashCode>
+      <FileName>UncompressedVolume.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Zeiss.IMT.PiWeb.Volume.VolumeMetadata">
+    <Position X="6.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAYBCAAAAAoAAAACBAAIAAAAAARBACAAA=</HashCode>
+      <FileName>VolumeMetadata.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
