@@ -87,58 +87,56 @@ namespace Zeiss.IMT.PiWeb.Volume
             }
         }
 
-        private bool ReadInXDirection( IntPtr pv, ushort width, ushort height )
-        {
-            if( _CurrentSlice >= _SizeX )
-                return false;
+		private bool ReadInXDirection(IntPtr pv, ushort width, ushort height)
+		{
+			if (_CurrentSlice >= _SizeX)
+				return false;
 
-            _ProgressNotifier?.Report( new VolumeSliceDefinition( _ReadDirection, _CurrentSlice ) );
+			_ProgressNotifier?.Report(new VolumeSliceDefinition(_ReadDirection, _CurrentSlice));
 
-            if( _Buffer.Length < width * height )
-                _Buffer = new byte[width * height];
+			if (_Buffer.Length < width * height)
+				_Buffer = new byte[width * height];
 
-            var sx = _SizeX;
+			var sx = _SizeX;
 
-            Parallel.For( 0, Math.Min( _SizeY, height ), z =>
-            {
-                var input = _Data[ z ];
-                var output = _Buffer;
-                long inputIndex = _CurrentSlice;
-                long outputIndex = z * width;
+			Parallel.For(0, Math.Min(_SizeZ, height), z =>
+			{
+				var input = _Data[z];
+				var output = _Buffer;
+				long inputIndex = _CurrentSlice;
+				long outputIndex = z * width;
 
-                for( var y = 0; y < _SizeY; y++ )
-                {
-                    output[ outputIndex ] = input[ inputIndex ];
-                    outputIndex++;
-                    inputIndex += sx;
-                }
-            } );
+				for (var y = 0; y < _SizeY; y++)
+				{
+					output[outputIndex] = input[inputIndex];
+					outputIndex++;
+					inputIndex += sx;
+				}
+			});
 
-            Marshal.Copy( _Buffer, 0, pv, width * height );
-            _CurrentSlice++;
+			Marshal.Copy(_Buffer, 0, pv, width * height);
+			_CurrentSlice++;
 
-            return true;
-        }
-
-
-        private bool ReadInYDirection( IntPtr pv, ushort width, ushort height )
-        {
-            if( _CurrentSlice >= _SizeY )
-                return false;
-
-            _ProgressNotifier?.Report( new VolumeSliceDefinition( _ReadDirection, _CurrentSlice ) );
-
-            var data = _Data[ _CurrentSlice ];
-
-            Parallel.For( 0, Math.Min( _SizeZ, height ), z => Marshal.Copy( data, _CurrentSlice * _SizeX, pv + z * width, _SizeX ) );
-
-            _CurrentSlice++;
-
-            return true;
-        }
+			return true;
+		}
 
 
-        private bool ReadInZDirection( IntPtr pv, ushort width, ushort height )
+		private bool ReadInYDirection(IntPtr pv, ushort width, ushort height)
+		{
+			if (_CurrentSlice >= _SizeY)
+				return false;
+
+			_ProgressNotifier?.Report(new VolumeSliceDefinition(_ReadDirection, _CurrentSlice));
+
+			Parallel.For(0, Math.Min(_SizeZ, height), z => Marshal.Copy(_Data[z], _CurrentSlice * _SizeX, pv + z * width, _SizeX));
+
+			_CurrentSlice++;
+
+			return true;
+		}
+
+
+		private bool ReadInZDirection( IntPtr pv, ushort width, ushort height )
         {
             if( _CurrentSlice >= _SizeZ )
                 return false;
