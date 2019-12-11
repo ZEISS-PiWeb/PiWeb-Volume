@@ -3,3 +3,5 @@ bin
 obj
 *.user
 x64
+packages
+.idea
