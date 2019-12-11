@@ -102,6 +102,7 @@
     <Compile Include="Components\VolumeDirectionButton.cs" />
     <Compile Include="Components\Ruler.cs" />
     <Compile Include="Converter\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converter\DictionaryToStringConverter.cs" />
     <Compile Include="Converter\IsEqualConverter.cs" />
     <Compile Include="Converter\IsNotNullConverter.cs" />
     <Compile Include="Effects\GrayscaleEffect.cs" />

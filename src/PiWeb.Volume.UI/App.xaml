@@ -13,7 +13,7 @@
             <converter:BooleanToVisibilityConverter Invert="True" x:Key="InvertedBooleanToVisibilityConverter" />
             <converter:IsNotNullConverter x:Key="IsNotNullConverter"/> 
             <converter:IsEqualConverter x:Key="IsEqualConverter"/> 
-            
+            <converter:DictionaryToStringConverter x:Key="DictionaryToStringConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

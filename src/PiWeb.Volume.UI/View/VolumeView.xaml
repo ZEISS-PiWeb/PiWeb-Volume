@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModel="clr-namespace:Zeiss.IMT.PiWeb.Volume.UI.ViewModel"
              xmlns:components="clr-namespace:Zeiss.IMT.PiWeb.Volume.UI.Components"
-             xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
              xmlns:volume="clr-namespace:Zeiss.IMT.PiWeb.Volume;assembly=PiWeb.Volume"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModel:VolumeViewModel}"
@@ -43,15 +42,15 @@
                 <StackPanel DockPanel.Dock="Right">
                     <HeaderedContentControl Header="X">
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right"
-                                   Text="{Binding Volume.Metadata.SizeX, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0} Voxels}" />
+                                   Text="{Binding Volume.Metadata.SizeX, StringFormat={}{0} Voxels}" />
                     </HeaderedContentControl>
                     <HeaderedContentControl Header="Y">
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right"
-                                   Text="{Binding Volume.Metadata.SizeY, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0} Voxels}" />
+                                   Text="{Binding Volume.Metadata.SizeY, StringFormat={}{0} Voxels}" />
                     </HeaderedContentControl>
                     <HeaderedContentControl Header="Z">
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right"
-                                   Text="{Binding Volume.Metadata.SizeZ, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0} Voxels}" />
+                                   Text="{Binding Volume.Metadata.SizeZ, StringFormat={}{0} Voxels}" />
                     </HeaderedContentControl>
                 </StackPanel>
             </DockPanel>
@@ -70,15 +69,15 @@
                 <StackPanel DockPanel.Dock="Right">
                     <HeaderedContentControl Header="X">
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right"
-                                   Text="{Binding Volume.Metadata.ResolutionX, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:F3} mm}" />
+                                   Text="{Binding Volume.Metadata.ResolutionX, StringFormat={}{0:F3} mm}" />
                     </HeaderedContentControl>
                     <HeaderedContentControl Header="Y">
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right"
-                                   Text="{Binding Volume.Metadata.ResolutionY, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:F3} mm}" />
+                                   Text="{Binding Volume.Metadata.ResolutionY, StringFormat={}{0:F3} mm}" />
                     </HeaderedContentControl>
                     <HeaderedContentControl Header="Z">
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right"
-                                   Text="{Binding Volume.Metadata.ResolutionZ, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:F3} mm}" />
+                                   Text="{Binding Volume.Metadata.ResolutionZ, StringFormat={}{0:F3} mm}" />
                     </HeaderedContentControl>
                 </StackPanel>
             </DockPanel>
@@ -127,16 +126,21 @@
             <StackPanel Grid.Row="7" Margin="8" DockPanel.Dock="Right">
                 <HeaderedContentControl Header="Encoder">
                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right"
-                               Text="{Binding Volume.CompressionOptions.Encoder, UpdateSourceTrigger=PropertyChanged}" />
+                               Text="{Binding Volume.CompressionOptions.Encoder}" />
                 </HeaderedContentControl>
                 <HeaderedContentControl Header="Bitrate">
                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right"
-                               Text="{Binding Volume.CompressionOptions.Bitrate, UpdateSourceTrigger=PropertyChanged}" />
+                               Text="{Binding Volume.CompressionOptions.Bitrate}" />
                 </HeaderedContentControl>
                 <HeaderedContentControl Header="PixelFormat">
                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right"
-                               Text="{Binding Volume.CompressionOptions.PixelFormat, UpdateSourceTrigger=PropertyChanged}" />
+                               Text="{Binding Volume.CompressionOptions.PixelFormat}" />
                 </HeaderedContentControl>
+                <HeaderedContentControl Header="Options">
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right"
+                               Text="{Binding Volume.CompressionOptions.EncoderOptions, Converter={StaticResource DictionaryToStringConverter}}" />
+                </HeaderedContentControl>
+                
             </StackPanel>
         </Grid>
 
@@ -282,8 +286,8 @@
                 <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" Margin="0,0,0,4">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="{}Slice: {0}/{1}">
-                            <Binding Path="SelectedLayerIndex" UpdateSourceTrigger="PropertyChanged" />
-                            <Binding Path="MaxLayer" UpdateSourceTrigger="PropertyChanged" />
+                            <Binding Path="SelectedLayerIndex" />
+                            <Binding Path="MaxLayer" />
                         </MultiBinding>
                     </TextBlock.Text>
                 </TextBlock>
