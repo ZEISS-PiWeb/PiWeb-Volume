@@ -3,6 +3,7 @@
 [multi]: docs/gfx/multi.png "multi"
 [previewExtraction]: docs/gfx/previewExtraction.png "PreviewExtraction"
 [sliceExtraction]: docs/gfx/sliceExtraction.png "SliceExtraction"
+[testingUI]: docs/gfx/testing_ui.jpg "TestingUI"
 
 # PiWeb Volume Library
 
@@ -13,6 +14,7 @@
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Testing](#testing)
 - [License](#license)
 
 ## Introduction
@@ -133,6 +135,20 @@ This option behaves like a mixture between the first two options. The method `co
 var compressedVolume = Volume.Load( inputStream );
 var preview = compressedVolume.CreatePreview();
 ```
+
+## Testing
+
+In the solution, you'll find a project named `PiWeb.Volume.UI` which is a small UI for loading and viewing PiWeb Volume files. Following functions are available
+
+1. Opening files
+2. Viewing properties and metadata of the volume
+3. Viewing slices of the volume
+4. Navigating through the volumes slices
+5. Changing the view direction by clicking on sides of the cube
+6. Fit and reset the zoom
+7. Zoom in and out with the mouse wheel and pan with the right mouse button pressed
+
+![Testing UI][testingUI]
 
 ## License
 
