@@ -138,7 +138,7 @@ var preview = compressedVolume.CreatePreview();
 
 ## Testing
 
-In the solution, you'll find a project named `PiWeb.Volume.UI` which is a small UI for loading and viewing PiWeb Volume files. Following functions are available
+In the solution, you'll find a project named `PiWeb.Volume.UI` which is a small UI for loading and viewing PiWeb Volume files. Following functions are available. This repository contains two small test files in the `testdata` folder. They contain the same volume, but once with multidirectional data and once without. You'll notice the performance difference when viewing them with the UI.
 
 1. Opening files
 2. Viewing properties and metadata of the volume
