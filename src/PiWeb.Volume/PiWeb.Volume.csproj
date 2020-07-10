@@ -1,90 +1,51 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <Platforms>x64</Platforms>
+    
     <RootNamespace>Zeiss.IMT.PiWeb.Volume</RootNamespace>
-    <AssemblyName>PiWeb.Volume</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <SignAssembly>true</SignAssembly>
-    <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup>
-    <!--Looks like there is a visual studio bug with the result that some macros like $(ProjectDir) return blank. As a workaround $(MSBuildProjectDirectory) can be used. -->
-    <PreBuildEvent>
-    </PreBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
+    <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Volume.snk</AssemblyOriginatorKeyFile>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\x64\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DocumentationFile>$(SolutionDir)\..\bin\$(Configuration)\PiWeb.Volume.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <OutputPath>..\x64\Release\</OutputPath>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <DocumentationFile>..\x64\Release\PiWeb.Volume.xml</DocumentationFile>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Optimize>true</Optimize>
+  
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <PackageId>Zeiss.IMT.PiWeb.Volume</PackageId>
+    <Title>Carl Zeiss PiWeb Volume API</Title>
+    <Authors>Carl Zeiss IZfM Dresden</Authors>
+    <Description>The Carl Zeiss PiWeb-Volume API allows to compress and store volumemetric data for visualization in PiWeb.</Description>
+    <PackageProjectUrl>https://github.com/ZEISS-PiWeb/PiWeb-Volume</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/ZEISS-PiWeb/PiWeb-Volume/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageIconUrl>https://github.com/ZEISS-PiWeb/PiWeb-Volume/raw/master/logo6464.png</PackageIconUrl>
+    <PackageTags>Carl Zeiss PiWeb Volume</PackageTags>
+    <PackageReleaseNotes>NuGet package is now .NET Standard 2.0 compatible</PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Copyright>© Carl Zeiss IZfM Dresden</Copyright>
+    <VersionPrefix>1.1.0</VersionPrefix>
   </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.XML" />
+    <ProjectReference Include="..\PiWeb.Volume.Core\PiWeb.Volume.Core.vcxproj" />
   </ItemGroup>
+  
   <ItemGroup>
-    <Compile Include="CompressedVolume.cs" />
-    <Compile Include="DataTypeId.cs" />
-    <Compile Include="DirectionMap.cs" />
-    <Compile Include="Interop\InteropStream.cs" />
-    <Compile Include="Interop\InteropSliceWriter.cs" />
-    <Compile Include="Property.cs" />
-    <Compile Include="SliceStreamReader.cs" />
-    <Compile Include="SliceReader.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="Interop\InteropSliceReader.cs" />
-    <Compile Include="PreviewCreator.cs" />
-    <Compile Include="Direction.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReaderWriterExtensions.cs" />
-    <Compile Include="ResourceManager.cs" />
-    <Compile Include="FullVolumeWriter.cs" />
-    <Compile Include="UncompressedVolume.cs" />
-    <Compile Include="VolumeSlice.cs" />
-    <Compile Include="VolumeSliceProgress.cs" />
-    <Compile Include="VolumeSliceRange.cs" />
-    <Compile Include="VolumeSliceCollection.cs" />
-    <Compile Include="VolumeSliceRangeCollector.cs" />
-    <Compile Include="StreamWrapper.cs" />
-    <Compile Include="Volume.cs" />
-    <Compile Include="VolumeCompressionOptions.cs" />
-    <Compile Include="VolumeError.cs" />
-    <Compile Include="VolumeException.cs" />
-    <Compile Include="VolumeMetadata.cs" />
-    <Compile Include="VolumeSliceRangeDefinition.cs" />
-    <Compile Include="VolumeCompressionState.cs" />
-    <Compile Include="VolumeSliceRangeDefinitionExtensions.cs" />
     <None Include="Volume.snk" />
-  </ItemGroup>
-  <ItemGroup>
+
     <EmbeddedResource Include="Volume.de.resx">
       <DependentUpon>Volume.cs</DependentUpon>
     </EmbeddedResource>
@@ -92,5 +53,10 @@
       <DependentUpon>Volume.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <ItemGroup>
+    <None Include="$(SolutionDir)\PiWeb.Volume.Core\lib\*.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
+    <None Include="$(SolutionDir)\..\bin\$(Configuration)\PiWeb.Volume.Core.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
+  </ItemGroup>
+
 </Project>
