@@ -40,7 +40,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PiWeb.Volume.Core\PiWeb.Volume.Core.vcxproj" />
+    <ProjectReference Include="..\PiWeb.Volume.Core\PiWeb.Volume.Core.vcxproj" PrivateAssets="all" />
   </ItemGroup>
   
   <ItemGroup>
