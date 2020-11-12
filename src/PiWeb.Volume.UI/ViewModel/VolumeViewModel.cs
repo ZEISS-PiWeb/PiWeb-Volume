@@ -23,6 +23,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.CommandWpf;
     using Zeiss.IMT.PiWeb.Volume.UI.Model;
+    using Range = Zeiss.IMT.PiWeb.Volume.UI.Model.Range;
 
     #endregion
 

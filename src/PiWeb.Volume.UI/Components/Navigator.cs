@@ -18,7 +18,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
     using System.Windows.Input;
     using System.Windows.Media;
     using GalaSoft.MvvmLight.CommandWpf;
-    using Zeiss.IMT.PiWeb.Volume.UI.Model;
+    using Range = Zeiss.IMT.PiWeb.Volume.UI.Model.Range;
 
     #endregion
 
