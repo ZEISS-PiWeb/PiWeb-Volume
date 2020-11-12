@@ -19,7 +19,7 @@ namespace Zeiss.IMT.PiWeb.Volume
     /// <summary>
     /// Describes a continous range of slices in a specific direction.
     /// </summary>
-    public struct VolumeSliceRangeDefinition
+    public readonly struct VolumeSliceRangeDefinition
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="VolumeSliceRangeDefinition"/> struct.

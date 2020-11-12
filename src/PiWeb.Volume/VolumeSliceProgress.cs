@@ -13,7 +13,7 @@ namespace Zeiss.IMT.PiWeb.Volume
     /// <summary>
     /// Holds the properties that define a volume slice.
     /// </summary>
-    public struct VolumeSliceDefinition
+    public readonly struct VolumeSliceDefinition
     {
         /// <summary>
         /// Creates a decription of a volume slice.
