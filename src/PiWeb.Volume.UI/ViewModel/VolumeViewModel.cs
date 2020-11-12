@@ -13,6 +13,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
     #region usings
 
     using System;
+    using System.Buffers;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -23,6 +24,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.CommandWpf;
     using Zeiss.IMT.PiWeb.Volume.UI.Model;
+    using Range = Zeiss.IMT.PiWeb.Volume.UI.Model.Range;
 
     #endregion
 
@@ -200,8 +202,9 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
         {
             _Subcription?.Dispose();
 
-            var layer = UpdateLayer( _Preview, Math.Min( ( ushort ) Math.Round( _SelectedLayerIndex / ( double ) Minification ), ( ushort ) _MaxPreviewLayer ) );
-            WriteImage( PreviewLayer, layer );
+            var (width, height, slice) = FetchSlice( _Preview, Math.Min( ( ushort ) Math.Round( _SelectedLayerIndex / ( double ) Minification ), ( ushort ) _MaxPreviewLayer ) );
+            
+            WriteImage( PreviewLayer, width, height, slice );
             ShowPreview = true;
 
             PreviewLayerChanged?.Invoke( this, EventArgs.Empty );
@@ -210,42 +213,34 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
         private void UpdateLayerAsync()
         {
             _Subcription?.Dispose();
-            _Subcription = Observable.FromAsync( ct => Task.Run( () => UpdateLayer( Volume, ( ushort ) _SelectedLayerIndex ), ct ) ).ObserveOn( _Dispatcher ).Subscribe( l =>
+            _Subcription = Observable
+                .FromAsync( ct => Task.Run( () => FetchSlice( Volume, ( ushort ) _SelectedLayerIndex ), ct ) )
+                .ObserveOn( _Dispatcher )
+                .Subscribe( data =>
             {
-                WriteImage( SelectedLayer, l );
+                var (width, height, slice) = data;
+                WriteImage( SelectedLayer, width, height, slice );
                 ShowPreview = false;
             } );
         }
 
-        private Layer UpdateLayer( Volume volume, ushort sliceIndex )
+        private (int width, int height, VolumeSlice slice) FetchSlice( Volume volume, ushort sliceIndex )
         {
             var slice = volume.GetSlice( new VolumeSliceDefinition( _Direction, sliceIndex ) );
             volume.Metadata.GetSliceSize( _Direction, out var width, out var height );
 
-            return new Layer( slice.Data, width, height );
+            return ( width, height, slice );
         }
 
-        private void WriteImage( WriteableBitmap bitmap, Layer layer )
+        private void WriteImage( WriteableBitmap bitmap, int width, int height, VolumeSlice slice )
         {
-            bitmap.WritePixels( new Int32Rect( 0, 0, layer.Width, layer.Height ), layer.Data, layer.Width, 0 );
-        }
+            var bufferSize = width * height;
+            var buffer = ArrayPool<byte>.Shared.Rent( bufferSize );
+            slice.CopyDataTo( buffer );
 
-        #endregion
-
-        #region class Layer
-
-        private struct Layer
-        {
-            public Layer( byte[] data, int width, int height ) : this()
-            {
-                Data = data;
-                Width = width;
-                Height = height;
-            }
-
-            public byte[] Data { get; }
-            public int Width { get; }
-            public int Height { get; }
+            var sourceRect = new Int32Rect( 0, 0, width, height );
+            SelectedLayer.WritePixels( sourceRect, buffer, width, 0, 0 );
+            ArrayPool<byte>.Shared.Return( buffer );
         }
 
         #endregion
