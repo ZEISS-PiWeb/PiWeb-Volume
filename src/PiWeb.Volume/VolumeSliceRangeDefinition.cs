@@ -21,6 +21,8 @@ namespace Zeiss.IMT.PiWeb.Volume
     /// </summary>
     public readonly struct VolumeSliceRangeDefinition
     {
+        #region constructors
+
         /// <summary>
         /// Initializes a new instance of the <see cref="VolumeSliceRangeDefinition"/> struct.
         /// </summary>
@@ -33,6 +35,10 @@ namespace Zeiss.IMT.PiWeb.Volume
             Last = Math.Max( first, last );
             Direction = direction;
         }
+
+        #endregion
+
+        #region properties
 
         /// <summary>
         /// Gets the direction.
@@ -51,5 +57,12 @@ namespace Zeiss.IMT.PiWeb.Volume
         /// Gets the inclusive last slice.
         /// </summary>
         public ushort Last { get; }
+
+        /// <summary>
+        /// Returns the number of slices defined by this definition.
+        /// </summary>
+        public int Length => Last - First;
+
+        #endregion
     }
 }

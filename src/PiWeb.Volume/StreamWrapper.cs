@@ -13,6 +13,7 @@ namespace Zeiss.IMT.PiWeb.Volume
     #region usings
 
     using System;
+    using System.Buffers;
     using System.IO;
     using System.Runtime.InteropServices;
     using Zeiss.IMT.PiWeb.Volume.Interop;
@@ -24,9 +25,6 @@ namespace Zeiss.IMT.PiWeb.Volume
         #region members
 
         private readonly Stream _Stream;
-
-        private byte[] _Buffer;
-
         internal InteropStream Interop;
 
         #endregion
@@ -36,7 +34,6 @@ namespace Zeiss.IMT.PiWeb.Volume
         internal StreamWrapper( Stream stream )
         {
             _Stream = stream ?? throw new ArgumentNullException();
-            _Buffer = new byte[0];
             Interop = new InteropStream
             {
                 Read = Read,
@@ -51,22 +48,22 @@ namespace Zeiss.IMT.PiWeb.Volume
 
         private int Read( IntPtr pv, int cb )
         {
-            if( cb > _Buffer.Length )
-                _Buffer = new byte[cb];
+            var buffer = ArrayPool<byte>.Shared.Rent( cb );
 
-            var result = _Stream.Read( _Buffer, 0, cb );
-            Marshal.Copy( _Buffer, 0, pv, result );
+            var result = _Stream.Read( buffer, 0, cb );
+            Marshal.Copy( buffer, 0, pv, result );
+            ArrayPool<byte>.Shared.Return( buffer );
 
             return result;
         }
 
         private int Write( IntPtr pv, int cb )
         {
-            if( cb > _Buffer.Length )
-                _Buffer = new byte[cb];
+            var buffer = ArrayPool<byte>.Shared.Rent( cb );
 
-            Marshal.Copy( pv, _Buffer, 0, cb );
-            _Stream.Write( _Buffer, 0, cb );
+            Marshal.Copy( pv, buffer, 0, cb );
+            _Stream.Write( buffer, 0, cb );
+            ArrayPool<byte>.Shared.Return( buffer );
 
             return cb;
         }

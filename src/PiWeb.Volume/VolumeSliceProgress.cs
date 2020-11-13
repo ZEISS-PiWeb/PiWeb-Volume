@@ -15,6 +15,8 @@ namespace Zeiss.IMT.PiWeb.Volume
     /// </summary>
     public readonly struct VolumeSliceDefinition
     {
+        #region constructors
+
         /// <summary>
         /// Creates a decription of a volume slice.
         /// </summary>
@@ -26,6 +28,10 @@ namespace Zeiss.IMT.PiWeb.Volume
             Index = index;
         }
 
+        #endregion
+
+        #region properties
+
         /// <summary>
         /// Direction
         /// </summary>
@@ -35,5 +41,7 @@ namespace Zeiss.IMT.PiWeb.Volume
         /// Slice index
         /// </summary>
         public ushort Index { get; }
+
+        #endregion
     }
 }

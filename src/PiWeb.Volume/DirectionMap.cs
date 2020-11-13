@@ -32,13 +32,13 @@ namespace Zeiss.IMT.PiWeb.Volume
         {
             get
             {
-                if( direction == Direction.Z )
-                    return _Z;
-                if( direction == Direction.Y )
-                    return _Y;
-                if( direction == Direction.X )
-                    return _X;
-                throw new ArgumentOutOfRangeException( nameof(direction) );
+                return direction switch
+                {
+                    Direction.Z => _Z,
+                    Direction.Y => _Y,
+                    Direction.X => _X,
+                    _ => throw new ArgumentOutOfRangeException( nameof(direction) )
+                };
             }
             set
             {

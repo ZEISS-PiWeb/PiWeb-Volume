@@ -23,7 +23,6 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
     using System.Windows.Threading;
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.CommandWpf;
-    using Zeiss.IMT.PiWeb.Volume.UI.Model;
     using Range = Zeiss.IMT.PiWeb.Volume.UI.Model.Range;
 
     #endregion
@@ -38,19 +37,21 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
         #region members
 
+        private readonly Dispatcher _Dispatcher;
+
         private readonly Volume _Preview;
         private int _SelectedLayerIndex;
-        private WriteableBitmap _SelectedLayer;
         private int _MaxLayer;
-        private Direction _Direction;
+
+        private WriteableBitmap _SelectedLayer;
         private WriteableBitmap _PreviewLayer;
+
+        private Direction _Direction;
         private bool _ShowPreview;
-        private IDisposable _Subcription;
         private int _MaxPreviewLayer;
-        private Dispatcher _Dispatcher;
+        private IDisposable _Subcription;
 
         private Range _HorizontalRange;
-
         private Range _VerticalRange;
 
         #endregion
@@ -65,9 +66,11 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
             _Dispatcher = Dispatcher.CurrentDispatcher;
             _SelectedLayerIndex = model.Metadata.GetSize( Direction.Z ) / 2;
 
-            Observable.FromEventPattern<EventArgs>( this, nameof(PreviewLayerChanged) ).Throttle( TimeSpan.FromMilliseconds( 100 ) )
+            Observable
+                .FromEventPattern<EventArgs>( this, nameof(PreviewLayerChanged) )
+                .Throttle( TimeSpan.FromMilliseconds( 100 ) )
                 .Subscribe( n => UpdateLayerAsync() );
-            
+
             UpdateProjection();
         }
 
@@ -159,9 +162,9 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
                 case Direction.Z:
 
                     SelectedLayer = new WriteableBitmap( Volume.Metadata.SizeX, Volume.Metadata.SizeY, 96, 96,
-                                                         PixelFormats.Gray8, BitmapPalettes.Gray256 );
+                        PixelFormats.Gray8, BitmapPalettes.Gray256 );
                     PreviewLayer = new WriteableBitmap( _Preview.Metadata.SizeX, _Preview.Metadata.SizeY, 96, 96,
-                                                        PixelFormats.Gray8, BitmapPalettes.Gray256 );
+                        PixelFormats.Gray8, BitmapPalettes.Gray256 );
                     MaxLayer = Volume.Metadata.SizeZ - 1;
                     _MaxPreviewLayer = _Preview.Metadata.SizeZ - 1;
                     HorizontalRange = new Range( 0, Volume.Metadata.SizeX );
@@ -169,9 +172,9 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
                     break;
                 case Direction.Y:
                     SelectedLayer = new WriteableBitmap( Volume.Metadata.SizeX, Volume.Metadata.SizeZ, 96, 96,
-                                                         PixelFormats.Gray8, BitmapPalettes.Gray256 );
+                        PixelFormats.Gray8, BitmapPalettes.Gray256 );
                     PreviewLayer = new WriteableBitmap( _Preview.Metadata.SizeX, _Preview.Metadata.SizeZ, 96, 96,
-                                                        PixelFormats.Gray8, BitmapPalettes.Gray256 );
+                        PixelFormats.Gray8, BitmapPalettes.Gray256 );
                     MaxLayer = Volume.Metadata.SizeY - 1;
                     _MaxPreviewLayer = _Preview.Metadata.SizeY - 1;
                     HorizontalRange = new Range( 0, Volume.Metadata.SizeX );
@@ -179,9 +182,9 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
                     break;
                 case Direction.X:
                     SelectedLayer = new WriteableBitmap( Volume.Metadata.SizeY, Volume.Metadata.SizeZ, 96, 96,
-                                                         PixelFormats.Gray8, BitmapPalettes.Gray256 );
+                        PixelFormats.Gray8, BitmapPalettes.Gray256 );
                     PreviewLayer = new WriteableBitmap( _Preview.Metadata.SizeY, _Preview.Metadata.SizeZ, 96, 96,
-                                                        PixelFormats.Gray8, BitmapPalettes.Gray256 );
+                        PixelFormats.Gray8, BitmapPalettes.Gray256 );
                     MaxLayer = Volume.Metadata.SizeX - 1;
                     _MaxPreviewLayer = _Preview.Metadata.SizeX - 1;
                     HorizontalRange = new Range( 0, Volume.Metadata.SizeY );
@@ -202,8 +205,9 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
         {
             _Subcription?.Dispose();
 
-            var (width, height, slice) = FetchSlice( _Preview, Math.Min( ( ushort ) Math.Round( _SelectedLayerIndex / ( double ) Minification ), ( ushort ) _MaxPreviewLayer ) );
-            
+            var sliceIndex = Math.Min( ( ushort ) Math.Round( _SelectedLayerIndex / ( double ) Minification ), ( ushort ) _MaxPreviewLayer );
+            var (width, height, slice) = FetchSlice( _Preview, sliceIndex );
+
             WriteImage( PreviewLayer, width, height, slice );
             ShowPreview = true;
 
@@ -217,11 +221,11 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
                 .FromAsync( ct => Task.Run( () => FetchSlice( Volume, ( ushort ) _SelectedLayerIndex ), ct ) )
                 .ObserveOn( _Dispatcher )
                 .Subscribe( data =>
-            {
-                var (width, height, slice) = data;
-                WriteImage( SelectedLayer, width, height, slice );
-                ShowPreview = false;
-            } );
+                {
+                    var (width, height, slice) = data;
+                    WriteImage( SelectedLayer, width, height, slice );
+                    ShowPreview = false;
+                } );
         }
 
         private (int width, int height, VolumeSlice slice) FetchSlice( Volume volume, ushort sliceIndex )
@@ -232,14 +236,14 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
             return ( width, height, slice );
         }
 
-        private void WriteImage( WriteableBitmap bitmap, int width, int height, VolumeSlice slice )
+        private static void WriteImage( WriteableBitmap bitmap, int width, int height, VolumeSlice slice )
         {
             var bufferSize = width * height;
             var buffer = ArrayPool<byte>.Shared.Rent( bufferSize );
             slice.CopyDataTo( buffer );
 
             var sourceRect = new Int32Rect( 0, 0, width, height );
-            SelectedLayer.WritePixels( sourceRect, buffer, width, 0, 0 );
+            bitmap.WritePixels( sourceRect, buffer, width, 0, 0 );
             ArrayPool<byte>.Shared.Return( buffer );
         }
 
