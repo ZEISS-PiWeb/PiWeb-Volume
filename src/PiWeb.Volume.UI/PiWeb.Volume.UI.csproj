@@ -11,6 +11,12 @@
     <Product>PiWeb.Volume.UI</Product>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" NoWarn="NU1701" />
     <PackageReference Include="System.Reactive" Version="4.2.0" />

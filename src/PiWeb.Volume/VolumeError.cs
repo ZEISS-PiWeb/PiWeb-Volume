@@ -24,6 +24,11 @@ namespace Zeiss.IMT.PiWeb.Volume
         /// The io context allocation failed
         /// </summary>
         IoContextAllocationFailed = -0x00010001,
+        
+        /// <summary>
+        /// Reading from the input stream failed
+        /// </summary>
+        IoContextReadFailed = -0x00010002,
 
         /// <summary>
         /// The format context allocation failed

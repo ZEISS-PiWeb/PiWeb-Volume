@@ -23,7 +23,7 @@ namespace Zeiss.IMT.PiWeb.Volume
     {
         #region members
 
-        private readonly IProgress<ushort> _ProgressNotifier;
+        private readonly IProgress<VolumeSliceDefinition> _ProgressNotifier;
         private readonly CancellationToken _Ct;
 
         private readonly byte[][] _Data;
@@ -36,10 +36,11 @@ namespace Zeiss.IMT.PiWeb.Volume
 
         #region constructors
 
-        internal FullVolumeWriter( VolumeMetadata metadata, Direction direction, IProgress<ushort> progressNotifier = null, CancellationToken ct = default( CancellationToken ) )
+        internal FullVolumeWriter( VolumeMetadata metadata, Direction direction, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default( CancellationToken ) )
         {
             if( metadata == null )
                 throw new ArgumentNullException( nameof(metadata) );
+            
             _ProgressNotifier = progressNotifier;
             _Ct = ct;
 
@@ -75,15 +76,15 @@ namespace Zeiss.IMT.PiWeb.Volume
 
         internal void WriteSlice( IntPtr line, ushort width, ushort height, ushort z )
         {
-            _Ct.ThrowIfCancellationRequested();
+	        _Ct.ThrowIfCancellationRequested();
 
-            if( z >= _SizeZ )
-                return;
+	        if( z >= _SizeZ )
+		        return;
 
-            _ProgressNotifier?.Report( z );
+	        _ProgressNotifier?.Report( new VolumeSliceDefinition( Direction.Z, z ) );
 
-            for( var y = 0; y < _SizeY; y++ )
-                Marshal.Copy( line + y * width, _Data[ z ], y * _SizeX, _SizeX );
+	        for( var y = 0; y < _SizeY; y++ )
+		        Marshal.Copy( line + y * width, _Data[ z ], y * _SizeX, _SizeX );
         }
 
         #endregion

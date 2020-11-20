@@ -121,7 +121,7 @@ namespace Zeiss.IMT.PiWeb.Volume
             if( pz >= _PreviewSizeZ )
                 return;
 
-            for( int oy = 0, py = 0; py < _PreviewSizeY && oy < width; py++, oy += _Minification )
+            for( int oy = 0, py = 0; py < _PreviewSizeY && oy < height; py++, oy += _Minification )
             for( int ox = 0, px = 0; px < _PreviewSizeX && ox < width; px++, ox += _Minification )
                 _PreviewData[ pz ][ py * _PreviewSizeX + px ] =
                     Marshal.ReadByte( line, oy * width + ox );

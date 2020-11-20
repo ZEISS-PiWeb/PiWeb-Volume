@@ -17,6 +17,7 @@ namespace Zeiss.IMT.PiWeb.Volume
     using System.IO;
     using System.Linq;
     using System.Threading;
+    using Zeiss.IMT.PiWeb.Volume.Block;
 
     #endregion
 
@@ -73,15 +74,21 @@ namespace Zeiss.IMT.PiWeb.Volume
         /// <exception cref="VolumeException">Error during encoding</exception>
         public CompressedVolume Compress( VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
         {
-            var directionMap = new DirectionMap { [ Direction.Z ] = CompressDirection( Direction.Z, options, progress, ct ) };
+	        if( options.Encoder == BlockVolume.EncoderID )
+	        {
+		        return BlockVolume.Create( Data, Metadata, options, progress, ct );
+	        }
+			else
+			{
+				var directionMap = new DirectionMap { [ Direction.Z ] = CompressDirection( Direction.Z, options, progress, ct ) };
 
-            if( multiDirection )
-            {
-                directionMap[ Direction.X ] = CompressDirection( Direction.X, options, progress, ct );
-                directionMap[ Direction.Y ] = CompressDirection( Direction.Y, options, progress, ct );
-            }
-
-            return new CompressedVolume( Metadata, options, directionMap );
+				if( multiDirection )
+				{
+					directionMap[ Direction.X ] = CompressDirection( Direction.X, options, progress, ct );
+					directionMap[ Direction.Y ] = CompressDirection( Direction.Y, options, progress, ct );
+				}
+				return new CompressedVolume( Metadata, options, directionMap );
+			}
         }
 
         /// <summary>
@@ -95,7 +102,7 @@ namespace Zeiss.IMT.PiWeb.Volume
         /// <exception cref="NotSupportedException">The volume has no decompressed data</exception>
         private byte[] CompressDirection( Direction direction, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
         {
-            using( var outputStream = new MemoryStream() )
+	        using( var outputStream = new MemoryStream() )
             {
                 GetEncodedSliceSize( Metadata, direction, out var encodingSizeX, out var encodingSizeY );
 

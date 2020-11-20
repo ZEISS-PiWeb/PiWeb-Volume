@@ -18,6 +18,7 @@ namespace Zeiss.IMT.PiWeb.Volume
     using System.IO.Compression;
     using System.Runtime.InteropServices;
     using System.Threading;
+    using Zeiss.IMT.PiWeb.Volume.Block;
     using Zeiss.IMT.PiWeb.Volume.Interop;
 
     #endregion
@@ -98,13 +99,14 @@ namespace Zeiss.IMT.PiWeb.Volume
         /// <exception cref="VolumeException">Error during encoding</exception>
         public static Volume CreateCompressed( VolumeMetadata metadata, Stream stream, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
         {
-            var compressedData = CompressStream( stream, Direction.Z, metadata, options, progress, ct );
-            var dirctionMap = new DirectionMap
-            {
-                [ Direction.Z ] = compressedData
-            };
-
-            return new CompressedVolume( metadata, options, dirctionMap );
+	        if( options.Encoder == BlockVolume.EncoderID )
+	        {
+		        return BlockVolume.Create( stream, metadata, options, progress, ct );
+	        }
+	        else
+	        {
+		        return CompressedVolume.Create( stream, Direction.Z, metadata, options, progress, ct );
+	        }
         }
 
         [DllImport( "PiWeb.Volume.Core.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi )]
@@ -115,7 +117,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
         [DllImport( "PiWeb.Volume.Core.dll", CallingConvention = CallingConvention.Cdecl )]
         internal static extern int DecompressSlices( InteropStream inputStream, InteropSliceWriter outputStream, ushort index, ushort count );
-
+        
         /// <summary>
         /// Returns the volumes accessibility in the specified direction.
         /// </summary>
@@ -183,23 +185,7 @@ namespace Zeiss.IMT.PiWeb.Volume
             }
         }
 
-        private static byte[] CompressStream( Stream stream, Direction direction, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
-        {
-            using( var outputStream = new MemoryStream() )
-            {
-                GetEncodedSliceSize( metadata, direction, out var encodingSizeX, out var encodingSizeY );
-
-                var inputStreamWrapper = new SliceStreamReader( metadata, stream, progress, ct );
-                var outputStreamWrapper = new StreamWrapper( outputStream );
-
-                var error = ( VolumeError ) CompressVolume( inputStreamWrapper.Interop, outputStreamWrapper.Interop, encodingSizeX, encodingSizeY, options.Encoder, options.PixelFormat, options.GetOptionsString(), options.Bitrate );
-
-                if( error != VolumeError.Success )
-                    throw new VolumeException( error, Resources.FormatResource<Volume>( "Compression_ErrorText", error ) );
-
-                return outputStream.ToArray();
-            }
-        }
+       
 
         /// <summary>
         /// Loads volume data from the specified data stream.
@@ -215,7 +201,7 @@ namespace Zeiss.IMT.PiWeb.Volume
                 stream = new MemoryStream( stream.StreamToArray() );
 
             VolumeMetadata metaData;
-            DirectionMap directionMap = new DirectionMap();
+            var directionMap = new DirectionMap();
             VolumeCompressionOptions compressionOptions;
 
             using( var archive = new ZipArchive( stream ) )
@@ -288,7 +274,10 @@ namespace Zeiss.IMT.PiWeb.Volume
                 #endregion
             }
 
-            return new CompressedVolume( metaData, compressionOptions, directionMap );
+            if (compressionOptions?.Encoder == BlockVolume.EncoderID)
+	            return new BlockVolume( metaData, compressionOptions, directionMap );
+            else
+				return new CompressedVolume( metaData, compressionOptions, directionMap );
         }
 
         #endregion
