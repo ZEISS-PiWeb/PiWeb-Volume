@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <Platforms>x64</Platforms>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Zeiss.IMT.PiWeb.Volume.Viewer</RootNamespace>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <AssemblyTitle>PiWeb.Volume.Viewer</AssemblyTitle>
+    <Product>PiWeb.Volume.Viewer</Product>    
+    <UseWPF>true</UseWPF>    
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
+    <PackageReference Include="System.Reactive" Version="4.2.0" />
+    <PackageReference Include="Unity" Version="5.11.1" />
+  </ItemGroup> 
+  <ItemGroup>
+    <Resource Include="Effects\*.ps" />
+    <Resource Include="Resources\**\*.png" />
+  </ItemGroup> 
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)\PiWeb.Volume\PiWeb.Volume.csproj" />
+    <ProjectReference Include="$(SolutionDir)\PiWeb.Volume.Convert\PiWeb.Volume.Convert.csproj" />
+    <ProjectReference Include="..\PiWeb.Volume.UI\PiWeb.Volume.UI.csproj" />   
+  </ItemGroup> 
+</Project>

@@ -16,23 +16,20 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Model
 
     #endregion
 
-    public class VolumeProgressEventArgs : EventArgs
+    public class DoubleProgress : IProgress<double>
     {
-        #region constructors
+	    #region events
 
-        public VolumeProgressEventArgs( double progress, string message )
-        {
-            Progress = progress;
-            Message = message;
-        }
+        public event EventHandler<VolumeProgressEventArgs> ProgressChanged;
 
         #endregion
 
-        #region properties
+        #region interface IProgress<VolumeSliceDefinition>
 
-        public double Progress { get; }
-
-        public string Message { get; }
+        public void Report( double value )
+        {
+	        ProgressChanged?.Invoke( this, new VolumeProgressEventArgs( value, $"Loaded {value:P}" ) );
+        }
 
         #endregion
     }

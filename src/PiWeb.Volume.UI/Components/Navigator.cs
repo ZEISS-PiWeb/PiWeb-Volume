@@ -347,7 +347,11 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
         protected override void OnScrollChanged( ScrollChangedEventArgs e )
         {
             base.OnScrollChanged( e );
+            
             UpdateRanges();
+            
+            HorizontalPanning = HorizontalOffset;
+            VerticalPanning = VerticalOffset;
         }
 
         private static void OnFitChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )

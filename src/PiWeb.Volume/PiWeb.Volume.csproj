@@ -16,6 +16,8 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <PackageVersion>1.2.1</PackageVersion>
     <LangVersion>8</LangVersion>
+    <AssemblyVersion>1.2.1</AssemblyVersion>
+    <FileVersion>1.2.1</FileVersion>    
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -25,7 +27,6 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-
     <PackageId>Zeiss.IMT.PiWeb.Volume</PackageId>
     <Title>Carl Zeiss PiWeb Volume API</Title>
     <Authors>Carl Zeiss IZfM Dresden</Authors>
@@ -61,8 +62,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Buffers" Version="4.5.1" />
-    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="5.0.0" />
+    <PackageReference Include="System.Buffers" />   
   </ItemGroup>
 
 </Project>

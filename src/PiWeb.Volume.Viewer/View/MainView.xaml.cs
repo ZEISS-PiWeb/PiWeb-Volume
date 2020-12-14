@@ -1,4 +1,4 @@
-#region copyright
+﻿#region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
 /* Carl Zeiss IMT (IZfM Dresden)                   */
@@ -8,13 +8,19 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.UI.Interfaces
+namespace Zeiss.IMT.PiWeb.Volume.Viewer.View
 {
-    public interface IFileService
+    /// <summary>
+    /// Interaction logic for MainView.xaml
+    /// </summary>
+    public partial class MainView
     {
-        #region methods
+        #region constructors
 
-        bool SelectOpenFileName( out string fileName );
+        public MainView()
+        {
+            InitializeComponent();
+        }
 
         #endregion
     }

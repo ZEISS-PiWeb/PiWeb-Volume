@@ -21,7 +21,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Services
     {
         #region constants
 
-        private const string VolumeFileFilter = "PiWeb volumes|*.volx";
+        private const string VolumeFileFilter = "All volume files|*.uint16_scv;*.vgi;*.volx|PiWeb volumes|*.volx|Calypso volumes|*.uint16_scv|VG volumes|*.vgi";
 
         #endregion
 

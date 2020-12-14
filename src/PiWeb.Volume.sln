@@ -10,7 +10,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume", "PiWeb.Volum
 		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3} = {7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume.UI", "PiWeb.Volume.UI\PiWeb.Volume.UI.csproj", "{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume.Viewer", "PiWeb.Volume.Viewer\PiWeb.Volume.Viewer.csproj", "{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume.Convert", "PiWeb.Volume.Convert\PiWeb.Volume.Convert.csproj", "{EE2E6934-C175-4029-9761-57E6A2806831}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume.Compare", "PiWeb.Volume.Compare\PiWeb.Volume.Compare.csproj", "{B20ABEBF-7831-4FF1-9515-4C3C839A1038}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume.UI", "PiWeb.Volume.UI\PiWeb.Volume.UI.csproj", "{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +36,18 @@ Global
 		{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}.Release|x64.Build.0 = Release|x64
 		{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}.Debug|x64.ActiveCfg = Debug|x64
 		{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}.Debug|x64.Build.0 = Debug|x64
+		{EE2E6934-C175-4029-9761-57E6A2806831}.Debug|x64.ActiveCfg = Debug|x64
+		{EE2E6934-C175-4029-9761-57E6A2806831}.Debug|x64.Build.0 = Debug|x64
+		{EE2E6934-C175-4029-9761-57E6A2806831}.Release|x64.ActiveCfg = Release|x64
+		{EE2E6934-C175-4029-9761-57E6A2806831}.Release|x64.Build.0 = Release|x64
+		{B20ABEBF-7831-4FF1-9515-4C3C839A1038}.Release|x64.ActiveCfg = Release|Any CPU
+		{B20ABEBF-7831-4FF1-9515-4C3C839A1038}.Release|x64.Build.0 = Release|Any CPU
+		{B20ABEBF-7831-4FF1-9515-4C3C839A1038}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B20ABEBF-7831-4FF1-9515-4C3C839A1038}.Debug|x64.Build.0 = Debug|Any CPU
+		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Release|x64.ActiveCfg = Release|Any CPU
+		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Release|x64.Build.0 = Release|Any CPU
+		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Debug|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

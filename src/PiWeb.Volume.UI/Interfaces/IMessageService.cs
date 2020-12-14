@@ -3,19 +3,17 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
 /* Carl Zeiss IMT (IZfM Dresden)                   */
 /* Softwaresystem PiWeb                            */
-/* (c) Carl Zeiss 2019                             */
+/* (c) Carl Zeiss 2020                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #endregion
 
 namespace Zeiss.IMT.PiWeb.Volume.UI.Interfaces
 {
-    public interface IFileService
-    {
-        #region methods
+	using System.Windows;
 
-        bool SelectOpenFileName( out string fileName );
-
-        #endregion
-    }
+	public interface IMessageService
+	{
+		void ShowMessage( MessageBoxImage image, string message );
+	}
 }
