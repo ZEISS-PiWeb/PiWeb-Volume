@@ -77,7 +77,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 					if( gz >= _SizeZ || gy >= _SizeY || gx >= _SizeX )
 						continue;
 
-					result[ bz ][ gy * _SizeX + gx ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
+					result[ gz ][ gy * _SizeX + gx ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
 				}
 			}, null, null, progress, ct );
 

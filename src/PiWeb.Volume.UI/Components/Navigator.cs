@@ -18,7 +18,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
     using System.Windows.Input;
     using System.Windows.Media;
     using GalaSoft.MvvmLight.CommandWpf;
-    using Range = Zeiss.IMT.PiWeb.Volume.UI.Model.Range;
+    using Zeiss.IMT.PiWeb.Volume.UI.Model;
 
     #endregion
 
@@ -62,10 +62,10 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
             "Fit", typeof( Rect ), typeof( Navigator ), new PropertyMetadata( Rect.Empty, OnFitChanged ) );
 
         public static readonly DependencyProperty HorizontalRangeProperty = DependencyProperty.Register(
-            "HorizontalRange", typeof( Range ), typeof( Navigator ), new PropertyMetadata( default( Range ) ) );
+            "HorizontalRange", typeof( DoubleRange ), typeof( Navigator ), new PropertyMetadata( default( DoubleRange ) ) );
 
         public static readonly DependencyProperty VerticalRangeProperty = DependencyProperty.Register(
-            "VerticalRange", typeof( Range ), typeof( Navigator ), new PropertyMetadata( default( Range ) ) );
+            "VerticalRange", typeof( DoubleRange ), typeof( Navigator ), new PropertyMetadata( default( DoubleRange ) ) );
         
 
         public static readonly ICommand ZoomToContentSizeCommand = new RelayCommand<Navigator>( ExecuteZoomToContentSize );
@@ -79,15 +79,15 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
 
         #region properties
 
-        public Range HorizontalRange
+        public DoubleRange HorizontalRange
         {
-            get => ( Range ) GetValue( HorizontalRangeProperty );
+            get => ( DoubleRange ) GetValue( HorizontalRangeProperty );
             set => SetCurrentValue( HorizontalRangeProperty, value );
         }
 
-        public Range VerticalRange
+        public DoubleRange VerticalRange
         {
-            get => ( Range ) GetValue( VerticalRangeProperty );
+            get => ( DoubleRange ) GetValue( VerticalRangeProperty );
             set => SetCurrentValue( VerticalRangeProperty, value );
         }
 
@@ -340,8 +340,8 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
                 down = ( VerticalOffset + ActualHeight ) / zoom;
             }
 
-            HorizontalRange = new Range( left, right );
-            VerticalRange = new Range( up, down );
+            HorizontalRange = new DoubleRange( left, right );
+            VerticalRange = new DoubleRange( up, down );
         }
 
         protected override void OnScrollChanged( ScrollChangedEventArgs e )

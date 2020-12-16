@@ -36,6 +36,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Viewer
 
 			container.RegisterType<IFileService, FileService>();
 			container.RegisterType<IMessageService, MessageService>();
+			container.RegisterType<IViewService, ViewService>();
 
 			var mainWindowViewModel = container.Resolve<MainViewModel>();
 			var window = new MainView { DataContext = mainWindowViewModel };

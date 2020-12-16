@@ -3,21 +3,25 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
 /* Carl Zeiss IMT (IZfM Dresden)                   */
 /* Softwaresystem PiWeb                            */
-/* (c) Carl Zeiss 2019                             */
+/* (c) Carl Zeiss 2020                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #endregion
 
 namespace Zeiss.IMT.PiWeb.Volume.UI.Interfaces
 {
-    public interface IFileService
-    {
-        #region methods
+	#region usings
 
-        bool SelectOpenFileName( out string fileName );
-        
-        bool SelectSaveFileName( out string fileName );
+	using GalaSoft.MvvmLight;
 
-        #endregion
-    }
+	#endregion
+
+	public interface IViewService
+	{
+		#region methods
+
+		public bool? RequestView( ViewModelBase viewModel );
+
+		#endregion
+	}
 }

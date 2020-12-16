@@ -78,12 +78,12 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		private void Encode( Func<byte[][]> getLayerAction, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition> progress )
 		{
 			var (bcx, bcy, _) = BlockVolume.GetBlockCount( metadata );
-			
+
 			var blockCount = bcx * bcy;
 			var inputBlocks = new double[blockCount][];
 			var resultBlocks = new short[blockCount][];
 			var resultLengths = new ushort[blockCount];
-			
+
 			for( var i = 0; i < blockCount; i++ )
 			{
 				inputBlocks[ i ] = new double[BlockVolume.N3];
@@ -91,7 +91,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			}
 
 			using var writer = new BinaryWriter( output );
-
+			
 			var quantization = Quantization.Calculate( _Options, false );
 			var zigzag = ZigZag.Calculate();
 
@@ -100,21 +100,35 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 				CreateLayer( getLayerAction(), inputBlocks, blockIndexZ, metadata );
 				EncodeLayer( inputBlocks, resultBlocks, resultLengths, quantization, zigzag );
 
-				for (var blockIndex = 0; blockIndex < blockCount; blockIndex++)
+				for( var blockIndex = 0; blockIndex < blockCount; blockIndex++ )
 				{
-					var length = resultLengths[ blockIndex ];
+					var resultLength = resultLengths[ blockIndex ];
 					var block = resultBlocks[ blockIndex ];
+
+					var length = resultLength & 0x0FFF;
+					var firstLength = ( resultLength & 0b0011000000000000 ) >> 12;
+					var otherLength = ( resultLength & 0b1100000000000000 ) >> 14;
 					
-					writer.Write( length );
+					writer.Write( resultLength );
 					
-					for( var i = 0; i < length; i++ )
-						writer.Write( block[ i ] );
+					if( length > 0 )
+						if (firstLength == 2)
+							writer.Write( block[ 0 ] );
+						else
+							writer.Write( (sbyte)block[ 0 ] );
+
+					for( var i = 1; i < length; i++ )
+						if (otherLength == 2)
+							writer.Write( block[ i ] );
+						else
+							writer.Write( (sbyte)block[ i ] );
+						
 				}
 
 				progress.Report( new VolumeSliceDefinition( Direction.Z, ( ushort ) ( blockIndexZ * BlockVolume.N ) ) );
 			}
 		}
-		
+
 		private static void EncodeLayer( double[][] inputBlocks, short[][] resultBlocks, ushort[] resultLengths, double[] quantization, int[] zigzag )
 		{
 			Parallel.For( 0, inputBlocks.Length,
@@ -123,7 +137,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 				{
 					var inputBlock = inputBlocks[ blockIndex ];
 					var resultBlock = resultBlocks[ blockIndex ];
-					
+
 					//1. Cosine transform
 					DiscreteCosineTransform.Transform( inputBlock, buffer );
 
@@ -140,17 +154,33 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 						resultBlock[ i ] = ( short ) Math.Max( short.MinValue, Math.Min( short.MaxValue, Math.Round( inputBlock[ i ] ) ) );
 
 					var count = 0;
+					var isShort = false;
 
 					for( var i = 0; i < BlockVolume.N3; i++ )
 					{
-						if( resultBlock[ i ] != 0 )
+						var value = resultBlock[ i ];
+						if( value != 0 )
 							count = i + 1;
+
+						if( i > 0 )
+							isShort |= IsShort( value );
 					}
 
-					resultLengths[blockIndex] = ( ushort ) count;
-
+					//resultLength has 16 bits: 
+					//Bit  0 - 11: index of last value that is greater than 0
+					//Bit 12 - 13: number of bytes of the first value of the block
+					//Bit 14 - 15: number of bytes of the other values of the block
+					resultLengths[ blockIndex ] = ( ushort ) ( count & 0x0FFF );
+					resultLengths[ blockIndex ] = ( ushort ) ( resultLengths[ blockIndex ] | ( IsShort( resultBlock[ 0 ] ) ? 2 << 12 : 1 << 12 ) );
+					resultLengths[ blockIndex ] = ( ushort ) ( resultLengths[ blockIndex ] | ( isShort ? 2 << 14 : 1 << 14 ) );
+					
 					return buffer;
 				}, buffer => ArrayPool<double>.Shared.Return( buffer ) );
+		}
+
+		private static bool IsShort( short value )
+		{
+			return value > byte.MaxValue || value < byte.MinValue;
 		}
 
 		private static void CreateLayer( byte[][] layer, double[][] blocks, ushort blockIndexZ, VolumeMetadata metadata )

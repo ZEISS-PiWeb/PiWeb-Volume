@@ -23,8 +23,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Viewer.ViewModel
 
 		public MainViewModel(
 			IFileService fileService,
-			IMessageService messageService )
-			: base( fileService, messageService )
+			IMessageService messageService,
+			IViewService viewService )
+			: base( fileService, messageService, viewService )
 		{
 		}
 

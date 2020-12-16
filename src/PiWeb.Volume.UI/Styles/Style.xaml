@@ -57,7 +57,7 @@
     <Style x:Key="ToolbarButtonStyle" TargetType="{x:Type ButtonBase}">
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Padding" Value="1" />
+        <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template">
             <Setter.Value>
@@ -67,16 +67,15 @@
                             x:Name="outerBorder"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="2"
+                            CornerRadius="1"
                             SnapsToDevicePixels="true">
                             <Border
                                 x:Name="innerBorder"
-                                Padding="{TemplateBinding Padding}"
                                 Background="{TemplateBinding Background}"
-                                BorderThickness="1"
                                 CornerRadius="1"
                                 SnapsToDevicePixels="true">
                                 <ContentPresenter
+                                    Margin="{TemplateBinding Padding}"
                                     HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                     SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />

@@ -20,6 +20,16 @@
     <HeaderedContentControl Header="File:">
         <Grid Height="22">
             <DockPanel>
+                
+                <Button
+                    HorizontalAlignment="Right"
+                    Command="{Binding SaveVolumeCommand}"
+                    Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Style="{StaticResource ToolbarButtonStyle}"
+                    DockPanel.Dock="Right">
+                    <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/save.png" Style="{StaticResource Icon}" />
+                </Button>
+                
                 <Button
                     HorizontalAlignment="Right"
                     Command="{Binding OpenVolumeCommand}"
@@ -36,7 +46,7 @@
                     DockPanel.Dock="Right">
                     <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/compress_table.png" Style="{StaticResource Icon}" />
                 </Button>
-
+                
                 <TextBox
                     Margin="8,0"
                     VerticalContentAlignment="Center"

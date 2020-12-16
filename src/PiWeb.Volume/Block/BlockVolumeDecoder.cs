@@ -78,7 +78,6 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 			using var reader = new BinaryReader( input );
 
-
 			for( ushort biz = 0; biz < bcz; biz++ )
 			{
 				ct.ThrowIfCancellationRequested();
@@ -100,26 +99,39 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		{
 			for( var i = 0; i < blockCount; i++ )
 			{
-				var count = reader.ReadUInt16();
+				var resultLength =  reader.ReadUInt16();
+				
+				var length = resultLength & 0x0FFF;
+				var firstLength = ( resultLength & 0b0011000000000000 ) >> 12;
+				var otherLength = ( resultLength & 0b1100000000000000 ) >> 14;
 
-				reader.BaseStream.Seek( count * sizeof( short ), SeekOrigin.Current );
+				var count = 0;
+				if( length > 0 )
+					count += firstLength;
+				if( length > 1 )
+					count += ( length - 1 ) * otherLength;
+				
+				reader.BaseStream.Seek( count, SeekOrigin.Current );
 			}
 		}
 
 		private void ReadLayer( BinaryReader reader, short[][] encodedBlocks, ushort[] encodedBlockLengths )
 		{
-			var buffer = ArrayPool<byte>.Shared.Rent( BlockVolume.N3 * sizeof( short ) );
-
 			for( var i = 0; i < encodedBlocks.Length; i++ )
 			{
-				var count = encodedBlockLengths[ i ] = reader.ReadUInt16();
-
-				reader.BaseStream.Read( buffer, 0, count * sizeof( short ) );
-
-				Buffer.BlockCopy( buffer, 0, encodedBlocks[ i ], 0, count * sizeof( short ) );
+				var resultLength =  reader.ReadUInt16();
+				
+				var length = resultLength & 0x0FFF;
+				var firstLength = ( resultLength & 0b0011000000000000 ) >> 12;
+				var otherLength = ( resultLength & 0b1100000000000000 ) >> 14;
+				
+				encodedBlockLengths[ i ] = (ushort)length;
+				if( length > 0 )
+					encodedBlocks[ i ][ 0 ] = firstLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
+				
+				for (var j = 1; j < length; j++)
+					encodedBlocks[ i ][ j ] = otherLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
 			}
-
-			ArrayPool<byte>.Shared.Return( buffer );
 		}
 
 		private static void DecodeLayer(

@@ -14,7 +14,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 
 	using System;
 	using System.IO;
-	using Zeiss.IMT.PiWeb.Volume;
+	using System.Threading;
 
 	#endregion
 
@@ -33,6 +33,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		public static UncompressedVolume FromVgi(
 			Stream vgiStream,
 			Stream dataStream,
+			bool extraPolate,
+			byte? minValue,
+			byte? maxValue,
 			IProgress<double> progress )
 		{
 			var vgi = Vgi.Parse( vgiStream );
@@ -41,7 +44,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 
 			switch( vgi.BitDepth )
 			{
-				case 16: return FromUint16( dataStream, vgi, progress );
+				case 16: return FromUint16( dataStream, vgi, extraPolate, minValue, maxValue, progress );
 				case 8: return FromUint8( dataStream, vgi, progress );
 				default: throw new NotSupportedException( "This converter can only convert 8 bit and 16 bit volumes." );
 			}
@@ -54,7 +57,12 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		/// </summary>
 		/// <param name="scvStream">Stream containing the scv data.</param>
 		/// <param name="progress">Progress</param>
-		public static UncompressedVolume FromScv( Stream scvStream, IProgress<double>? progress )
+		public static UncompressedVolume FromScv(
+			Stream scvStream,
+			bool extraPolate,
+			byte? minValue,
+			byte? maxValue,
+			IProgress<double> progress )
 		{
 			var scv = Scv.Parse( scvStream );
 
@@ -62,7 +70,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 
 			switch( scv.BitDepth )
 			{
-				case 16: return FromUint16( scvStream, scv, progress );
+				case 16: return FromUint16( scvStream, scv, extraPolate, minValue, maxValue, progress );
 				case 8: return FromUint8( scvStream, scv, progress );
 				default: throw new NotSupportedException( "This converter can only convert 8 bit and 16 bit volumes." );
 			}
@@ -74,8 +82,30 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		/// </summary>
 		/// <param name="uint16Stream">Stream containing the uint16 data.</param>
 		/// <param name="metadata">Metadata</param>
+		/// <param name="maxValue">Maximum value for extrapolation. </param>
 		/// <param name="progress">Progress</param>
-		public static UncompressedVolume FromUint16( Stream uint16Stream, VolumeMetadata metadata, IProgress<double>? progress )
+		/// <param name="extrapolate">Determines whether or not to extrapolate the value range.</param>
+		/// <param name="minValue"></param>
+		public static UncompressedVolume FromUint16( Stream uint16Stream, VolumeMetadata metadata, bool extrapolate, byte? minValue, byte? maxValue, IProgress<double>? progress )
+		{
+			if( extrapolate )
+			{
+				if( !minValue.HasValue || !maxValue.HasValue )
+				{
+					var (automaticMin, automaticMax) = GetMinMax16( uint16Stream, metadata, progress );
+					minValue ??= automaticMin;
+					maxValue ??= automaticMax;
+				}
+
+				return ReadExtrapolated16( uint16Stream, metadata, minValue.Value, maxValue.Value, progress );
+			}
+			else
+			{
+				return Read16( uint16Stream, metadata, progress );
+			}
+		}
+
+		private static UncompressedVolume Read16( Stream uint16Stream, VolumeMetadata metadata, IProgress<double>? progress )
 		{
 			var sx = metadata.SizeX;
 			var sy = metadata.SizeY;
@@ -87,7 +117,6 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 				data[ z ] = new byte[sy * sx];
 
 			var buffer = new byte[sx * sy * 2];
-
 			for( var z = 0; z < sz; z++ )
 			{
 				progress?.Report( ( double ) z / sz );
@@ -100,6 +129,95 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 			}
 
 			return new UncompressedVolume( metadata, data );
+		}
+
+		private static UncompressedVolume ReadExtrapolated16( Stream uint16Stream, VolumeMetadata metadata, byte minValue, byte maxValue, IProgress<double>? progress )
+		{
+			var sx = metadata.SizeX;
+			var sy = metadata.SizeY;
+			var sz = metadata.SizeZ;
+
+			var data = new byte[sz][];
+
+			for( var z = 0; z < sz; z++ )
+				data[ z ] = new byte[sy * sx];
+
+			if( maxValue <= minValue )
+				return new UncompressedVolume( metadata, data );
+
+			var buffer = new byte[sx * sy * 2];
+			var shortbuffer = new ushort[sx * sy];
+			var shortMin = minValue << 8;
+			
+			var factor = 256 / ( double ) ( maxValue - minValue );
+			var toByteFactor = 1.0 / 256;
+			
+			for( var z = 0; z < sz; z++ )
+			{
+				progress?.Report( ( double ) z / sz );
+
+				uint16Stream.Read( buffer, 0, sx * sy * 2 );
+				Buffer.BlockCopy( buffer, 0, shortbuffer, 0, sx * sy * 2 );
+				
+				var layer = data[ z ];
+
+				for( var index = 0; index < sx * sy; index++ )
+					layer[ index ] = ( byte ) (Math.Max( ushort.MinValue, Math.Min( ushort.MaxValue, ( shortbuffer[ index ] - shortMin ) * factor ) ) * toByteFactor );
+			}
+
+			return new UncompressedVolume( metadata, data );
+		}
+
+		private static (byte Min, byte Max) GetMinMax16( Stream uint16Stream, VolumeMetadata metadata, IProgress<double> progress )
+		{
+			byte? minimum = null;
+			byte maximum = 0;
+			var histogram = CreateHistogram( uint16Stream, metadata, progress );
+
+			var threshold = ( long ) metadata.SizeX * metadata.SizeY * metadata.SizeZ / 1000;
+
+			for( var i = 0; i <= byte.MaxValue; i++ )
+			{
+				if( histogram[ i ] < threshold )
+					continue;
+
+				if( !minimum.HasValue )
+					minimum = ( byte ) i;
+
+				maximum = ( byte ) i;
+			}
+
+			return ( minimum ?? 0, maximum );
+		}
+
+		private static long[] CreateHistogram( Stream uint16Stream, VolumeMetadata metadata, IProgress<double> progress )
+		{
+			var result = new long[256];
+
+			var sx = metadata.SizeX;
+			var sy = metadata.SizeY;
+			var sz = metadata.SizeZ;
+
+			var buffer = new byte[sx * sy * 2];
+
+			var position = uint16Stream.Position;
+
+			for( var z = 0; z < sz; z++ )
+			{
+				progress?.Report( ( double ) z / sz );
+
+				uint16Stream.Read( buffer, 0, sx * sy * 2 );
+
+				for( var index = 0; index < sx * sy; index++ )
+				{
+					var value = buffer[ index * 2 + 1 ];
+					Interlocked.Increment( ref result[ value ] );
+				}
+			}
+
+			uint16Stream.Seek( position, SeekOrigin.Begin );
+
+			return result;
 		}
 
 		/// <summary>

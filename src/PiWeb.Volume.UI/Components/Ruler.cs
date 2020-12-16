@@ -18,7 +18,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media;
-    using Range = Zeiss.IMT.PiWeb.Volume.UI.Model.Range;
+    using Zeiss.IMT.PiWeb.Volume.UI.Model;
 
     #endregion
 
@@ -27,7 +27,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
         #region members
 
         public static DependencyProperty ValueRangeProperty =
-            DependencyProperty.Register( "ValueRange", typeof( Range ), typeof( Ruler ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.AffectsRender )
+            DependencyProperty.Register( "ValueRange", typeof( DoubleRange? ), typeof( Ruler ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.AffectsRender )
             );
 
         public static DependencyProperty StrokeThicknessProperty =
@@ -47,7 +47,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
 
 
         public static DependencyProperty HighlightedRangeProperty =
-            DependencyProperty.Register( "HighlightedRange", typeof( Range ), typeof( Ruler ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.AffectsRender )
+            DependencyProperty.Register( "HighlightedRange", typeof( DoubleRange? ), typeof( Ruler ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.AffectsRender )
             );
 
         public static DependencyProperty OrientationProperty =
@@ -58,9 +58,9 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
 
         #region properties
 
-        public Range ValueRange
+        public DoubleRange? ValueRange
         {
-            get => ( Range ) GetValue( ValueRangeProperty );
+            get => ( DoubleRange? ) GetValue( ValueRangeProperty );
             set => SetCurrentValue( ValueRangeProperty, value );
         }
 
@@ -92,9 +92,9 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
             set => SetCurrentValue( HighlightBrushProperty, value );
         }
 
-        public Range HighlightedRange
+        public DoubleRange? HighlightedRange
         {
-            get => ( Range ) GetValue( HighlightedRangeProperty );
+            get => ( DoubleRange? ) GetValue( HighlightedRangeProperty );
             set => SetCurrentValue( HighlightedRangeProperty, value );
         }
 
@@ -129,22 +129,19 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
             if( ActualWidth <= 0 || ActualHeight <= 0 )
                 return;
 
-            if( ValueRange == null || ValueRange.Size <= 0 )
+            if( ValueRange is null || ValueRange.Value.Size <= 0 )
                 return;
 
             var pen = new Pen( Stroke, StrokeThickness );
 
             ctx.PushGuidelineSet( new GuidelineSet( new[] { pen.Thickness / 2 }, new[] { pen.Thickness / 2 } ) );
 
-            var valueRange = new Range( ValueRange.Start, ValueRange.Stop );
+            var valueRange = new DoubleRange( ValueRange.Value.Start, ValueRange.Value.Stop );
 
             if( Invert )
-            {
-                valueRange.Start = ValueRange.Stop;
-                valueRange.Stop = ValueRange.Start;
-            }
-
-            var valueRangeBase = new Range( valueRange.Start, valueRange.Stop );
+	            valueRange = valueRange.Invert();
+            
+            var valueRangeBase = new DoubleRange( valueRange.Start, valueRange.Stop );
 
             var w = ActualWidth;
             var h = ActualHeight;
@@ -166,14 +163,15 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
 
             var step = CalculateStep( valueRange.Size, w );
 
-            var drawingRange = new Range( 0, w );
+            var drawingRange = new DoubleRange( 0, w );
 
-            if( HighlightedRange != null && HighlightedRange.Size > 0 )
+            if( HighlightedRange.HasValue && HighlightedRange.Value.Size > 0 )
             {
-                var highlightedValueRange = new Range( Range.Clip( valueRangeBase, HighlightedRange.Start ), Range.Clip( valueRangeBase, HighlightedRange.Stop ) );
+	            var highlightedRange = HighlightedRange.Value;
+                var highlightedValueRange = new DoubleRange( DoubleRange.Clip( valueRangeBase, highlightedRange.Start ), DoubleRange.Clip( valueRangeBase, highlightedRange.Stop ) );
 
-                var highlightedDrawingRange = new Range(
-                    Math.Floor( Range.Transform( highlightedValueRange.Start, valueRangeBase, drawingRange ) ), Math.Floor( Range.Transform( highlightedValueRange.Stop, valueRangeBase, drawingRange ) ) );
+                var highlightedDrawingRange = new DoubleRange(
+                    Math.Floor( DoubleRange.Transform( highlightedValueRange.Start, valueRangeBase, drawingRange ) ), Math.Floor( DoubleRange.Transform( highlightedValueRange.Stop, valueRangeBase, drawingRange ) ) );
 
                 if( Invert )
                     highlightedDrawingRange.Invert();
@@ -189,7 +187,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
 
                 var value = firstValue + sign * ( step + i * step );
 
-                var x = Math.Floor( Range.Transform( value, valueRange, drawingRange ) );
+                var x = Math.Floor( DoubleRange.Transform( value, valueRange, drawingRange ) );
 
                 if( Math.Abs( value % ( 10 * step ) ) < 1e-9 )
                 {

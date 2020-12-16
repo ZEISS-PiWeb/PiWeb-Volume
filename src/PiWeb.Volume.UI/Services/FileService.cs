@@ -21,7 +21,8 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Services
     {
         #region constants
 
-        private const string VolumeFileFilter = "All volume files|*.uint16_scv;*.vgi;*.volx|PiWeb volumes|*.volx|Calypso volumes|*.uint16_scv|VG volumes|*.vgi";
+        private const string AllVolumeFileFilter = "All volume files|*.uint16_scv;*.vgi;*.volx|PiWeb volumes|*.volx|Calypso volumes|*.uint16_scv|VG volumes|*.vgi";
+        private const string PiWebVolumeFileFilter = "PiWeb volumes|*.volx";
 
         #endregion
 
@@ -33,7 +34,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Services
 
             var dialog = new OpenFileDialog
             {
-                Filter = VolumeFileFilter,
+                Filter = AllVolumeFileFilter,
                 CheckFileExists = true,
                 CheckPathExists = true,
                 Multiselect = false
@@ -44,6 +45,22 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Services
 
             fileName = dialog.FileName;
             return true;
+        }
+        
+        public bool SelectSaveFileName( out string fileName )
+        {
+	        fileName = null;
+
+	        var dialog = new SaveFileDialog
+	        {
+		        Filter = PiWebVolumeFileFilter
+	        };
+
+	        if( dialog.ShowDialog() != true || string.IsNullOrEmpty( dialog.FileName ) )
+		        return false;
+
+	        fileName = dialog.FileName;
+	        return true;
         }
 
         #endregion

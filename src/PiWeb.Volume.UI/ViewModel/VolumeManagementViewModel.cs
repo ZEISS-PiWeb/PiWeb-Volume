@@ -31,13 +31,12 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 		private readonly IFileService _FileService;
 		private readonly IMessageService _MessageService;
+		private readonly IViewService _ViewService;
 		private VolumeViewModel _VolumeViewModel;
 		private string _FileName;
 		private double _Progress;
 		private string _ProgressMessage;
 		private bool _IsLoading;
-
-		public event EventHandler<EventArgs> VolumeChanged;
 
 		#endregion
 
@@ -45,11 +44,19 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 		public VolumeManagementViewModel(
 			IFileService fileService,
-			IMessageService messageService )
+			IMessageService messageService,
+			IViewService viewService )
 		{
 			_FileService = fileService;
 			_MessageService = messageService;
+			_ViewService = viewService;
 		}
+
+		#endregion
+
+		#region events
+
+		public event EventHandler<EventArgs> VolumeChanged;
 
 		#endregion
 
@@ -57,36 +64,9 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 		public ICommand OpenVolumeCommand => new RelayCommand( ExecuteOpenVolume );
 
+		public ICommand SaveVolumeCommand => new RelayCommand( ExecuteSaveVolume, CanExecuteSaveVolume );
+
 		public ICommand DecompressCommand => new RelayCommand( ExecuteDecompress, CanExecuteDecompress );
-
-		private bool CanExecuteDecompress()
-		{
-			return VolumeViewModel?.Volume.GetCompressionState( Direction.Z ) == VolumeCompressionState.CompressedInDirection;
-		}
-
-		private async void ExecuteDecompress()
-		{
-			var volume = VolumeViewModel?.Volume as CompressedVolume;
-			if( volume?.GetCompressionState( Direction.Z ) != VolumeCompressionState.CompressedInDirection )
-				return;
-
-			IsLoading = true;
-
-			var progress = new VolumeProgress( volume );
-
-			progress.ProgressChanged += OnProgressChanged;
-
-			var decompressedVolume = await Task.Run( () => volume.Decompress( progress ) );
-
-			progress.ProgressChanged -= OnProgressChanged;
-
-			ProgressMessage = null;
-			Progress = 0.0;
-
-			VolumeViewModel = new VolumeViewModel( decompressedVolume, decompressedVolume, 1 );
-
-			IsLoading = false;
-		}
 
 		#endregion
 
@@ -130,6 +110,71 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 		#region methods
 
+		private async void ExecuteSaveVolume()
+		{
+			if( !( VolumeViewModel.Volume is UncompressedVolume volume ) || !_FileService.SelectSaveFileName( out var fileName ) )
+				return;
+
+			await using var stream = File.Create( fileName );
+
+			var codecViewModel = new CodecViewModel();
+
+			if( _ViewService.RequestView( codecViewModel ) != true )
+				return;
+
+			var options = codecViewModel.GetOptions();
+			var multiDirection = codecViewModel.MultiDirection;
+
+			IsLoading = true;
+
+			var progress = new VolumeProgress( volume );
+
+			progress.ProgressChanged += OnProgressChanged;
+
+			await Task.Run( () => volume.Save( stream, options, multiDirection, progress ) );
+
+			progress.ProgressChanged -= OnProgressChanged;
+
+			ProgressMessage = null;
+			Progress = 0.0;
+
+			IsLoading = false;
+		}
+
+		private bool CanExecuteSaveVolume()
+		{
+			return VolumeViewModel?.Volume is UncompressedVolume;
+		}
+
+		private bool CanExecuteDecompress()
+		{
+			return VolumeViewModel?.Volume.GetCompressionState( Direction.Z ) == VolumeCompressionState.CompressedInDirection;
+		}
+
+		private async void ExecuteDecompress()
+		{
+			var volume = VolumeViewModel?.Volume as CompressedVolume;
+			if( volume?.GetCompressionState( Direction.Z ) != VolumeCompressionState.CompressedInDirection )
+				return;
+
+			IsLoading = true;
+
+			var progress = new VolumeProgress( volume );
+
+			progress.ProgressChanged += OnProgressChanged;
+
+			var decompressedVolume = await Task.Run( () => volume.Decompress( progress ) );
+
+			progress.ProgressChanged -= OnProgressChanged;
+
+			ProgressMessage = null;
+			Progress = 0.0;
+
+			VolumeViewModel = new VolumeViewModel( decompressedVolume, decompressedVolume, 1 );
+
+			IsLoading = false;
+		}
+
 		private async void ExecuteOpenVolume()
 		{
 			if( !_FileService.SelectOpenFileName( out var fileName ) )
@@ -158,7 +203,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 		private async Task LoadPiWebVolume()
 		{
-			using var stream = File.OpenRead( FileName );
+			await using var stream = File.OpenRead( FileName );
 
 			var volume = Volume.Load( stream );
 
@@ -188,15 +233,19 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 					"A '.uint16' file with the same name as the vgi file must be placed in the same directory as the vgi file" );
 				return;
 			}
+			
+			var loadOptionsViewModel = new LoadOptionsViewModel();
+			if( _ViewService.RequestView( loadOptionsViewModel ) != true )
+				return;
 
-			using var vgi = File.OpenRead( FileName );
-			using var data = File.OpenRead( uint16File );
+			await using var vgi = File.OpenRead( FileName );
+			await using var data = File.OpenRead( uint16File );
 
 			var progress = new DoubleProgress();
 
 			progress.ProgressChanged += OnProgressChanged;
 
-			var volume = await Task.Run( () => ConvertVolume.FromVgi( vgi, data, progress ) );
+			var volume = await Task.Run( () => ConvertVolume.FromVgi( vgi, data, loadOptionsViewModel.Extrapolate, null, null, progress ) );
 
 			progress.ProgressChanged -= OnProgressChanged;
 
@@ -209,13 +258,17 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 		private async Task LoadScvVolume()
 		{
-			using var scv = File.OpenRead( FileName );
+			var loadOptionsViewModel = new LoadOptionsViewModel();
+			if( _ViewService.RequestView( loadOptionsViewModel ) != true )
+				return;
+			
+			await using var scv = File.OpenRead( FileName );
 
 			var progress = new DoubleProgress();
 
 			progress.ProgressChanged += OnProgressChanged;
 
-			var volume = await Task.Run( () => ConvertVolume.FromScv( scv, progress ) );
+			var volume = await Task.Run( () => ConvertVolume.FromScv( scv, loadOptionsViewModel.Extrapolate, null, null, progress ) );
 
 			progress.ProgressChanged -= OnProgressChanged;
 

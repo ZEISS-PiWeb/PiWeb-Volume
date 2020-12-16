@@ -23,7 +23,6 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 	using GalaSoft.MvvmLight;
 	using GalaSoft.MvvmLight.CommandWpf;
 	using Zeiss.IMT.PiWeb.Volume.UI.Model;
-	using Range = Zeiss.IMT.PiWeb.Volume.UI.Model.Range;
 
 	#endregion
 
@@ -42,8 +41,8 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 		private int _MaxPreviewLayer;
 		private Dispatcher _Dispatcher;
 
-		private Range _HorizontalRange;
-		private Range _VerticalRange;
+		private DoubleRange _HorizontalRange;
+		private DoubleRange _VerticalRange;
 
 		private Layer _SelectedLayer;
 		private Layer _PreviewLayer;
@@ -153,13 +152,13 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 			}
 		}
 
-		public Range HorizontalRange
+		public DoubleRange HorizontalRange
 		{
 			get => _HorizontalRange;
 			private set => Set( ref _HorizontalRange, value );
 		}
 
-		public Range VerticalRange
+		public DoubleRange VerticalRange
 		{
 			get => _VerticalRange;
 			private set => Set( ref _VerticalRange, value );
@@ -181,8 +180,8 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 						PixelFormats.Gray8, BitmapPalettes.Gray256 );
 					MaxLayer = Volume.Metadata.SizeZ - 1;
 					_MaxPreviewLayer = _Preview.Metadata.SizeZ - 1;
-					HorizontalRange = new Range( 0, Volume.Metadata.SizeX );
-					VerticalRange = new Range( 0, Volume.Metadata.SizeY );
+					HorizontalRange = new DoubleRange( 0, Volume.Metadata.SizeX );
+					VerticalRange = new DoubleRange( 0, Volume.Metadata.SizeY );
 					break;
 				case Direction.Y:
 					SelectedLayerImage = new WriteableBitmap( Volume.Metadata.SizeX, Volume.Metadata.SizeZ, 96, 96,
@@ -191,8 +190,8 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 						PixelFormats.Gray8, BitmapPalettes.Gray256 );
 					MaxLayer = Volume.Metadata.SizeY - 1;
 					_MaxPreviewLayer = _Preview.Metadata.SizeY - 1;
-					HorizontalRange = new Range( 0, Volume.Metadata.SizeX );
-					VerticalRange = new Range( 0, Volume.Metadata.SizeZ );
+					HorizontalRange = new DoubleRange( 0, Volume.Metadata.SizeX );
+					VerticalRange = new DoubleRange( 0, Volume.Metadata.SizeZ );
 					break;
 				case Direction.X:
 					SelectedLayerImage = new WriteableBitmap( Volume.Metadata.SizeY, Volume.Metadata.SizeZ, 96, 96,
@@ -201,8 +200,8 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 						PixelFormats.Gray8, BitmapPalettes.Gray256 );
 					MaxLayer = Volume.Metadata.SizeX - 1;
 					_MaxPreviewLayer = _Preview.Metadata.SizeX - 1;
-					HorizontalRange = new Range( 0, Volume.Metadata.SizeY );
-					VerticalRange = new Range( 0, Volume.Metadata.SizeZ );
+					HorizontalRange = new DoubleRange( 0, Volume.Metadata.SizeY );
+					VerticalRange = new DoubleRange( 0, Volume.Metadata.SizeZ );
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();

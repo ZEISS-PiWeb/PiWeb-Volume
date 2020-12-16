@@ -1,0 +1,29 @@
+﻿<Window x:Class="Zeiss.IMT.PiWeb.Volume.UI.View.LoadOptionsView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModel="clr-namespace:Zeiss.IMT.PiWeb.Volume.UI.ViewModel"
+
+        Title="Load options"
+        Width="400"
+        SizeToContent="Height"
+        ShowInTaskbar="False"
+        UseLayoutRounding="True"
+        WindowStartupLocation="CenterOwner"
+        d:DataContext="{d:DesignInstance viewModel:LoadOptionsViewModel}"
+        mc:Ignorable="d">
+   
+    <UniformGrid Columns="2">
+
+        <TextBlock Margin="8">Extrapolate value range</TextBlock>
+        <CheckBox Margin="8" IsChecked="{Binding Path=Extrapolate}" />
+      
+        <Button Margin="8" IsCancel="True">Cancel</Button>
+        <Button Margin="8"
+                Click="OkButton_Click"
+                IsDefault="True">
+            OK
+        </Button>
+    </UniformGrid>
+</Window>
