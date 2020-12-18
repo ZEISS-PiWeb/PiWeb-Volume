@@ -151,7 +151,6 @@ namespace Zeiss.IMT.PiWeb.Volume
 			return Volume.CreateUncompressed( new VolumeMetadata( _PreviewSizeX, _PreviewSizeY, _PreviewSizeZ, _Metadata.ResolutionX * _Minification, _Metadata.ResolutionY * _Minification, _Metadata.ResolutionZ * _Minification ), _PreviewData );
 		}
 
-
 		internal void WriteSlice( IntPtr line, ushort width, ushort height, ushort z )
 		{
 			_Ct.ThrowIfCancellationRequested();

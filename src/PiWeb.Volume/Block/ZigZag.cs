@@ -10,11 +10,17 @@
 
 namespace Zeiss.IMT.PiWeb.Volume.Block
 {
+	#region usings
+
 	using System.Collections.Generic;
 	using System.Linq;
 
+	#endregion
+
 	internal static class ZigZag
 	{
+		#region methods
+
 		public static int[] Calculate()
 		{
 			var entries = new List<ZigZagEntry>();
@@ -26,7 +32,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			{
 				entries.Add( new ZigZagEntry( x, y, z, i++ ) );
 			}
-			
+
 			return entries.OrderBy( e => e.X * e.X + e.Y * e.Y + e.Z * e.Z )
 				.ThenBy( e => e.Z )
 				.ThenBy( e => e.Y )
@@ -34,6 +40,8 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 				.Select( e => e.Index )
 				.ToArray();
 		}
+
+		#endregion
 
 		#region class ZigZagEntry
 

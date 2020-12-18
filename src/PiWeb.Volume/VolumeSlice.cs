@@ -176,7 +176,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 				{
 					var result = new byte[sx * sy];
 
-					stream.Seek( (long)index * sx * sy, SeekOrigin.Begin );
+					stream.Seek( ( long ) index * sx * sy, SeekOrigin.Begin );
 					stream.Read( result, 0, sx * sy );
 
 					return new VolumeSlice( direction, index, result );

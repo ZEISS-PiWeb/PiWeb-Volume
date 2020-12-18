@@ -32,7 +32,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Compare.ViewModel
 		private double _HorizontalPanning;
 		private double _VerticalPanning;
 		private double _Zoom = 1;
-		
+
 		private IDisposable _LayerChangedSubscription;
 
 		private SpectrumData[] _LeftSpectrum;
@@ -41,10 +41,10 @@ namespace Zeiss.IMT.PiWeb.Volume.Compare.ViewModel
 
 		private int _DeltaMin = 1;
 		private int _DeltaMax = 10;
-		
+
 		private IDisposable _CreateSpectrumSubscription;
 
-		private double _ContrastLow = 0;
+		private double _ContrastLow;
 		private double _ContrastHigh = 256;
 
 		#endregion

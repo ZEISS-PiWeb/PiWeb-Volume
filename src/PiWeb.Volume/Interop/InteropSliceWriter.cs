@@ -10,22 +10,22 @@
 
 namespace Zeiss.IMT.PiWeb.Volume.Interop
 {
-    #region usings
+	#region usings
 
-    using System;
-    using System.Runtime.InteropServices;
+	using System;
+	using System.Runtime.InteropServices;
 
-    #endregion
+	#endregion
 
-    internal delegate void WriteSliceCallback( IntPtr line, ushort width, ushort height, ushort z );
+	internal delegate void WriteSliceCallback( IntPtr line, ushort width, ushort height, ushort z );
 
-    [StructLayout( LayoutKind.Sequential )]
-    internal class InteropSliceWriter
-    {
-        #region members
+	[StructLayout( LayoutKind.Sequential )]
+	internal class InteropSliceWriter
+	{
+		#region members
 
-        public WriteSliceCallback WriteSlice;
+		public WriteSliceCallback WriteSlice;
 
-        #endregion
-    }
+		#endregion
+	}
 }

@@ -39,7 +39,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 		private bool _ShowPreview;
 		private IDisposable _Subcription;
 		private int _MaxPreviewLayer;
-		private Dispatcher _Dispatcher;
+		private readonly Dispatcher _Dispatcher;
 
 		private DoubleRange _HorizontalRange;
 		private DoubleRange _VerticalRange;
@@ -60,7 +60,8 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 			_Dispatcher = Dispatcher.CurrentDispatcher;
 			_SelectedLayerIndex = model.Metadata.GetSize( Direction.Z ) / 2;
 
-			Observable.FromEventPattern<EventArgs>( this, nameof(PreviewLayerChanged) ).Throttle( TimeSpan.FromMilliseconds( 100 ) )
+			Observable.FromEventPattern<EventArgs>( this, nameof(PreviewLayerChanged) )
+				.Throttle( TimeSpan.FromMilliseconds( 100 ) )
 				.Subscribe( n => UpdateLayerAsync() );
 
 			UpdateProjection();

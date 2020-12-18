@@ -10,65 +10,65 @@
 
 namespace Zeiss.IMT.PiWeb.Volume
 {
-    #region usings
+	#region usings
 
-    using System;
+	using System;
 
-    #endregion
+	#endregion
 
-    /// <summary>
-    /// Exceptions thrown by the volume compressor and decompressor
-    /// </summary>
-    /// <seealso cref="System.Exception" />
-    public sealed class VolumeException : Exception
-    {
-        #region constructors
+	/// <summary>
+	/// Exceptions thrown by the volume compressor and decompressor
+	/// </summary>
+	/// <seealso cref="System.Exception" />
+	public sealed class VolumeException : Exception
+	{
+		#region constructors
 
-        /// <inheritdoc />
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException" /> class.
-        /// </summary>
-        /// <param name="error">The error.</param>
-        internal VolumeException( VolumeError error )
-        {
-            Error = error;
-        }
+		/// <inheritdoc />
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException" /> class.
+		/// </summary>
+		/// <param name="error">The error.</param>
+		internal VolumeException( VolumeError error )
+		{
+			Error = error;
+		}
 
-        /// <inheritdoc />
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException" /> class.
-        /// </summary>
-        /// <param name="error">The error.</param>
-        /// <param name="message">The message.</param>
-        internal VolumeException( VolumeError error, string message ) : base( message )
-        {
-            Error = error;
-        }
+		/// <inheritdoc />
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException" /> class.
+		/// </summary>
+		/// <param name="error">The error.</param>
+		/// <param name="message">The message.</param>
+		internal VolumeException( VolumeError error, string message ) : base( message )
+		{
+			Error = error;
+		}
 
-        /// <inheritdoc />
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException" /> class.
-        /// </summary>
-        /// <param name="error">The error.</param>
-        /// <param name="message">The message.</param>
-        /// <param name="innerException">The inner exception.</param>
-        internal VolumeException( VolumeError error, string message, Exception innerException ) : base( message, innerException )
-        {
-            Error = error;
-        }
+		/// <inheritdoc />
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException" /> class.
+		/// </summary>
+		/// <param name="error">The error.</param>
+		/// <param name="message">The message.</param>
+		/// <param name="innerException">The inner exception.</param>
+		internal VolumeException( VolumeError error, string message, Exception innerException ) : base( message, innerException )
+		{
+			Error = error;
+		}
 
-        #endregion
+		#endregion
 
-        #region properties
+		#region properties
 
-        /// <summary>
-        /// Gets the error code.
-        /// </summary>
-        /// <value>
-        /// The error.
-        /// </value>
-        public VolumeError Error { get; }
+		/// <summary>
+		/// Gets the error code.
+		/// </summary>
+		/// <value>
+		/// The error.
+		/// </value>
+		public VolumeError Error { get; }
 
-        #endregion
-    }
+		#endregion
+	}
 }

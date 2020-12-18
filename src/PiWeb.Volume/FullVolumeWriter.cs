@@ -10,83 +10,83 @@
 
 namespace Zeiss.IMT.PiWeb.Volume
 {
-    #region usings
+	#region usings
 
-    using System;
-    using System.Runtime.InteropServices;
-    using System.Threading;
-    using Zeiss.IMT.PiWeb.Volume.Interop;
+	using System;
+	using System.Runtime.InteropServices;
+	using System.Threading;
+	using Zeiss.IMT.PiWeb.Volume.Interop;
 
-    #endregion
+	#endregion
 
-    internal class FullVolumeWriter
-    {
-        #region members
+	internal class FullVolumeWriter
+	{
+		#region members
 
-        private readonly IProgress<VolumeSliceDefinition> _ProgressNotifier;
-        private readonly CancellationToken _Ct;
+		private readonly IProgress<VolumeSliceDefinition> _ProgressNotifier;
+		private readonly CancellationToken _Ct;
 
-        private readonly byte[][] _Data;
+		private readonly byte[][] _Data;
 
-        private readonly ushort _SizeX;
-        private readonly ushort _SizeY;
-        private readonly ushort _SizeZ;
+		private readonly ushort _SizeX;
+		private readonly ushort _SizeY;
+		private readonly ushort _SizeZ;
 
-        #endregion
+		#endregion
 
-        #region constructors
+		#region constructors
 
-        internal FullVolumeWriter( VolumeMetadata metadata, Direction direction, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default( CancellationToken ) )
-        {
-            if( metadata == null )
-                throw new ArgumentNullException( nameof(metadata) );
-            
-            _ProgressNotifier = progressNotifier;
-            _Ct = ct;
+		internal FullVolumeWriter( VolumeMetadata metadata, Direction direction, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default( CancellationToken ) )
+		{
+			if( metadata == null )
+				throw new ArgumentNullException( nameof(metadata) );
 
-            metadata.GetSliceSize( direction, out _SizeX, out _SizeY );
+			_ProgressNotifier = progressNotifier;
+			_Ct = ct;
 
-            _SizeZ = metadata.GetSize( direction );
+			metadata.GetSliceSize( direction, out _SizeX, out _SizeY );
 
-            _Data = new byte[_SizeZ][];
+			_SizeZ = metadata.GetSize( direction );
 
-            for( var z = 0; z < _SizeZ; z++ )
-                _Data[ z ] = new byte[_SizeX * _SizeY];
+			_Data = new byte[_SizeZ][];
 
-            Interop = new InteropSliceWriter
-            {
-                WriteSlice = WriteSlice
-            };
-        }
+			for( var z = 0; z < _SizeZ; z++ )
+				_Data[ z ] = new byte[_SizeX * _SizeY];
 
-        #endregion
+			Interop = new InteropSliceWriter
+			{
+				WriteSlice = WriteSlice
+			};
+		}
 
-        #region properties
+		#endregion
 
-        internal InteropSliceWriter Interop { get; }
+		#region properties
 
-        #endregion
+		internal InteropSliceWriter Interop { get; }
 
-        #region methods
+		#endregion
 
-        internal byte[][] GetData()
-        {
-            return _Data;
-        }
+		#region methods
 
-        internal void WriteSlice( IntPtr line, ushort width, ushort height, ushort z )
-        {
-	        _Ct.ThrowIfCancellationRequested();
+		internal byte[][] GetData()
+		{
+			return _Data;
+		}
 
-	        if( z >= _SizeZ )
-		        return;
+		internal void WriteSlice( IntPtr line, ushort width, ushort height, ushort z )
+		{
+			_Ct.ThrowIfCancellationRequested();
 
-	        _ProgressNotifier?.Report( new VolumeSliceDefinition( Direction.Z, z ) );
+			if( z >= _SizeZ )
+				return;
 
-	        for( var y = 0; y < _SizeY; y++ )
-		        Marshal.Copy( line + y * width, _Data[ z ], y * _SizeX, _SizeX );
-        }
+			_ProgressNotifier?.Report( new VolumeSliceDefinition( Direction.Z, z ) );
 
-        #endregion
-    }
+			for( var y = 0; y < _SizeY; y++ )
+				Marshal.Copy( line + y * width, _Data[ z ], y * _SizeX, _SizeX );
+		}
+
+		#endregion
+	}
 }

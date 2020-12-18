@@ -74,12 +74,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 				Stream.Seek( 0, SeekOrigin.Begin );
 				return BlockVolume.Create( Stream, Metadata, options, progress, ct );
 			}
-			else
-			{
-				var directionMap = new DirectionMap { [ Direction.Z ] = CompressDirection( options, progress, ct ) };
 
-				return new CompressedVolume( Metadata, options, directionMap );
-			}
+			var directionMap = new DirectionMap { [ Direction.Z ] = CompressDirection( options, progress, ct ) };
+
+			return new CompressedVolume( Metadata, options, directionMap );
 		}
 
 		/// <summary>

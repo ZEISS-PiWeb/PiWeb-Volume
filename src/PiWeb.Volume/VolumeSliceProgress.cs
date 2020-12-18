@@ -10,30 +10,38 @@
 
 namespace Zeiss.IMT.PiWeb.Volume
 {
-    /// <summary>
-    /// Holds the properties that define a volume slice.
-    /// </summary>
-    public struct VolumeSliceDefinition
-    {
-        /// <summary>
-        /// Creates a decription of a volume slice.
-        /// </summary>
-        /// <param name="direction"></param>
-        /// <param name="index"></param>
-        public VolumeSliceDefinition( Direction direction, ushort index )
-        {
-            Direction = direction;
-            Index = index;
-        }
+	/// <summary>
+	/// Holds the properties that define a volume slice.
+	/// </summary>
+	public readonly struct VolumeSliceDefinition
+	{
+		#region constructors
 
-        /// <summary>
-        /// Direction
-        /// </summary>
-        public Direction Direction { get; }
+		/// <summary>
+		/// Creates a decription of a volume slice.
+		/// </summary>
+		/// <param name="direction"></param>
+		/// <param name="index"></param>
+		public VolumeSliceDefinition( Direction direction, ushort index )
+		{
+			Direction = direction;
+			Index = index;
+		}
 
-        /// <summary>
-        /// Slice index
-        /// </summary>
-        public ushort Index { get; }
-    }
+		#endregion
+
+		#region properties
+
+		/// <summary>
+		/// Direction
+		/// </summary>
+		public Direction Direction { get; }
+
+		/// <summary>
+		/// Slice index
+		/// </summary>
+		public ushort Index { get; }
+
+		#endregion
+	}
 }

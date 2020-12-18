@@ -10,31 +10,31 @@
 
 namespace Zeiss.IMT.PiWeb.Volume.Interop
 {
-    #region usings
+	#region usings
 
-    using System;
-    using System.IO;
-    using System.Runtime.InteropServices;
+	using System;
+	using System.IO;
+	using System.Runtime.InteropServices;
 
-    #endregion
+	#endregion
 
-    internal delegate int Read( IntPtr ptr, int length );
+	internal delegate int Read( IntPtr ptr, int length );
 
-    internal delegate int Write( IntPtr ptr, int length );
+	internal delegate int Write( IntPtr ptr, int length );
 
-    internal delegate long Seek( long pos, SeekOrigin origin );
+	internal delegate long Seek( long pos, SeekOrigin origin );
 
-    [StructLayout( LayoutKind.Sequential )]
-    internal class InteropStream
-    {
-        #region members
+	[StructLayout( LayoutKind.Sequential )]
+	internal class InteropStream
+	{
+		#region members
 
-        public Read Read;
+		public Read Read;
 
-        public Write Write;
+		public Write Write;
 
-        public Seek Seek;
+		public Seek Seek;
 
-        #endregion
-    }
+		#endregion
+	}
 }

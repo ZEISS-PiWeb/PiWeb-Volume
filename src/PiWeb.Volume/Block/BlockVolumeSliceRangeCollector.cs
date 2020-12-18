@@ -37,7 +37,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		private readonly Dictionary<ushort, List<VolumeSlice>> _SlicesX = new Dictionary<ushort, List<VolumeSlice>>();
 		private readonly Dictionary<ushort, List<VolumeSlice>> _SlicesY = new Dictionary<ushort, List<VolumeSlice>>();
 		private readonly Dictionary<ushort, List<VolumeSlice>> _SlicesZ = new Dictionary<ushort, List<VolumeSlice>>();
-		private VolumeMetadata _Metadata;
+		private readonly VolumeMetadata _Metadata;
 
 		#endregion
 
@@ -77,17 +77,13 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		private Dictionary<ushort, List<VolumeSlice>> GetSlices( Direction direction )
 		{
-			switch( direction )
+			return direction switch
 			{
-				case Direction.X:
-					return _SlicesX;
-				case Direction.Y:
-					return _SlicesY;
-				case Direction.Z:
-					return _SlicesZ;
-				default:
-					throw new ArgumentOutOfRangeException( nameof(direction), direction, null );
-			}
+				Direction.X => _SlicesX,
+				Direction.Y => _SlicesY,
+				Direction.Z => _SlicesZ,
+				_ => throw new ArgumentOutOfRangeException( nameof(direction), direction, null )
+			};
 		}
 
 		internal VolumeSliceCollection CollectSliceRanges( IProgress<VolumeSliceDefinition> progress, CancellationToken ct )
@@ -109,7 +105,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 					if( _SlicesX.TryGetValue( index.X, out var slicesX ) )
 						ReadXSlices( block, index, slicesX );
-				}, 
+				},
 				layerIndex => _SlicesZ.ContainsKey( layerIndex ) || _SlicesX.Count > 0 || _SlicesY.Count > 0,
 				blockIndex => _SlicesZ.ContainsKey( blockIndex.Z ) || _SlicesY.ContainsKey( blockIndex.Y ) ||
 				              _SlicesX.ContainsKey( blockIndex.X ), progress, ct );
@@ -154,7 +150,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			foreach( var slice in slices )
 				ReadYSlice( block, index, slice );
 		}
-		
+
 		private void ReadYSlice( byte[] block, BlockIndex index, VolumeSlice slice )
 		{
 			var by = slice.Index - index.Y * BlockVolume.N;
@@ -180,7 +176,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			foreach( var slice in slices )
 				ReadXSlice( block, index, slice );
 		}
-		
+
 		private void ReadXSlice( byte[] block, BlockIndex index, VolumeSlice slice )
 		{
 			var bx = slice.Index - index.X * BlockVolume.N;

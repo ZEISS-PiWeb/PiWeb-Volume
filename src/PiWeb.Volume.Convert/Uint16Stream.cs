@@ -23,12 +23,12 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 
 		private readonly Stream _BaseStream;
 		private readonly ushort _MinValue;
-		private bool _Extrapolate;
+		private readonly bool _Extrapolate;
 
 		private byte[] _ByteBuffer;
 		private ushort[] _ShortBuffer;
-		private double _Factor;
-		private long _Offset;
+		private readonly double _Factor;
+		private readonly long _Offset;
 
 		#endregion
 
