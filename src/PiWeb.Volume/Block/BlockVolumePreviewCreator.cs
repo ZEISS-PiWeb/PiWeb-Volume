@@ -30,7 +30,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		private readonly ushort _SizeZ;
 		private readonly ushort _SizeY;
 		private readonly ushort _SizeX;
-		private VolumeMetadata _Metadata;
+		private readonly VolumeMetadata _Metadata;
 
 		#endregion
 
@@ -66,14 +66,14 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			var decoder = new BlockVolumeDecoder( _Volume.CompressionOptions );
 			var data = _Volume.CompressedData[ Direction.Z ];
 			var input = new MemoryStream( data );
-			
+
 			var result = new byte[_PreviewSizeZ][];
 			long sliceSize = _PreviewSizeX * _PreviewSizeY;
 
 			for( var z = 0; z < _PreviewSizeZ; z++ )
 				result[ z ] = new byte[sliceSize];
 
-			decoder.Decode( input, _Metadata, (block, index) =>
+			decoder.Decode( input, _Metadata, ( block, index ) =>
 			{
 				for( var bz = 0; bz < BlockVolume.N; bz++ )
 				for( var by = 0; by < BlockVolume.N; by++ )
@@ -98,13 +98,13 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 				}
 			}, null, null, progress, ct );
 
-			return new UncompressedVolume( new VolumeMetadata( 
-				_PreviewSizeX, 
-				_PreviewSizeY, 
-				_PreviewSizeZ, 
-				_Metadata.ResolutionX * _Minification, 
-				_Metadata.ResolutionY * _Minification, 
-				_Metadata.ResolutionZ * _Minification ), 
+			return new UncompressedVolume( new VolumeMetadata(
+					_PreviewSizeX,
+					_PreviewSizeY,
+					_PreviewSizeZ,
+					_Metadata.ResolutionX * _Minification,
+					_Metadata.ResolutionY * _Minification,
+					_Metadata.ResolutionZ * _Minification ),
 				result );
 		}
 

@@ -20,8 +20,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 	{
 		#region members
 
-		private static bool _Extrapolate = false;
-		private static bool _Automatic;
+		private static bool _Extrapolate;
 		private static byte _Minimum = 0;
 		private static byte _Maximum = 255;
 

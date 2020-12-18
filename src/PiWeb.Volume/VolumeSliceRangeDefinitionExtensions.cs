@@ -10,50 +10,48 @@
 
 namespace Zeiss.IMT.PiWeb.Volume
 {
-    #region usings
+	#region usings
 
-    using System.Collections.Generic;
-    using System.Linq;
+	using System.Collections.Generic;
+	using System.Linq;
 
-    #endregion
+	#endregion
 
-    internal static class VolumeSliceRangeDefinitionExtensions
-    {
-        #region methods
+	internal static class VolumeSliceRangeDefinitionExtensions
+	{
+		#region methods
 
-        internal static IEnumerable<VolumeSliceRangeDefinition> Merge( this IReadOnlyCollection<VolumeSliceRangeDefinition> ranges )
-        {
-            var groups = ranges.GroupBy( r => r.Direction );
+		internal static IEnumerable<VolumeSliceRangeDefinition> Merge( this IReadOnlyCollection<VolumeSliceRangeDefinition> ranges )
+		{
+			var groups = ranges.GroupBy( r => r.Direction );
 
-            foreach( var group in groups )
-            {
-                var ordered = group.OrderBy( r => r.First );
-                ushort? first = null;
-                ushort? last = null;
-                foreach( var range in ordered )
-                {
-                    if( !first.HasValue )
-                        first = range.First;
-                    if( !last.HasValue )
-                        last = range.Last;
+			foreach( var group in groups )
+			{
+				var ordered = group.OrderBy( r => r.First );
+				ushort? first = null;
+				ushort? last = null;
+				foreach( var range in ordered )
+				{
+					first ??= range.First;
+					last ??= range.Last;
 
-                    if( range.First > last.Value + 1 )
-                    {
-                        yield return new VolumeSliceRangeDefinition( group.Key, first.Value, last.Value );
-                        first = range.First;
-                        last = range.Last;
-                    }
-                    else if( range.Last > last.Value )
-                    {
-                        last = range.Last;
-                    }
-                }
+					if( range.First > last.Value + 1 )
+					{
+						yield return new VolumeSliceRangeDefinition( group.Key, first.Value, last.Value );
+						first = range.First;
+						last = range.Last;
+					}
+					else if( range.Last > last.Value )
+					{
+						last = range.Last;
+					}
+				}
 
-                if( first.HasValue )
-                    yield return new VolumeSliceRangeDefinition( group.Key, first.Value, last.Value );
-            }
-        }
+				if( first.HasValue )
+					yield return new VolumeSliceRangeDefinition( group.Key, first.Value, last.Value );
+			}
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

@@ -15,9 +15,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 	/// </summary>
 	internal readonly struct BlockIndex
 	{
-		public readonly ushort X;
-		public readonly ushort Y;
-		public readonly ushort Z;
+		#region constructors
 
 		internal BlockIndex( ushort x, ushort y, ushort z )
 		{
@@ -25,5 +23,15 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			Y = y;
 			Z = z;
 		}
+
+		#endregion
+
+		#region properties
+
+		public ushort X { get; }
+		public ushort Y { get; }
+		public ushort Z { get; }
+
+		#endregion
 	}
 }

@@ -26,10 +26,6 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		#region members
 
 		private readonly VolumeCompressionOptions _Options;
-		
-		internal delegate void BlockAction( byte[] data, BlockIndex index );
-		internal delegate bool BlockPredicate( BlockIndex index );
-		internal delegate bool LayerPredicate( ushort index );
 
 		#endregion
 
@@ -95,12 +91,12 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			}
 		}
 
-		private void SkipLayer( BinaryReader reader, int blockCount )
+		private static void SkipLayer( BinaryReader reader, int blockCount )
 		{
 			for( var i = 0; i < blockCount; i++ )
 			{
-				var resultLength =  reader.ReadUInt16();
-				
+				var resultLength = reader.ReadUInt16();
+
 				var length = resultLength & 0x0FFF;
 				var firstLength = ( resultLength & 0b0011000000000000 ) >> 12;
 				var otherLength = ( resultLength & 0b1100000000000000 ) >> 14;
@@ -110,26 +106,26 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 					count += firstLength;
 				if( length > 1 )
 					count += ( length - 1 ) * otherLength;
-				
+
 				reader.BaseStream.Seek( count, SeekOrigin.Current );
 			}
 		}
 
-		private void ReadLayer( BinaryReader reader, short[][] encodedBlocks, ushort[] encodedBlockLengths )
+		private static void ReadLayer( BinaryReader reader, short[][] encodedBlocks, ushort[] encodedBlockLengths )
 		{
 			for( var i = 0; i < encodedBlocks.Length; i++ )
 			{
-				var resultLength =  reader.ReadUInt16();
-				
+				var resultLength = reader.ReadUInt16();
+
 				var length = resultLength & 0x0FFF;
 				var firstLength = ( resultLength & 0b0011000000000000 ) >> 12;
 				var otherLength = ( resultLength & 0b1100000000000000 ) >> 14;
-				
-				encodedBlockLengths[ i ] = (ushort)length;
+
+				encodedBlockLengths[ i ] = ( ushort ) length;
 				if( length > 0 )
 					encodedBlocks[ i ][ 0 ] = firstLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
-				
-				for (var j = 1; j < length; j++)
+
+				for( var j = 1; j < length; j++ )
 					encodedBlocks[ i ][ j ] = otherLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
 			}
 		}
@@ -194,6 +190,24 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 					ArrayPool<byte>.Shared.Return( buffers.Item3 );
 				} );
 		}
+
+		#endregion
+
+		#region class BlockAction
+
+		internal delegate void BlockAction( byte[] data, BlockIndex index );
+
+		#endregion
+
+		#region class BlockPredicate
+
+		internal delegate bool BlockPredicate( BlockIndex index );
+
+		#endregion
+
+		#region class LayerPredicate
+
+		internal delegate bool LayerPredicate( ushort index );
 
 		#endregion
 	}

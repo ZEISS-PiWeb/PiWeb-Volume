@@ -91,7 +91,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			}
 
 			using var writer = new BinaryWriter( output );
-			
+
 			var quantization = Quantization.Calculate( _Options, false );
 			var zigzag = ZigZag.Calculate();
 
@@ -108,21 +108,20 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 					var length = resultLength & 0x0FFF;
 					var firstLength = ( resultLength & 0b0011000000000000 ) >> 12;
 					var otherLength = ( resultLength & 0b1100000000000000 ) >> 14;
-					
+
 					writer.Write( resultLength );
-					
+
 					if( length > 0 )
-						if (firstLength == 2)
+						if( firstLength == 2 )
 							writer.Write( block[ 0 ] );
 						else
-							writer.Write( (sbyte)block[ 0 ] );
+							writer.Write( ( sbyte ) block[ 0 ] );
 
 					for( var i = 1; i < length; i++ )
-						if (otherLength == 2)
+						if( otherLength == 2 )
 							writer.Write( block[ i ] );
 						else
-							writer.Write( (sbyte)block[ i ] );
-						
+							writer.Write( ( sbyte ) block[ i ] );
 				}
 
 				progress.Report( new VolumeSliceDefinition( Direction.Z, ( ushort ) ( blockIndexZ * BlockVolume.N ) ) );
@@ -173,7 +172,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 					resultLengths[ blockIndex ] = ( ushort ) ( count & 0x0FFF );
 					resultLengths[ blockIndex ] = ( ushort ) ( resultLengths[ blockIndex ] | ( IsShort( resultBlock[ 0 ] ) ? 2 << 12 : 1 << 12 ) );
 					resultLengths[ blockIndex ] = ( ushort ) ( resultLengths[ blockIndex ] | ( isShort ? 2 << 14 : 1 << 14 ) );
-					
+
 					return buffer;
 				}, buffer => ArrayPool<double>.Shared.Return( buffer ) );
 		}

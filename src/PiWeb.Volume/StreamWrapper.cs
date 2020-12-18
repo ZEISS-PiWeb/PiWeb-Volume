@@ -10,72 +10,72 @@
 
 namespace Zeiss.IMT.PiWeb.Volume
 {
-    #region usings
+	#region usings
 
-    using System;
-    using System.IO;
-    using System.Runtime.InteropServices;
-    using Zeiss.IMT.PiWeb.Volume.Interop;
+	using System;
+	using System.IO;
+	using System.Runtime.InteropServices;
+	using Zeiss.IMT.PiWeb.Volume.Interop;
 
-    #endregion
+	#endregion
 
-    internal class StreamWrapper
-    {
-        #region members
+	internal class StreamWrapper
+	{
+		#region members
 
-        private readonly Stream _Stream;
+		private readonly Stream _Stream;
 
-        private byte[] _Buffer;
+		private byte[] _Buffer;
 
-        internal InteropStream Interop;
+		internal InteropStream Interop;
 
-        #endregion
+		#endregion
 
-        #region constructors
+		#region constructors
 
-        internal StreamWrapper( Stream stream )
-        {
-            _Stream = stream ?? throw new ArgumentNullException();
-            _Buffer = new byte[0];
-            Interop = new InteropStream
-            {
-                Read = Read,
-                Write = Write,
-                Seek = Seek
-            };
-        }
+		internal StreamWrapper( Stream stream )
+		{
+			_Stream = stream ?? throw new ArgumentNullException();
+			_Buffer = new byte[0];
+			Interop = new InteropStream
+			{
+				Read = Read,
+				Write = Write,
+				Seek = Seek
+			};
+		}
 
-        #endregion
+		#endregion
 
-        #region methods
+		#region methods
 
-        private int Read( IntPtr pv, int cb )
-        {
-            if( cb > _Buffer.Length )
-                _Buffer = new byte[cb];
+		private int Read( IntPtr pv, int cb )
+		{
+			if( cb > _Buffer.Length )
+				_Buffer = new byte[cb];
 
-            var result = _Stream.Read( _Buffer, 0, cb );
-            Marshal.Copy( _Buffer, 0, pv, result );
+			var result = _Stream.Read( _Buffer, 0, cb );
+			Marshal.Copy( _Buffer, 0, pv, result );
 
-            return result;
-        }
+			return result;
+		}
 
-        private int Write( IntPtr pv, int cb )
-        {
-            if( cb > _Buffer.Length )
-                _Buffer = new byte[cb];
+		private int Write( IntPtr pv, int cb )
+		{
+			if( cb > _Buffer.Length )
+				_Buffer = new byte[cb];
 
-            Marshal.Copy( pv, _Buffer, 0, cb );
-            _Stream.Write( _Buffer, 0, cb );
+			Marshal.Copy( pv, _Buffer, 0, cb );
+			_Stream.Write( _Buffer, 0, cb );
 
-            return cb;
-        }
+			return cb;
+		}
 
-        private long Seek( long dlibMove, SeekOrigin dwOrigin )
-        {
-            return _Stream.Seek( dlibMove, dwOrigin );
-        }
+		private long Seek( long dlibMove, SeekOrigin dwOrigin )
+		{
+			return _Stream.Seek( dlibMove, dwOrigin );
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

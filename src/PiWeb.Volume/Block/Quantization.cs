@@ -10,25 +10,31 @@
 
 namespace Zeiss.IMT.PiWeb.Volume.Block
 {
+	#region usings
+
 	using System;
-	
+
+	#endregion
+
 	/// <summary>
 	/// Helper class to calculate the quantization.
 	/// </summary>
 	internal static class Quantization
 	{
+		#region methods
+
 		/// <summary>
 		/// Origin of base values: libjpeg
 		/// </summary>
 		internal static double[] Calculate( VolumeCompressionOptions options, bool invert )
 		{
 			var scale = 100;
-			
+
 			if( options.EncoderOptions.TryGetValue( "quality", out var qualityString ) && int.TryParse( qualityString, out var quality ) )
 				scale = QualityScaling( quality );
 
 			var values = new double[BlockVolume.N3];
-			
+
 			var baseValues = new[]
 			{
 				16, 11, 10, 16, 24, 40, 51, 61,
@@ -81,12 +87,14 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 			return quality;
 		}
-		
+
 		private static void Swap( ref int a, ref int b )
 		{
 			var temp = a;
 			a = b;
 			b = temp;
 		}
+
+		#endregion
 	}
 }

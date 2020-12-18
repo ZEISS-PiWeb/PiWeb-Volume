@@ -55,9 +55,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 				int u, p, x, y, z;
 
 				//iterieren über x (n 0..N): values[ n, y, z ] * u[ n, x ] ;
-                for ( z = 0, p = 0; z < BlockVolume.N; z++ )
-                for ( y = 0; y < BlockVolume.N; y++, p+= BlockVolume.N )
-                for ( x = 0, u = 0; x < BlockVolume.N; x++, u+= BlockVolume.N )
+				for( z = 0, p = 0; z < BlockVolume.N; z++ )
+				for( y = 0; y < BlockVolume.N; y++, p += BlockVolume.N )
+				for( x = 0, u = 0; x < BlockVolume.N; x++, u += BlockVolume.N )
 				{
 					//u = x * N;
 					//p = z * NN + y * N;
