@@ -22,8 +22,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#endregion
 
 	/// <summary>
-	/// TODO: add summary.
+	/// An uncompressed volume. This volume is optimized for speed to make the access
+	/// to slices as fast as possible. The tradeoff for speed is memory.  
 	/// </summary>
+	/// <seealso cref="CompressedVolume"/>
 	public sealed class UncompressedVolume : Volume
 	{
 		#region constructors

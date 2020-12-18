@@ -23,8 +23,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#endregion
 
 	/// <summary>
-	/// A compressed volume.
+	/// A compressed volume. This volume is optimized for memory size. The tradeoff for memory size is speed.
 	/// </summary>
+	/// <seealso cref="UncompressedVolume"/>
 	public class CompressedVolume : Volume
 	{
 		#region members
