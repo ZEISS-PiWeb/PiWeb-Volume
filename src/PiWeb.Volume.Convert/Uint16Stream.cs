@@ -26,7 +26,6 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		private readonly bool _Extrapolate;
 
 		private byte[] _ByteBuffer;
-		private ushort[] _ShortBuffer;
 		private readonly double _Factor;
 		private readonly long _Offset;
 
