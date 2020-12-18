@@ -255,39 +255,42 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			using var zipOutput = new ZipArchive( stream, ZipArchiveMode.Create );
 			
-			var entry = zipOutput.CreateNormalizedEntry( "Metadata.xml", CompressionLevel.Optimal );
-			using( var entryStream = entry.Open() )
+			var metaDataEntry = zipOutput.CreateNormalizedEntry( "Metadata.xml", CompressionLevel.Optimal );
+			using( var entryStream = metaDataEntry.Open() )
 			{
 				Metadata.Serialize( entryStream );
 			}
 
 			if( CompressionOptions != null )
 			{
-				entry = zipOutput.CreateNormalizedEntry( "CompressionOptions.xml", CompressionLevel.Optimal );
-				using var entryStream = entry.Open();
+				var compressionOptionsEntry = zipOutput.CreateNormalizedEntry( "CompressionOptions.xml", CompressionLevel.Optimal );
+				using var entryStream = compressionOptionsEntry.Open();
+				
 				CompressionOptions.Serialize( entryStream );
 			}
 
 			if( CompressedData[ Direction.Z ] == null )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
-			entry = zipOutput.CreateNormalizedEntry( "VoxelsZ.dat", CompressionOptions.Encoder == BlockVolume.EncoderID ? CompressionLevel.Optimal : CompressionLevel.NoCompression );
-			using( var entryStream = entry.Open() )
+			var zEntry = zipOutput.CreateNormalizedEntry( "VoxelsZ.dat", CompressionOptions.Encoder == BlockVolume.EncoderID ? CompressionLevel.Optimal : CompressionLevel.NoCompression );
+			using( var entryStream = zEntry.Open() )
 			{
 				entryStream.Write( CompressedData[ Direction.Z ], 0, CompressedData[ Direction.Z ].Length );
 			}
 
 			if( CompressedData[ Direction.X ] != null )
 			{
-				entry = zipOutput.CreateNormalizedEntry( "VoxelsX.dat", CompressionLevel.NoCompression );
-				using var entryStream = entry.Open();
+				var xEntry = zipOutput.CreateNormalizedEntry( "VoxelsX.dat", CompressionLevel.NoCompression );
+				using var entryStream = xEntry.Open();
+				
 				entryStream.Write( CompressedData[ Direction.X ], 0, CompressedData[ Direction.X ].Length );
 			}
 
 			if( CompressedData[ Direction.Y ] != null )
 			{
-				entry = zipOutput.CreateNormalizedEntry( "VoxelsY.dat", CompressionLevel.NoCompression );
-				using var entryStream = entry.Open();
+				var yEntry = zipOutput.CreateNormalizedEntry( "VoxelsY.dat", CompressionLevel.NoCompression );
+				using var entryStream = yEntry.Open();
+				
 				entryStream.Write( CompressedData[ Direction.Y ], 0, CompressedData[ Direction.Y ].Length );
 			}
 		}
