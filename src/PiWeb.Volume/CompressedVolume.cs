@@ -158,7 +158,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			//Partial scan in directed compressed volumes
 			if( combinedRanges.All( r => CompressedData[ r.Direction ] != null ) &&
 			    combinedRanges.Length <= Constants.RangeNumberLimitForEfficientScan &&
-			    combinedRanges.Sum( r => r.Last - r.First + 1 ) < Constants.SliceNumberLimitForEfficientScan )
+			    combinedRanges.Sum( r => r.Length + 1 ) < Constants.SliceNumberLimitForEfficientScan )
 			{
 				return new VolumeSliceCollection( ranges.Select( range => GetSliceRange( range ) ) );
 			}
@@ -196,7 +196,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 					var inputWrapper = new StreamWrapper( input );
 					var rangeReader = new VolumeSliceRangeCollector( Metadata, range.Direction, new[] { range }, progress, ct );
 
-					var error = ( VolumeError ) DecompressSlices( inputWrapper.Interop, rangeReader.Interop, range.First, ( ushort ) ( range.Last - range.First + 1 ) );
+					var error = ( VolumeError ) DecompressSlices( inputWrapper.Interop, rangeReader.Interop, range.First, ( ushort ) ( range.Length + 1 ) );
 					if( error != VolumeError.Success )
 						throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
 

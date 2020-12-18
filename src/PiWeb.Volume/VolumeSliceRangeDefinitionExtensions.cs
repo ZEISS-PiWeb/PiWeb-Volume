@@ -28,8 +28,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 			foreach( var group in groups )
 			{
 				var ordered = group.OrderBy( r => r.First );
+				
 				ushort? first = null;
 				ushort? last = null;
+				
 				foreach( var range in ordered )
 				{
 					first ??= range.First;
@@ -38,6 +40,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 					if( range.First > last.Value + 1 )
 					{
 						yield return new VolumeSliceRangeDefinition( group.Key, first.Value, last.Value );
+						
 						first = range.First;
 						last = range.Last;
 					}
