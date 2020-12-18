@@ -33,6 +33,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		private readonly ushort _SizeX;
 		private readonly ushort _SizeY;
 		private readonly ushort _SizeZ;
+
 		private ushort _CurrentSlice;
 		private byte[] _Buffer;
 
@@ -52,7 +53,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			_SizeY = metadata.SizeY;
 			_SizeZ = metadata.SizeZ;
 
-			_Buffer = new byte[0];
+			_Buffer = Array.Empty<byte>();
 
 			Interop = new InteropSliceReader
 			{
@@ -88,10 +89,11 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( _CurrentSlice >= _SizeX )
 				return false;
 
-			_ProgressNotifier?.Report( new VolumeSliceDefinition( _ReadDirection, _CurrentSlice ) );
+			ReportProgress();
 
-			if( _Buffer.Length < width * height )
-				_Buffer = new byte[width * height];
+			var bufferSize = width * height;
+			if( _Buffer.Length < bufferSize )
+				_Buffer = new byte[bufferSize];
 
 			var sx = _SizeX;
 
@@ -110,19 +112,18 @@ namespace Zeiss.IMT.PiWeb.Volume
 				}
 			} );
 
-			Marshal.Copy( _Buffer, 0, pv, width * height );
+			Marshal.Copy( _Buffer, 0, pv, bufferSize );
 			_CurrentSlice++;
 
 			return true;
 		}
-
 
 		private bool ReadInYDirection( IntPtr pv, ushort width, ushort height )
 		{
 			if( _CurrentSlice >= _SizeY )
 				return false;
 
-			_ProgressNotifier?.Report( new VolumeSliceDefinition( _ReadDirection, _CurrentSlice ) );
+			ReportProgress();
 
 			Parallel.For( 0, Math.Min( _SizeZ, height ), z => Marshal.Copy( _Data[ z ], _CurrentSlice * _SizeX, pv + z * width, _SizeX ) );
 
@@ -137,7 +138,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( _CurrentSlice >= _SizeZ )
 				return false;
 
-			_ProgressNotifier?.Report( new VolumeSliceDefinition( _ReadDirection, _CurrentSlice ) );
+			ReportProgress();
 
 			var data = _Data[ _CurrentSlice ];
 
@@ -146,6 +147,11 @@ namespace Zeiss.IMT.PiWeb.Volume
 			_CurrentSlice++;
 
 			return true;
+		}
+
+		private void ReportProgress()
+		{
+			_ProgressNotifier?.Report( new VolumeSliceDefinition( _ReadDirection, _CurrentSlice ) );
 		}
 
 		#endregion

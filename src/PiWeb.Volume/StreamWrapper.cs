@@ -24,7 +24,6 @@ namespace Zeiss.IMT.PiWeb.Volume
 		#region members
 
 		private readonly Stream _Stream;
-
 		private byte[] _Buffer;
 
 		internal InteropStream Interop;
@@ -36,7 +35,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		internal StreamWrapper( Stream stream )
 		{
 			_Stream = stream ?? throw new ArgumentNullException();
-			_Buffer = new byte[0];
+			_Buffer = Array.Empty<byte>();
 			Interop = new InteropStream
 			{
 				Read = Read,

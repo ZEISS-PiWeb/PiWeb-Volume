@@ -13,6 +13,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Compare.ViewModel
 	#region usings
 
 	using System;
+	using System.Buffers;
 	using System.Reactive.Linq;
 	using System.Threading;
 	using System.Threading.Tasks;
@@ -195,7 +196,8 @@ namespace Zeiss.IMT.PiWeb.Volume.Compare.ViewModel
 				var deltaMax = new SpectrumData( "Maximum deviation", Colors.IndianRed );
 				var deltaAvg = new SpectrumData( "Average deviation", Colors.DodgerBlue );
 
-				var counts = new long[256];
+				const int spectrumLength = 256;
+				var counts = ArrayPool<long>.Shared.Rent( spectrumLength );
 
 				for( var i = 0; i < left.Data.Length; i++ )
 				{
@@ -208,7 +210,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Compare.ViewModel
 					deltaMax.Values[ leftValue ] = Math.Max( deltaMax.Values[ leftValue ], delta );
 				}
 
-				for( var i = 0; i < 256; i++ )
+				for( var i = 0; i < spectrumLength; i++ )
 				{
 					var count = counts[ i ];
 					if( count == 0 )
@@ -216,6 +218,8 @@ namespace Zeiss.IMT.PiWeb.Volume.Compare.ViewModel
 
 					deltaAvg.Values[ i ] /= count;
 				}
+
+				ArrayPool<long>.Shared.Return( counts );
 
 				return ( leftData, new[] { deltaAvg, deltaMax }, rightData );
 			}, ct );

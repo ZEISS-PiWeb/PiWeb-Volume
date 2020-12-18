@@ -13,6 +13,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#region usings
 
 	using System;
+	using System.Buffers;
 	using System.IO;
 	using System.Runtime.InteropServices;
 	using System.Threading;
@@ -115,7 +116,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( previewSizeX < 2 || previewSizeY < 2 || previewSizeZ < 2 )
 				throw new ArgumentOutOfRangeException( nameof(minification) );
 
-			var sliceBuffer = new byte[sizeX * sizeY];
+			var sliceBufferSize = sizeX * sizeY;
+			var sliceBuffer = ArrayPool<byte>.Shared.Rent( sliceBufferSize );
+			
 			var result = new byte[previewSizeZ][];
 			long sliceSize = previewSizeX * previewSizeY;
 
@@ -128,7 +131,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 				if( oz % minification == 0 )
 				{
-					stream.Read( sliceBuffer, 0, sizeX * sizeY );
+					stream.Read( sliceBuffer, 0, sliceBufferSize );
 					var position = 0;
 
 					for( ushort y = 0, oy = 0; y < previewSizeY && oy < sizeY; y++, oy += minification )
@@ -139,9 +142,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 				}
 				else
 				{
-					stream.Seek( sizeX * sizeY, SeekOrigin.Current );
+					stream.Seek( sliceBufferSize, SeekOrigin.Current );
 				}
 			}
+			ArrayPool<byte>.Shared.Return( sliceBuffer );
 
 			return Volume.CreateUncompressed( new VolumeMetadata( previewSizeX, previewSizeY, previewSizeZ, metadata.ResolutionX * minification, metadata.ResolutionY * minification, metadata.ResolutionZ * minification ), result );
 		}
