@@ -20,8 +20,9 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
-        <PackageReference Include="System.Reactive" Version="4.2.0" />        
+        <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" NoWarn="NU1701" />
+        <PackageReference Include="System.Reactive" Version="4.2.0" NoWarn="NU1701" />
+        <PackageReference Include="Extended.Wpf.Toolkit" Version="4.0.1" NoWarn="NU1701" />
     </ItemGroup>
     <ItemGroup>
         <Resource Include="Effects\*.ps" />
@@ -30,11 +31,6 @@
     <ItemGroup>
         <ProjectReference Include="$(SolutionDir)\PiWeb.Volume\PiWeb.Volume.csproj" />
         <ProjectReference Include="$(SolutionDir)\PiWeb.Volume.Convert\PiWeb.Volume.Convert.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <Reference Include="Xceed.Wpf.Toolkit, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4">
-        <HintPath>..\..\..\..\Users\ddschn\.nuget\packages\extended.wpf.toolkit\4.0.1\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
 </Project>
