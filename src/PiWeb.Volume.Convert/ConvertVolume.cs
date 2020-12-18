@@ -14,7 +14,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 
 	using System;
 	using System.IO;
-	
+
 	#endregion
 
 	public static class ConvertVolume
@@ -48,14 +48,14 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 
 			switch( vgi.BitDepth )
 			{
-				case 16: 
-					var uint16Stream = extraPolate 
-						? new Uint16Stream( dataStream, minValue, maxValue ) 
+				case 16:
+					var uint16Stream = extraPolate
+						? new Uint16Stream( dataStream, minValue, maxValue )
 						: new Uint16Stream( dataStream );
 					return FromUint8( uint16Stream, vgi, streamed, progress );
-				case 8: 
-					var uint8Stream = extraPolate 
-						? new Uint8Stream( dataStream, minValue, maxValue ) 
+				case 8:
+					var uint8Stream = extraPolate
+						? new Uint8Stream( dataStream, minValue, maxValue )
 						: new Uint8Stream( dataStream );
 					return FromUint8( uint8Stream, vgi, streamed, progress );
 				default: throw new NotSupportedException( "This converter can only convert 8 bit and 16 bit volumes." );
@@ -87,14 +87,14 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 
 			switch( scv.BitDepth )
 			{
-				case 16: 
-					var uint16Stream = extraPolate 
-						? new Uint16Stream( scvStream, minValue, maxValue ) 
+				case 16:
+					var uint16Stream = extraPolate
+						? new Uint16Stream( scvStream, minValue, maxValue )
 						: new Uint16Stream( scvStream );
 					return FromUint8( uint16Stream, scv, streamed, progress );
-				case 8: 
-					var uint8Stream = extraPolate 
-						? new Uint8Stream( scvStream, minValue, maxValue ) 
+				case 8:
+					var uint8Stream = extraPolate
+						? new Uint8Stream( scvStream, minValue, maxValue )
 						: new Uint8Stream( scvStream );
 					return FromUint8( uint8Stream, scv, streamed, progress );
 				default: throw new NotSupportedException( "This converter can only convert 8 bit and 16 bit volumes." );
@@ -111,9 +111,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		/// <param name="progress">Progress</param>
 		public static Volume FromUint16( Stream uint16Stream, VolumeMetadata metadata, bool streamed, IProgress<double> progress )
 		{
-			if (streamed)
+			if( streamed )
 				return new StreamedVolume( metadata, uint16Stream );
-			
+
 			var sx = metadata.SizeX;
 			var sy = metadata.SizeY;
 			var sz = metadata.SizeZ;
@@ -148,9 +148,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		/// <param name="progress">Progress</param>
 		public static Volume FromUint8( Stream uint8Stream, VolumeMetadata metadata, bool streamed, IProgress<double> progress )
 		{
-			if (streamed)
+			if( streamed )
 				return new StreamedVolume( metadata, uint8Stream );
-			
+
 			var sx = metadata.SizeX;
 			var sy = metadata.SizeY;
 			var sz = metadata.SizeZ;

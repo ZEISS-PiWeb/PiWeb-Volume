@@ -24,10 +24,10 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		private readonly Stream _BaseStream;
 		private readonly ushort _MinValue;
 		private readonly bool _Extrapolate;
-
-		private byte[] _ByteBuffer;
 		private readonly double _Factor;
 		private readonly long _Offset;
+
+		private byte[] _ByteBuffer;
 
 		#endregion
 
@@ -55,11 +55,11 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		public override bool CanRead => true;
 		public override bool CanSeek => true;
 		public override bool CanWrite => false;
-		public override long Length => (_BaseStream.Length - _Offset) / sizeof( ushort );
+		public override long Length => ( _BaseStream.Length - _Offset ) / sizeof( ushort );
 
 		public override long Position
 		{
-			get => (_BaseStream.Position - _Offset )/ sizeof( ushort );
+			get => ( _BaseStream.Position - _Offset ) / sizeof( ushort );
 			set => _BaseStream.Position = _Offset + value * sizeof( ushort );
 		}
 
@@ -76,14 +76,14 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		{
 			if( _ByteBuffer is null || _ByteBuffer.Length != count * 2 )
 				_ByteBuffer = new byte[count * sizeof( ushort )];
-			
+
 			var read = _BaseStream.Read( _ByteBuffer, 0, count * 2 );
 
 			if( _Extrapolate )
 			{
 				for( var i = 0; i < read / 2; i++ )
 				{
-					var value = (ushort)(_ByteBuffer[i * 2] | _ByteBuffer[i * 2+1] << 8);
+					var value = ( ushort ) ( _ByteBuffer[ i * 2 ] | _ByteBuffer[ i * 2 + 1 ] << 8 );
 					buffer[ i + offset ] = ( byte ) ( ( ushort ) Math.Min( ushort.MaxValue, Math.Max( ushort.MinValue, value - _MinValue ) * _Factor ) >> 8 );
 				}
 			}
@@ -93,8 +93,6 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 				{
 					buffer[ i + offset ] = _ByteBuffer[ i * 2 + 1 ];
 				}
-
-				
 			}
 
 			return read / 2;
@@ -104,8 +102,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		{
 			if( origin == SeekOrigin.Begin )
 				return _BaseStream.Seek( _Offset + offset * sizeof( ushort ), origin );
-			else
-				return _BaseStream.Seek( offset * sizeof( ushort ), origin );
+			return _BaseStream.Seek( offset * sizeof( ushort ), origin );
 		}
 
 		public override void SetLength( long value )

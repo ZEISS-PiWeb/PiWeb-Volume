@@ -57,7 +57,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		public override long Position
 		{
 			get => _BaseStream.Position - _Offset;
-			set => _BaseStream.Position = value - + _Offset;
+			set => _BaseStream.Position = value - +_Offset;
 		}
 
 		#endregion
@@ -86,8 +86,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		{
 			if( origin == SeekOrigin.Begin )
 				return _BaseStream.Seek( _Offset + offset, origin );
-			else
-				return _BaseStream.Seek( offset, origin );
+			return _BaseStream.Seek( offset, origin );
 		}
 
 		public override void SetLength( long value )
