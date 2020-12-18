@@ -22,7 +22,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 	/// <summary>
 	/// A single layer of a discrete volume.
 	/// </summary>
-	public sealed class VolumeSlice
+	public readonly struct VolumeSlice
 	{
 		#region constructors
 
