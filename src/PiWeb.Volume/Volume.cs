@@ -197,83 +197,69 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( !stream.CanSeek )
 				stream = new MemoryStream( stream.StreamToArray() );
 
-			VolumeMetadata metaData;
-			var directionMap = new DirectionMap();
-			VolumeCompressionOptions compressionOptions;
-
-			using( var archive = new ZipArchive( stream ) )
-			{
-				#region Metadata
-
-				var metaDataEntry = archive.GetEntry( "Metadata.xml" );
-				if( metaDataEntry == null )
-					throw new InvalidOperationException( Resources.FormatResource<Volume>( "InvalidFormatMissingFile_ErrorText", "Metadata.xml" ) );
-
-				using( var entryStream = metaDataEntry.Open() )
-				{
-					metaData = VolumeMetadata.Deserialize( entryStream );
-					if( metaData.FileVersion > FileVersion )
-						throw new InvalidOperationException( Resources.FormatResource<Volume>( "FileVersionError_Text", metaData.FileVersion, FileVersion ) );
-				}
-
-				#endregion
-
-				#region CompressionOptions
-
-				var compressionOptionsEntry = archive.GetEntry( "CompressionOptions.xml" );
-
-				if( compressionOptionsEntry != null )
-					using( var entryStream = compressionOptionsEntry.Open() )
-					{
-						compressionOptions = VolumeCompressionOptions.Deserialize( entryStream );
-					}
-				else
-					compressionOptions = null;
-
-				#endregion
-
-				#region Voxels
-
-				var dataEntry = archive.GetEntry( "Voxels.dat" );
-				if( dataEntry == null )
-				{
-					dataEntry = archive.GetEntry( "VoxelsZ.dat" );
-					if( dataEntry == null )
-						throw new InvalidOperationException( Resources.FormatResource<Volume>( "InvalidFormatMissingFile_ErrorText", "Voxels.dat" ) );
-
-					using( var entryStream = dataEntry.Open() )
-					{
-						directionMap[ Direction.Z ] = entryStream.StreamToArray();
-					}
-
-					dataEntry = archive.GetEntry( "VoxelsY.dat" );
-					if( dataEntry != null )
-						using( var entryStream = dataEntry.Open() )
-						{
-							directionMap[ Direction.Y ] = entryStream.StreamToArray();
-						}
-
-					dataEntry = archive.GetEntry( "VoxelsX.dat" );
-					if( dataEntry != null )
-						using( var entryStream = dataEntry.Open() )
-						{
-							directionMap[ Direction.X ] = entryStream.StreamToArray();
-						}
-				}
-				else
-				{
-					using( var entryStream = dataEntry.Open() )
-					{
-						directionMap[ Direction.Z ] = entryStream.StreamToArray();
-					}
-				}
-
-				#endregion
-			}
+			using var archive = new ZipArchive( stream );
+			
+			var metaData = ReadVolumeMetadata( archive );
+			var compressionOptions = ReadVolumeCompressionOptions( archive );
+			var directionMap = ReadVolumeVoxels( archive );
 
 			if( compressionOptions?.Encoder == BlockVolume.EncoderID )
 				return new BlockVolume( metaData, compressionOptions, directionMap );
+			
 			return new CompressedVolume( metaData, compressionOptions, directionMap );
+		}
+
+		private static DirectionMap ReadVolumeVoxels( ZipArchive archive )
+		{
+			var directionMap = new DirectionMap();
+
+			if( ReadVoxelData( archive.GetEntry( "Voxels.dat" ), Direction.Z, directionMap ) ) 
+				return directionMap;
+			
+			if( !ReadVoxelData( archive.GetEntry( "VoxelsZ.dat" ), Direction.Z, directionMap ) ) 
+				throw new InvalidOperationException( Resources.FormatResource<Volume>( "InvalidFormatMissingFile_ErrorText", "Voxels.dat" ) );
+
+			ReadVoxelData( archive.GetEntry( "VoxelsY.dat" ), Direction.Y, directionMap );
+			ReadVoxelData( archive.GetEntry( "VoxelsX.dat" ), Direction.X, directionMap ); 
+
+			return directionMap;
+		}
+
+		private static bool ReadVoxelData( ZipArchiveEntry dataEntry, Direction direction, DirectionMap directionMap )
+		{
+			if( dataEntry == null )
+				return false;
+			
+			using var entryStream = dataEntry.Open();
+			directionMap[ direction ] = entryStream.StreamToArray( ( int ) dataEntry.Length );
+
+			return true;
+		}
+
+		private static VolumeMetadata ReadVolumeMetadata( ZipArchive archive )
+		{
+			var metaDataEntry = archive.GetEntry( "Metadata.xml" );
+			if( metaDataEntry == null )
+				throw new InvalidOperationException( Resources.FormatResource<Volume>( "InvalidFormatMissingFile_ErrorText", "Metadata.xml" ) );
+
+			using var entryStream = metaDataEntry.Open();
+			var metaData = VolumeMetadata.Deserialize( entryStream );
+
+			if( metaData.FileVersion > FileVersion )
+				throw new InvalidOperationException( Resources.FormatResource<Volume>( "FileVersionError_Text", metaData.FileVersion, FileVersion ) );
+
+			return metaData;
+		}
+
+		private static VolumeCompressionOptions ReadVolumeCompressionOptions( ZipArchive archive )
+		{
+			var compressionOptionsEntry = archive.GetEntry( "CompressionOptions.xml" );
+
+			if( compressionOptionsEntry == null )
+				return null;
+			
+			using var entryStream = compressionOptionsEntry.Open();
+			return VolumeCompressionOptions.Deserialize( entryStream );
 		}
 
 		#endregion
