@@ -156,15 +156,17 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 			var sz = metadata.SizeZ;
 
 			var data = new byte[sz][];
+			var sliceSize = sx * sy;
 
 			for( var z = 0; z < sz; z++ )
-				data[ z ] = new byte[sy * sx];
+			{
+				data[ z ] = new byte[sliceSize];
+			}
 
 			for( var z = 0; z < sz; z++ )
 			{
 				progress?.Report( ( double ) z / sz );
-
-				uint8Stream.Read( data[ z ], 0, sx * sy );
+				uint8Stream.Read( data[ z ], 0, sliceSize );
 			}
 
 			return new UncompressedVolume( metadata, data );
