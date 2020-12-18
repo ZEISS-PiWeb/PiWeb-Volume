@@ -77,6 +77,9 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 			get => _VolumeViewModel;
 			set
 			{
+				if( _VolumeViewModel?.Volume is IDisposable disposable )
+					disposable.Dispose();
+
 				if( Set( ref _VolumeViewModel, value ) )
 					VolumeChanged?.Invoke( this, EventArgs.Empty );
 			}
@@ -112,7 +115,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 		private async void ExecuteSaveVolume()
 		{
-			if( !( VolumeViewModel.Volume is UncompressedVolume volume ) || !_FileService.SelectSaveFileName( out var fileName ) )
+			if( !_FileService.SelectSaveFileName( out var fileName ) )
 				return;
 
 			await using var stream = File.Create( fileName );
@@ -127,11 +130,15 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 			IsLoading = true;
 
+			var volume = VolumeViewModel.Volume;
 			var progress = new VolumeProgress( volume );
 
 			progress.ProgressChanged += OnProgressChanged;
 
-			await Task.Run( () => volume.Save( stream, options, multiDirection, progress ) );
+			if (volume is UncompressedVolume uncompressedVolume)
+				await Task.Run( () => uncompressedVolume.Save( stream, options, multiDirection, progress ) );
+			else if (volume is StreamedVolume streamedVolume)
+				await Task.Run( () => streamedVolume.Save( stream, options, progress ) );
 
 			progress.ProgressChanged -= OnProgressChanged;
 
@@ -143,7 +150,8 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 		private bool CanExecuteSaveVolume()
 		{
-			return VolumeViewModel?.Volume is UncompressedVolume;
+			return VolumeViewModel?.Volume is UncompressedVolume ||
+			       VolumeViewModel?.Volume is StreamedVolume;
 		}
 
 		private bool CanExecuteDecompress()
@@ -169,7 +177,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 			ProgressMessage = null;
 			Progress = 0.0;
-
+			
 			VolumeViewModel = new VolumeViewModel( decompressedVolume, decompressedVolume, 1 );
 
 			IsLoading = false;
@@ -217,7 +225,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 			ProgressMessage = null;
 			Progress = 0.0;
-
+		
 			VolumeViewModel = new VolumeViewModel( volume, preview, 4 );
 
 			IsLoading = false;
@@ -233,7 +241,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 					"A '.uint16' file with the same name as the vgi file must be placed in the same directory as the vgi file" );
 				return;
 			}
-			
+
 			var loadOptionsViewModel = new LoadOptionsViewModel();
 			if( _ViewService.RequestView( loadOptionsViewModel ) != true )
 				return;
@@ -245,7 +253,14 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 			progress.ProgressChanged += OnProgressChanged;
 
-			var volume = await Task.Run( () => ConvertVolume.FromVgi( vgi, data, loadOptionsViewModel.Extrapolate, null, null, progress ) );
+			var volume = await Task.Run( () => ConvertVolume.FromVgi(
+				vgi,
+				data,
+				loadOptionsViewModel.Extrapolate,
+				loadOptionsViewModel.Minimum,
+				loadOptionsViewModel.Maximum,
+				loadOptionsViewModel.Streamed,
+				progress ) );
 
 			progress.ProgressChanged -= OnProgressChanged;
 
@@ -261,21 +276,45 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 			var loadOptionsViewModel = new LoadOptionsViewModel();
 			if( _ViewService.RequestView( loadOptionsViewModel ) != true )
 				return;
-			
-			await using var scv = File.OpenRead( FileName );
+
+			var scv = File.OpenRead( FileName );
 
 			var progress = new DoubleProgress();
 
 			progress.ProgressChanged += OnProgressChanged;
 
-			var volume = await Task.Run( () => ConvertVolume.FromScv( scv, loadOptionsViewModel.Extrapolate, null, null, progress ) );
+			var volume = await Task.Run( () => ConvertVolume.FromScv(
+				scv,
+				loadOptionsViewModel.Extrapolate,
+				loadOptionsViewModel.Minimum,
+				loadOptionsViewModel.Maximum,
+				loadOptionsViewModel.Streamed,
+				progress ) );
 
 			progress.ProgressChanged -= OnProgressChanged;
+
+			if( volume is StreamedVolume streamed )
+			{
+				var previewProgress = new VolumeProgress( volume );
+
+				previewProgress.ProgressChanged += OnProgressChanged;
+
+				var preview = await Task.Run( () => streamed.CreatePreview( 4, previewProgress ) );
+
+				previewProgress.ProgressChanged -= OnProgressChanged;
+
+				VolumeViewModel = new VolumeViewModel( streamed, preview, 4 );
+			}
+			else
+			{
+				scv.Close();
+
+				VolumeViewModel = new VolumeViewModel( volume, volume, 1 );
+			}
 
 			ProgressMessage = null;
 			Progress = 0.0;
 
-			VolumeViewModel = new VolumeViewModel( volume, volume, 1 );
 			IsLoading = false;
 		}
 

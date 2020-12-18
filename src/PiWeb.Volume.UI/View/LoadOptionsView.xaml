@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModel="clr-namespace:Zeiss.IMT.PiWeb.Volume.UI.ViewModel"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:extensions="clr-namespace:Zeiss.IMT.PiWeb.Volume.UI.Extensions"
 
         Title="Load options"
         Width="400"
@@ -16,8 +18,17 @@
    
     <UniformGrid Columns="2">
 
+        <TextBlock Margin="8">Streamed</TextBlock>
+        <CheckBox Margin="8" IsChecked="{Binding Path=Streamed}" />
+        
         <TextBlock Margin="8">Extrapolate value range</TextBlock>
         <CheckBox Margin="8" IsChecked="{Binding Path=Extrapolate}" />
+        
+        <TextBlock Margin="8">Minimum</TextBlock>
+        <xctk:IntegerUpDown Minimum="0" Maximum="255" IsEnabled="{extensions:IfBinding Extrapolate}" Value="{Binding Minimum}" Margin="8"  />
+        
+        <TextBlock Margin="8">Maximum</TextBlock>
+        <xctk:IntegerUpDown Minimum="0" Maximum="255" IsEnabled="{extensions:IfBinding Extrapolate}" Value="{Binding Maximum}" Margin="8"  />
       
         <Button Margin="8" IsCancel="True">Cancel</Button>
         <Button Margin="8"

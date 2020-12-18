@@ -80,10 +80,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 
             if( _Buffer.Length < width * height )
                 _Buffer = new byte[width * height];
-
+            
             for( var y = 0; y < _SizeY; y++ )
-                _Stream.Read( _Buffer, y * width, _SizeX );
-
+	            _Stream.Read( _Buffer, width * y, _SizeX );
 
             Marshal.Copy( _Buffer, 0, pv, width * height );
             _CurrentSlice++;
