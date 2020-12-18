@@ -14,7 +14,6 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 
 	using System.IO;
 	using System.Text;
-	using Zeiss.IMT.PiWeb.Volume;
 
 	#endregion
 
@@ -31,9 +30,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		#region properties
 
 		public double PositionX { get; private set; }
-		
+
 		public double PositionY { get; private set; }
-		
+
 		public double PositionZ { get; private set; }
 
 		public float BinningMode { get; private set; }
@@ -61,9 +60,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		public int VolumeSizeZ { get; private set; }
 
 		public double ResolutionX { get; private set; }
-		
+
 		public double ResolutionY { get; private set; }
-		
+
 		public double ResolutionZ { get; private set; }
 
 		public double MinBitDepth { get; private set; }
@@ -71,9 +70,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		public double MaxBitDepth { get; private set; }
 
 		public double ScannerPositionX { get; private set; }
-		
+
 		public double ScannerPositionY { get; private set; }
-		
+
 		public double ScannerPositionZ { get; private set; }
 
 		public int ScannerCurrent { get; private set; }
@@ -81,9 +80,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		public int ScannerVoltage { get; private set; }
 
 		public double RtPositionX { get; private set; }
-		
+
 		public double RtPositionY { get; private set; }
-		
+
 		public double RtPositionZ { get; private set; }
 
 		public double DetectorTime { get; private set; }
@@ -91,9 +90,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		public double DetectorGain { get; private set; }
 
 		public double DetectorPositionX { get; private set; }
-		
+
 		public double DetectorPositionY { get; private set; }
-		
+
 		public double DetectorPositionZ { get; private set; }
 
 		public float DetectorVoxelSizeX { get; private set; }
@@ -107,11 +106,11 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		public int BitDepth { get; private set; }
 
 		public int RoiX { get; private set; }
-		
+
 		public int RoiY { get; private set; }
-		
+
 		public int RoiW { get; private set; }
-		
+
 		public int RoiH { get; private set; }
 
 		public float MaxReko { get; private set; }

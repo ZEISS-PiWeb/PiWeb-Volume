@@ -15,7 +15,6 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 	using System;
 	using System.Globalization;
 	using System.IO;
-	using Zeiss.IMT.PiWeb.Volume;
 
 	#endregion
 
