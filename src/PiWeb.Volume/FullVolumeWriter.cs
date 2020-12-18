@@ -36,7 +36,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		#region constructors
 
-		internal FullVolumeWriter( VolumeMetadata metadata, Direction direction, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default( CancellationToken ) )
+		internal FullVolumeWriter( VolumeMetadata metadata, Direction direction, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default )
 		{
 			if( metadata == null )
 				throw new ArgumentNullException( nameof(metadata) );

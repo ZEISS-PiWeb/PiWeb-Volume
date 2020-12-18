@@ -335,7 +335,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			}
 			catch( Exception )
 			{
-				result = default( TimeSpan );
+				result = default;
 				return false;
 			}
 		}

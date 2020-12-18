@@ -71,22 +71,20 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 
 		/// <inheritdoc />
-		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			if( CompressedData[ Direction.Z ] == null )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
-			using( var input = new MemoryStream( CompressedData[ Direction.Z ], false ) )
-			{
-				var inputWrapper = new StreamWrapper( input );
-				var previewCreator = new PreviewCreator( Metadata, minification, progress, ct );
+			using var input = new MemoryStream( CompressedData[ Direction.Z ], false );
+			var inputWrapper = new StreamWrapper( input );
+			var previewCreator = new PreviewCreator( Metadata, minification, progress, ct );
 
-				var error = ( VolumeError ) DecompressVolume( inputWrapper.Interop, previewCreator.Interop );
-				if( error != VolumeError.Success )
-					throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
+			var error = ( VolumeError ) DecompressVolume( inputWrapper.Interop, previewCreator.Interop );
+			if( error != VolumeError.Success )
+				throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
 
-				return previewCreator.GetPreview();
-			}
+			return previewCreator.GetPreview();
 		}
 
 		internal static CompressedVolume Create( Stream stream, Direction direction, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
@@ -102,20 +100,18 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		private static byte[] CompressStream( Stream stream, Direction direction, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
-			using( var outputStream = new MemoryStream() )
-			{
-				GetEncodedSliceSize( metadata, direction, out var encodingSizeX, out var encodingSizeY );
+			using var outputStream = new MemoryStream();
+			GetEncodedSliceSize( metadata, direction, out var encodingSizeX, out var encodingSizeY );
 
-				var inputStreamWrapper = new SliceStreamReader( metadata, stream, progress, ct );
-				var outputStreamWrapper = new StreamWrapper( outputStream );
+			var inputStreamWrapper = new SliceStreamReader( metadata, stream, progress, ct );
+			var outputStreamWrapper = new StreamWrapper( outputStream );
 
-				var error = ( VolumeError ) CompressVolume( inputStreamWrapper.Interop, outputStreamWrapper.Interop, encodingSizeX, encodingSizeY, options.Encoder, options.PixelFormat, options.GetOptionsString(), options.Bitrate );
+			var error = ( VolumeError ) CompressVolume( inputStreamWrapper.Interop, outputStreamWrapper.Interop, encodingSizeX, encodingSizeY, options.Encoder, options.PixelFormat, options.GetOptionsString(), options.Bitrate );
 
-				if( error != VolumeError.Success )
-					throw new VolumeException( error, Resources.FormatResource<Volume>( "Compression_ErrorText", error ) );
+			if( error != VolumeError.Success )
+				throw new VolumeException( error, Resources.FormatResource<Volume>( "Compression_ErrorText", error ) );
 
-				return outputStream.ToArray();
-			}
+			return outputStream.ToArray();
 		}
 
 		/// <summary>
@@ -125,27 +121,25 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="ct">Cancellation token</param>
 		/// <exception cref="VolumeException">Error during decoding</exception>
 		/// <exception cref="NotSupportedException">The volume has no compressed data</exception>
-		public virtual UncompressedVolume Decompress( IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public virtual UncompressedVolume Decompress( IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			if( CompressedData[ Direction.Z ] == null )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
-			using( var input = new MemoryStream( CompressedData[ Direction.Z ] ) )
-			{
-				var inputWrapper = new StreamWrapper( input );
-				var outputWrapper = new FullVolumeWriter( Metadata, Direction.Z, progress, ct );
+			using var input = new MemoryStream( CompressedData[ Direction.Z ] );
+			var inputWrapper = new StreamWrapper( input );
+			var outputWrapper = new FullVolumeWriter( Metadata, Direction.Z, progress, ct );
 
-				var error = ( VolumeError ) DecompressVolume( inputWrapper.Interop, outputWrapper.Interop );
-				if( error != VolumeError.Success )
-					throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
+			var error = ( VolumeError ) DecompressVolume( inputWrapper.Interop, outputWrapper.Interop );
+			if( error != VolumeError.Success )
+				throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
 
-				return CreateUncompressed( Metadata, outputWrapper.GetData() );
-			}
+			return CreateUncompressed( Metadata, outputWrapper.GetData() );
 		}
 
 		/// <inheritdoc />
 		/// <exception cref="NotSupportedException">The volume has no compressed data</exception>
-		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			if( ranges == null )
 				throw new ArgumentNullException( nameof(ranges) );
@@ -158,7 +152,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			//Partial scan in directed compressed volumes
 			if( combinedRanges.All( r => CompressedData[ r.Direction ] != null ) &&
 			    combinedRanges.Length <= Constants.RangeNumberLimitForEfficientScan &&
-			    combinedRanges.Sum( r => r.Last - r.First + 1 ) < Constants.SliceNumberLimitForEfficientScan )
+			    combinedRanges.Sum( r => r.Length + 1 ) < Constants.SliceNumberLimitForEfficientScan )
 			{
 				return new VolumeSliceCollection( ranges.Select( range => GetSliceRange( range ) ) );
 			}
@@ -172,36 +166,32 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( CompressedData[ direction ] == null )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
-			using( var input = new MemoryStream( CompressedData[ direction ], false ) )
-			{
-				var inputWrapper = new StreamWrapper( input );
-				var rangeReader = new VolumeSliceRangeCollector( Metadata, direction, combinedRanges, progress, ct );
+			using var input = new MemoryStream( CompressedData[ direction ], false );
+			var inputWrapper = new StreamWrapper( input );
+			var rangeReader = new VolumeSliceRangeCollector( Metadata, direction, combinedRanges, progress, ct );
 
-				var error = ( VolumeError ) DecompressVolume( inputWrapper.Interop, rangeReader.Interop );
-				if( error != VolumeError.Success )
-					throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
+			var error = ( VolumeError ) DecompressVolume( inputWrapper.Interop, rangeReader.Interop );
+			if( error != VolumeError.Success )
+				throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
 
-				return rangeReader.GetSliceRangeCollection();
-			}
+			return rangeReader.GetSliceRangeCollection();
 		}
 
 		/// <inheritdoc />
 		/// <exception cref="NotSupportedException">The volume has no compressed data</exception>
-		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			if( CompressedData[ range.Direction ] != null )
 			{
-				using( var input = new MemoryStream( CompressedData[ range.Direction ], false ) )
-				{
-					var inputWrapper = new StreamWrapper( input );
-					var rangeReader = new VolumeSliceRangeCollector( Metadata, range.Direction, new[] { range }, progress, ct );
+				using var input = new MemoryStream( CompressedData[ range.Direction ], false );
+				var inputWrapper = new StreamWrapper( input );
+				var rangeReader = new VolumeSliceRangeCollector( Metadata, range.Direction, new[] { range }, progress, ct );
 
-					var error = ( VolumeError ) DecompressSlices( inputWrapper.Interop, rangeReader.Interop, range.First, ( ushort ) ( range.Last - range.First + 1 ) );
-					if( error != VolumeError.Success )
-						throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
+				var error = ( VolumeError ) DecompressSlices( inputWrapper.Interop, rangeReader.Interop, range.First, ( ushort ) ( range.Length + 1 ) );
+				if( error != VolumeError.Success )
+					throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
 
-					return rangeReader.GetSliceRange( range );
-				}
+				return rangeReader.GetSliceRange( range );
 			}
 
 			if( CompressedData[ Direction.Z ] == null )
@@ -222,22 +212,20 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		/// <inheritdoc />
 		/// <exception cref="NotSupportedException">The volume has no compressed data</exception>
-		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			//Videos with a very small number of frames appearantly have issues with av_seek, so we do a full scan instead
 			if( CompressedData[ slice.Direction ] != null )
 			{
-				using( var input = new MemoryStream( CompressedData[ slice.Direction ] ) )
-				{
-					var inputWrapper = new StreamWrapper( input );
-					var outputWrapper = new VolumeSliceRangeCollector( Metadata, slice.Direction, new[] { new VolumeSliceRangeDefinition( slice.Direction, slice.Index, slice.Index ) }, progress, ct );
+				using var input = new MemoryStream( CompressedData[ slice.Direction ] );
+				var inputWrapper = new StreamWrapper( input );
+				var outputWrapper = new VolumeSliceRangeCollector( Metadata, slice.Direction, new[] { new VolumeSliceRangeDefinition( slice.Direction, slice.Index, slice.Index ) }, progress, ct );
 
-					var error = ( VolumeError ) DecompressSlices( inputWrapper.Interop, outputWrapper.Interop, slice.Index, 1 );
-					if( error != VolumeError.Success )
-						throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
+				var error = ( VolumeError ) DecompressSlices( inputWrapper.Interop, outputWrapper.Interop, slice.Index, 1 );
+				if( error != VolumeError.Success )
+					throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
 
-					return outputWrapper.GetSlice( slice.Direction, slice.Index );
-				}
+				return outputWrapper.GetSlice( slice.Direction, slice.Index );
 			}
 
 			if( CompressedData[ Direction.Z ] == null )
@@ -265,49 +253,45 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( stream == null )
 				throw new ArgumentNullException( nameof(stream) );
 
-			using( var zipOutput = new ZipArchive( stream, ZipArchiveMode.Create ) )
+			using var zipOutput = new ZipArchive( stream, ZipArchiveMode.Create );
+			
+			var metaDataEntry = zipOutput.CreateNormalizedEntry( "Metadata.xml", CompressionLevel.Optimal );
+			using( var entryStream = metaDataEntry.Open() )
 			{
-				var entry = zipOutput.CreateNormalizedEntry( "Metadata.xml", CompressionLevel.Optimal );
-				using( var entryStream = entry.Open() )
-				{
-					Metadata.Serialize( entryStream );
-				}
+				Metadata.Serialize( entryStream );
+			}
 
-				if( CompressionOptions != null )
-				{
-					entry = zipOutput.CreateNormalizedEntry( "CompressionOptions.xml", CompressionLevel.Optimal );
-					using( var entryStream = entry.Open() )
-					{
-						CompressionOptions.Serialize( entryStream );
-					}
-				}
+			if( CompressionOptions != null )
+			{
+				var compressionOptionsEntry = zipOutput.CreateNormalizedEntry( "CompressionOptions.xml", CompressionLevel.Optimal );
+				using var entryStream = compressionOptionsEntry.Open();
+				
+				CompressionOptions.Serialize( entryStream );
+			}
 
-				if( CompressedData[ Direction.Z ] == null )
-					throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
+			if( CompressedData[ Direction.Z ] == null )
+				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
-				entry = zipOutput.CreateNormalizedEntry( "VoxelsZ.dat", CompressionOptions.Encoder == BlockVolume.EncoderID ? CompressionLevel.Optimal : CompressionLevel.NoCompression );
-				using( var entryStream = entry.Open() )
-				{
-					entryStream.Write( CompressedData[ Direction.Z ], 0, CompressedData[ Direction.Z ].Length );
-				}
+			var zEntry = zipOutput.CreateNormalizedEntry( "VoxelsZ.dat", CompressionOptions.Encoder == BlockVolume.EncoderID ? CompressionLevel.Optimal : CompressionLevel.NoCompression );
+			using( var entryStream = zEntry.Open() )
+			{
+				entryStream.Write( CompressedData[ Direction.Z ], 0, CompressedData[ Direction.Z ].Length );
+			}
 
-				if( CompressedData[ Direction.X ] != null )
-				{
-					entry = zipOutput.CreateNormalizedEntry( "VoxelsX.dat", CompressionLevel.NoCompression );
-					using( var entryStream = entry.Open() )
-					{
-						entryStream.Write( CompressedData[ Direction.X ], 0, CompressedData[ Direction.X ].Length );
-					}
-				}
+			if( CompressedData[ Direction.X ] != null )
+			{
+				var xEntry = zipOutput.CreateNormalizedEntry( "VoxelsX.dat", CompressionLevel.NoCompression );
+				using var entryStream = xEntry.Open();
+				
+				entryStream.Write( CompressedData[ Direction.X ], 0, CompressedData[ Direction.X ].Length );
+			}
 
-				if( CompressedData[ Direction.Y ] != null )
-				{
-					entry = zipOutput.CreateNormalizedEntry( "VoxelsY.dat", CompressionLevel.NoCompression );
-					using( var entryStream = entry.Open() )
-					{
-						entryStream.Write( CompressedData[ Direction.Y ], 0, CompressedData[ Direction.Y ].Length );
-					}
-				}
+			if( CompressedData[ Direction.Y ] != null )
+			{
+				var yEntry = zipOutput.CreateNormalizedEntry( "VoxelsY.dat", CompressionLevel.NoCompression );
+				using var entryStream = yEntry.Open();
+				
+				entryStream.Write( CompressedData[ Direction.Y ], 0, CompressedData[ Direction.Y ].Length );
 			}
 		}
 

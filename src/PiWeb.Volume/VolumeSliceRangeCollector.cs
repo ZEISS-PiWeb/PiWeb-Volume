@@ -43,7 +43,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		#region constructors
 
-		internal VolumeSliceRangeCollector( VolumeMetadata metaData, Direction direction, IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default( CancellationToken ) )
+		internal VolumeSliceRangeCollector( VolumeMetadata metaData, Direction direction, IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default )
 		{
 			if( direction != Direction.Z && ranges.Any( r => r.Direction != direction ) )
 				throw new ArgumentException( "Collecting slices ranges for different directions than input is only allowed for z-directed input" );
@@ -85,9 +85,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 		internal VolumeSliceCollection GetSliceRangeCollection()
 		{
 			return new VolumeSliceCollection(
-				_SlicesX.ToDictionary( kvp => kvp.Key, kvp => new VolumeSlice( Direction.X, kvp.Key, kvp.Value ) ),
-				_SlicesY.ToDictionary( kvp => kvp.Key, kvp => new VolumeSlice( Direction.Y, kvp.Key, kvp.Value ) ),
-				_SlicesZ.ToDictionary( kvp => kvp.Key, kvp => new VolumeSlice( Direction.Z, kvp.Key, kvp.Value ) )
+				_SlicesX.ToDictionary( k => k.Key, v => new VolumeSlice( Direction.X, v.Key, v.Value ) ),
+				_SlicesY.ToDictionary( k => k.Key, v => new VolumeSlice( Direction.Y, v.Key, v.Value ) ),
+				_SlicesZ.ToDictionary( k => k.Key, v => new VolumeSlice( Direction.Z, v.Key, v.Value ) )
 			);
 		}
 
@@ -147,48 +147,42 @@ namespace Zeiss.IMT.PiWeb.Volume
 			}
 		}
 
-		internal void WriteXSlice( IntPtr slice, ushort width, ushort height, ushort index )
+		internal void WriteXSlice( IntPtr slice, ushort width, ushort height, ushort x )
 		{
-			if( index >= _X )
-				return;
-
-			var x = index;
-
 			_ProgressNotifier?.Report( new VolumeSliceDefinition( Direction.X, x ) );
 
-			if( _SlicesX.ContainsKey( x ) )
-			{
-				for( var z = 0; z < _Z; z++ )
-					Marshal.Copy( slice + z * width, _SlicesX[ x ], z * _Y, _Y );
-			}
-		}
-
-		internal void WriteYSlice( IntPtr slice, ushort width, ushort height, ushort index )
-		{
-			if( index >= _Y )
+			if( x >= _X )
 				return;
 
-			var y = index;
+			if( !_SlicesX.TryGetValue( x, out var sliceX ) ) 
+				return;
+			
+			for( var z = 0; z < _Z; z++ )
+				Marshal.Copy( slice + z * width, sliceX, z * _Y, _Y );
+		}
 
+		internal void WriteYSlice( IntPtr slice, ushort width, ushort height, ushort y )
+		{
 			_ProgressNotifier?.Report( new VolumeSliceDefinition( Direction.Y, y ) );
 
-			if( _SlicesY.ContainsKey( y ) )
-			{
-				Parallel.For( 0, _Z, z => Marshal.Copy( slice + z * width, _SlicesY[ y ], z * _X, _X ) );
-			}
-		}
-
-		internal void WriteZSlice( IntPtr slice, ushort width, ushort height, ushort index )
-		{
-			if( index >= _Z )
+			if( y >= _Y )
 				return;
 
-			var z = index;
+			if( !_SlicesY.TryGetValue( y, out var sliceY ) )
+				return;
 
+			Parallel.For( 0, _Z, z => Marshal.Copy( slice + z * width, sliceY, z * _X, _X ) );
+		}
+
+		internal void WriteZSlice( IntPtr slice, ushort width, ushort height, ushort z )
+		{
 			_ProgressNotifier?.Report( new VolumeSliceDefinition( Direction.Z, z ) );
 
-			if( _SlicesZ.ContainsKey( z ) )
-				Parallel.For( 0, _Y, y => Marshal.Copy( slice + y * width, _SlicesZ[ z ], y * _X, _X ) );
+			if( z >= _Z )
+				return;
+
+			if( _SlicesZ.TryGetValue( z, out var sliceZ ) )
+				Parallel.For( 0, _Y, y => Marshal.Copy( slice + y * width, sliceZ, y * _X, _X ) );
 
 			foreach( var slicey in _SlicesY )
 			{
@@ -199,10 +193,13 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( !_SlicesX.Any() )
 				return;
 
-			foreach( var slicex in _SlicesX )
+			foreach( var sliceX in _SlicesX )
 			{
-				var x = slicex.Key;
-				Parallel.For( 0, _Y, y => { slicex.Value[ y + z * _Y ] = Marshal.ReadByte( slice, x + width * y ); } );
+				var x = sliceX.Key;
+				Parallel.For( 0, _Y, y => 
+				{
+					sliceX.Value[ y + z * _Y ] = Marshal.ReadByte( slice, x + width * y ); 
+				} );
 			}
 		}
 

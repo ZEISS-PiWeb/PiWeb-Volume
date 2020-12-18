@@ -82,45 +82,13 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <exception cref="System.ArgumentOutOfRangeException">direction - null</exception>
 		internal static VolumeSlice Extract( Direction direction, ushort index, VolumeMetadata volumeMetadata, byte[][] data )
 		{
-			var sx = volumeMetadata.SizeX;
-			var sy = volumeMetadata.SizeY;
-			var sz = volumeMetadata.SizeZ;
-
-			switch( direction )
+			return direction switch
 			{
-				case Direction.X:
-				{
-					var result = new byte[sy * sz];
-
-					Parallel.For( 0, sz, z =>
-					{
-						for( var y = 0; y < sy; y++ )
-						{
-							result[ z * sy + y ] = data[ z ][ y * sx + index ];
-						}
-					} );
-
-					return new VolumeSlice( direction, index, result );
-				}
-
-				case Direction.Y:
-				{
-					var result = new byte[sx * sz];
-
-					Parallel.For( 0, sz, z => { Array.Copy( data[ z ], index * sx, result, z * sx, sx ); } );
-
-					return new VolumeSlice( direction, index, result );
-				}
-
-				case Direction.Z:
-				{
-					var result = new byte[sx * sy];
-					Array.Copy( data[ index ], 0, result, 0, sx * sy );
-					return new VolumeSlice( direction, index, result );
-				}
-				default:
-					throw new ArgumentOutOfRangeException( nameof(direction), direction, null );
-			}
+				Direction.X => ReadSliceX( direction, index, data, volumeMetadata ),
+				Direction.Y => ReadSliceY( direction, index, data, volumeMetadata ),
+				Direction.Z => ReadSliceZ( direction, index, data, volumeMetadata ),
+				_ => throw new ArgumentOutOfRangeException( nameof(direction), direction, null )
+			};
 		}
 
 		/// <summary>
@@ -134,56 +102,119 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <exception cref="System.ArgumentOutOfRangeException">direction - null</exception>
 		internal static VolumeSlice Extract( Direction direction, ushort index, VolumeMetadata volumeMetadata, Stream stream )
 		{
+			return direction switch
+			{
+				Direction.X => ReadSliceX( direction, index, stream, volumeMetadata ),
+				Direction.Y => ReadSliceY( direction, index, stream, volumeMetadata ),
+				Direction.Z => ReadSliceZ( direction, index, stream, volumeMetadata ),
+				_ => throw new ArgumentOutOfRangeException( nameof(direction), direction, null )
+			};
+		}
+
+		private static VolumeSlice ReadSliceX( Direction direction, ushort index, Stream stream, VolumeMetadata volumeMetadata )
+		{
 			var sx = volumeMetadata.SizeX;
 			var sy = volumeMetadata.SizeY;
 			var sz = volumeMetadata.SizeZ;
 
-			switch( direction )
+			var bufferSize = sx * sy;
+			var buffer = ArrayPool<byte>.Shared.Rent( bufferSize );
+			var result = new byte[sy * sz];
+
+			for( var z = 0; z < sz; z++ )
 			{
-				case Direction.X:
+				stream.Read( buffer, 0, bufferSize );
+
+				for( var y = 0; y < sy; y++ )
 				{
-					var buffer = ArrayPool<byte>.Shared.Rent( sx * sy );
-					var result = new byte[sy * sz];
-
-					for( var z = 0; z < sz; z++ )
-					{
-						stream.Read( buffer, 0, sx * sy );
-
-						for( var y = 0; y < sy; y++ )
-						{
-							result[ z * sy + y ] = buffer[ y * sx + index ];
-						}
-					}
-
-					return new VolumeSlice( direction, index, result );
+					result[ z * sy + y ] = buffer[ y * sx + index ];
 				}
-
-				case Direction.Y:
-				{
-					var result = new byte[sx * sz];
-					var buffer = ArrayPool<byte>.Shared.Rent( sx * sy );
-
-					for( var z = 0; z < sz; z++ )
-					{
-						stream.Read( buffer, 0, sx * sy );
-						Array.Copy( buffer, index * sx, result, z * sx, sx );
-					}
-
-					return new VolumeSlice( direction, index, result );
-				}
-
-				case Direction.Z:
-				{
-					var result = new byte[sx * sy];
-
-					stream.Seek( ( long ) index * sx * sy, SeekOrigin.Begin );
-					stream.Read( result, 0, sx * sy );
-
-					return new VolumeSlice( direction, index, result );
-				}
-				default:
-					throw new ArgumentOutOfRangeException( nameof(direction), direction, null );
 			}
+
+			ArrayPool<byte>.Shared.Return( buffer );
+
+			return new VolumeSlice( direction, index, result );
+		}
+
+		private static VolumeSlice ReadSliceX( Direction direction, ushort index, byte[][] data, VolumeMetadata volumeMetadata )
+		{
+			var sx = volumeMetadata.SizeX;
+			var sy = volumeMetadata.SizeY;
+			var sz = volumeMetadata.SizeZ;
+
+			var bufferSize = sy * sz;
+			var result = new byte[bufferSize];
+
+			Parallel.For( 0, sz, z =>
+			{
+				for( var y = 0; y < sy; y++ )
+				{
+					result[ z * sy + y ] = data[ z ][ y * sx + index ];
+				}
+			} );
+
+			return new VolumeSlice( direction, index, result );
+		}
+
+		private static VolumeSlice ReadSliceY( Direction direction, ushort index, Stream stream, VolumeMetadata volumeMetadata )
+		{
+			var sx = volumeMetadata.SizeX;
+			var sy = volumeMetadata.SizeY;
+			var sz = volumeMetadata.SizeZ;
+
+			var result = new byte[sx * sz];
+			var bufferSize = sx * sy;
+			var buffer = ArrayPool<byte>.Shared.Rent( bufferSize );
+
+			for( var z = 0; z < sz; z++ )
+			{
+				stream.Read( buffer, 0, bufferSize );
+				Array.Copy( buffer, index * sx, result, z * sx, sx );
+			}
+
+			ArrayPool<byte>.Shared.Return( buffer );
+
+			return new VolumeSlice( direction, index, result );
+		}
+
+		private static VolumeSlice ReadSliceY( Direction direction, ushort index, byte[][] data, VolumeMetadata volumeMetadata )
+		{
+			var sx = volumeMetadata.SizeX;
+			var sz = volumeMetadata.SizeZ;
+
+			var bufferSize = sx * sz;
+			var result = new byte[bufferSize];
+
+			Parallel.For( 0, sz, z => { Array.Copy( data[ z ], index * sx, result, z * sx, sx ); } );
+
+			return new VolumeSlice( direction, index, result );
+		}
+
+		private static VolumeSlice ReadSliceZ( Direction direction, ushort index, Stream stream, VolumeMetadata volumeMetadata )
+		{
+			var sx = volumeMetadata.SizeX;
+			var sy = volumeMetadata.SizeY;
+
+			var bufferSize = sx * sy;
+			var result = new byte[bufferSize];
+
+			stream.Seek( ( long ) index * sx * sy, SeekOrigin.Begin );
+			stream.Read( result, 0, bufferSize );
+
+			return new VolumeSlice( direction, index, result );
+		}
+
+		private static VolumeSlice ReadSliceZ( Direction direction, ushort index, byte[][] data, VolumeMetadata volumeMetadata )
+		{
+			var sx = volumeMetadata.SizeX;
+			var sy = volumeMetadata.SizeY;
+
+			var bufferSize = sx * sy;
+
+			var result = new byte[bufferSize];
+			Array.Copy( data[ index ], 0, result, 0, bufferSize );
+
+			return new VolumeSlice( direction, index, result );
 		}
 
 		#endregion

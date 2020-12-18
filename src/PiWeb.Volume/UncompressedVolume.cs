@@ -72,7 +72,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
 		/// <param name="ct"></param>
 		/// <exception cref="VolumeException">Error during encoding</exception>
-		public CompressedVolume Compress( VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public CompressedVolume Compress( VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			if( options.Encoder == BlockVolume.EncoderID )
 			{
@@ -99,7 +99,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="options">Codec settings</param>
 		/// <exception cref="VolumeException">Error during encoding</exception>
 		/// <exception cref="NotSupportedException">The volume has no decompressed data</exception>
-		private byte[] CompressDirection( Direction direction, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		private byte[] CompressDirection( Direction direction, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			using( var outputStream = new MemoryStream() )
 			{
@@ -124,13 +124,13 @@ namespace Zeiss.IMT.PiWeb.Volume
 		}
 
 		/// <inheritdoc />
-		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			return PreviewCreator.CreatePreview( Data, Metadata, minification );
 		}
 
 		/// <inheritdoc />
-		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			if( ranges == null )
 				throw new ArgumentNullException( nameof(ranges) );
@@ -142,13 +142,13 @@ namespace Zeiss.IMT.PiWeb.Volume
 		}
 
 		/// <inheritdoc />
-		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			return VolumeSliceRange.Extract( range, Metadata, Data );
 		}
 
 		/// <inheritdoc />
-		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			return VolumeSlice.Extract( slice.Direction, slice.Index, Metadata, Data );
 		}
@@ -161,7 +161,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="multiDirection">if set to <c>true</c> [multi direction].</param>
 		/// <param name="progress">The progress.</param>
 		/// <param name="ct">The ct.</param>
-		public void Save( Stream stream, VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public void Save( Stream stream, VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			var compressed = Compress( options, multiDirection, progress, ct );
 			compressed.Save( stream );

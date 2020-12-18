@@ -40,7 +40,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		#region constructors
 
-		internal PreviewCreator( VolumeMetadata metadata, ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		internal PreviewCreator( VolumeMetadata metadata, ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			_Metadata = metadata ?? throw new ArgumentNullException( nameof(metadata) );
 			_Minification = minification;

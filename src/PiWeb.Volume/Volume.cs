@@ -82,7 +82,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="ct"></param>
 		/// <exception cref="IndexOutOfRangeException">The specified data did not match the dimensions of the specified <paramref name="metadata"/>.</exception>
 		/// <exception cref="VolumeException">Error during encoding</exception>
-		public static CompressedVolume CreateCompressed( VolumeMetadata metadata, byte[][] data, VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public static CompressedVolume CreateCompressed( VolumeMetadata metadata, byte[][] data, VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			var volume = new UncompressedVolume( metadata, data );
 			return volume.Compress( options, multiDirection, progress, ct );
@@ -97,7 +97,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
 		/// <param name="ct"></param>
 		/// <exception cref="VolumeException">Error during encoding</exception>
-		public static Volume CreateCompressed( VolumeMetadata metadata, Stream stream, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public static Volume CreateCompressed( VolumeMetadata metadata, Stream stream, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			if( options.Encoder == BlockVolume.EncoderID )
 			{
@@ -131,7 +131,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="ct"></param>
 		/// <returns>An enumeration of slice ranges or an empty enumeration.</returns>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) );
+		public abstract VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default );
 
 		/// <summary>
 		/// Gets the specified slice range. This is usually a lot faster than extracting single slices and consumes less memory than a full decompression.
@@ -141,7 +141,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="ct"></param>
 		/// <returns></returns>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) );
+		public abstract VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default );
 
 		/// <summary>
 		/// Gets the specified slice. This is the most memory friendly and usually the fastest approach to get a single slice.
@@ -151,7 +151,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="ct"></param>
 		/// <returns></returns>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) );
+		public abstract VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default );
 
 		/// <summary>
 		/// Creates a smaller volume from the current volume without performing a full decompression.
@@ -160,7 +160,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
 		/// <param name="ct"></param>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) );
+		public abstract UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default );
 
 		internal static void GetEncodedSliceSize( VolumeMetadata metadata, Direction direction, out ushort x, out ushort y )
 		{
@@ -197,83 +197,69 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( !stream.CanSeek )
 				stream = new MemoryStream( stream.StreamToArray() );
 
-			VolumeMetadata metaData;
-			var directionMap = new DirectionMap();
-			VolumeCompressionOptions compressionOptions;
-
-			using( var archive = new ZipArchive( stream ) )
-			{
-				#region Metadata
-
-				var metaDataEntry = archive.GetEntry( "Metadata.xml" );
-				if( metaDataEntry == null )
-					throw new InvalidOperationException( Resources.FormatResource<Volume>( "InvalidFormatMissingFile_ErrorText", "Metadata.xml" ) );
-
-				using( var entryStream = metaDataEntry.Open() )
-				{
-					metaData = VolumeMetadata.Deserialize( entryStream );
-					if( metaData.FileVersion > FileVersion )
-						throw new InvalidOperationException( Resources.FormatResource<Volume>( "FileVersionError_Text", metaData.FileVersion, FileVersion ) );
-				}
-
-				#endregion
-
-				#region CompressionOptions
-
-				var compressionOptionsEntry = archive.GetEntry( "CompressionOptions.xml" );
-
-				if( compressionOptionsEntry != null )
-					using( var entryStream = compressionOptionsEntry.Open() )
-					{
-						compressionOptions = VolumeCompressionOptions.Deserialize( entryStream );
-					}
-				else
-					compressionOptions = null;
-
-				#endregion
-
-				#region Voxels
-
-				var dataEntry = archive.GetEntry( "Voxels.dat" );
-				if( dataEntry == null )
-				{
-					dataEntry = archive.GetEntry( "VoxelsZ.dat" );
-					if( dataEntry == null )
-						throw new InvalidOperationException( Resources.FormatResource<Volume>( "InvalidFormatMissingFile_ErrorText", "Voxels.dat" ) );
-
-					using( var entryStream = dataEntry.Open() )
-					{
-						directionMap[ Direction.Z ] = entryStream.StreamToArray();
-					}
-
-					dataEntry = archive.GetEntry( "VoxelsY.dat" );
-					if( dataEntry != null )
-						using( var entryStream = dataEntry.Open() )
-						{
-							directionMap[ Direction.Y ] = entryStream.StreamToArray();
-						}
-
-					dataEntry = archive.GetEntry( "VoxelsX.dat" );
-					if( dataEntry != null )
-						using( var entryStream = dataEntry.Open() )
-						{
-							directionMap[ Direction.X ] = entryStream.StreamToArray();
-						}
-				}
-				else
-				{
-					using( var entryStream = dataEntry.Open() )
-					{
-						directionMap[ Direction.Z ] = entryStream.StreamToArray();
-					}
-				}
-
-				#endregion
-			}
+			using var archive = new ZipArchive( stream );
+			
+			var metaData = ReadVolumeMetadata( archive );
+			var compressionOptions = ReadVolumeCompressionOptions( archive );
+			var directionMap = ReadVolumeVoxels( archive );
 
 			if( compressionOptions?.Encoder == BlockVolume.EncoderID )
 				return new BlockVolume( metaData, compressionOptions, directionMap );
+			
 			return new CompressedVolume( metaData, compressionOptions, directionMap );
+		}
+
+		private static DirectionMap ReadVolumeVoxels( ZipArchive archive )
+		{
+			var directionMap = new DirectionMap();
+
+			if( ReadVoxelData( archive.GetEntry( "Voxels.dat" ), Direction.Z, directionMap ) ) 
+				return directionMap;
+			
+			if( !ReadVoxelData( archive.GetEntry( "VoxelsZ.dat" ), Direction.Z, directionMap ) ) 
+				throw new InvalidOperationException( Resources.FormatResource<Volume>( "InvalidFormatMissingFile_ErrorText", "Voxels.dat" ) );
+
+			ReadVoxelData( archive.GetEntry( "VoxelsY.dat" ), Direction.Y, directionMap );
+			ReadVoxelData( archive.GetEntry( "VoxelsX.dat" ), Direction.X, directionMap ); 
+
+			return directionMap;
+		}
+
+		private static bool ReadVoxelData( ZipArchiveEntry dataEntry, Direction direction, DirectionMap directionMap )
+		{
+			if( dataEntry == null )
+				return false;
+			
+			using var entryStream = dataEntry.Open();
+			directionMap[ direction ] = entryStream.StreamToArray( ( int ) dataEntry.Length );
+
+			return true;
+		}
+
+		private static VolumeMetadata ReadVolumeMetadata( ZipArchive archive )
+		{
+			var metaDataEntry = archive.GetEntry( "Metadata.xml" );
+			if( metaDataEntry == null )
+				throw new InvalidOperationException( Resources.FormatResource<Volume>( "InvalidFormatMissingFile_ErrorText", "Metadata.xml" ) );
+
+			using var entryStream = metaDataEntry.Open();
+			var metaData = VolumeMetadata.Deserialize( entryStream );
+
+			if( metaData.FileVersion > FileVersion )
+				throw new InvalidOperationException( Resources.FormatResource<Volume>( "FileVersionError_Text", metaData.FileVersion, FileVersion ) );
+
+			return metaData;
+		}
+
+		private static VolumeCompressionOptions ReadVolumeCompressionOptions( ZipArchive archive )
+		{
+			var compressionOptionsEntry = archive.GetEntry( "CompressionOptions.xml" );
+
+			if( compressionOptionsEntry == null )
+				return null;
+			
+			using var entryStream = compressionOptionsEntry.Open();
+			return VolumeCompressionOptions.Deserialize( entryStream );
 		}
 
 		#endregion
