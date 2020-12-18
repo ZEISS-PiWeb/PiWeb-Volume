@@ -61,7 +61,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <summary>
 		/// Returns the number of slices defined by this definition.
 		/// </summary>
-		public int Length => Last - First;
+		public ushort Length => (ushort)( Last - First + 1 );
 
 		#endregion
 	}

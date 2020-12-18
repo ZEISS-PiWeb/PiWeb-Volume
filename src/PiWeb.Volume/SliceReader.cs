@@ -14,6 +14,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#region usings
 
 	using System;
+	using System.Collections.Generic;
 	using System.Runtime.InteropServices;
 	using System.Threading;
 	using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 	{
 		#region members
 
-		private readonly byte[][] _Data;
+		private readonly IReadOnlyList<VolumeSlice> _Slices;
 		private readonly Direction _ReadDirection;
 		private readonly IProgress<VolumeSliceDefinition> _ProgressNotifier;
 		private readonly CancellationToken _Ct;
@@ -41,9 +42,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		#region constructors
 
-		internal SliceReader( VolumeMetadata metadata, byte[][] data, Direction readDirection = Direction.Z, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default )
+		internal SliceReader( VolumeMetadata metadata, IReadOnlyList<VolumeSlice> slices, Direction readDirection = Direction.Z, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default )
 		{
-			_Data = data;
+			_Slices = slices;
 			_ReadDirection = readDirection;
 			_ProgressNotifier = progressNotifier;
 			_Ct = ct;
@@ -99,7 +100,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			Parallel.For( 0, Math.Min( _SizeZ, height ), z =>
 			{
-				var input = _Data[ z ];
+				var input = _Slices[ z ].Data;
 				var output = _Buffer;
 				long inputIndex = _CurrentSlice;
 				long outputIndex = z * width;
@@ -125,7 +126,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			ReportProgress();
 
-			Parallel.For( 0, Math.Min( _SizeZ, height ), z => Marshal.Copy( _Data[ z ], _CurrentSlice * _SizeX, pv + z * width, _SizeX ) );
+			Parallel.For( 0, Math.Min( _SizeZ, height ), z => Marshal.Copy( _Slices[ z ].Data, _CurrentSlice * _SizeX, pv + z * width, _SizeX ) );
 
 			_CurrentSlice++;
 
@@ -140,7 +141,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			ReportProgress();
 
-			var data = _Data[ _CurrentSlice ];
+			var data = _Slices[ _CurrentSlice ].Data;
 
 			Parallel.For( 0, Math.Min( _SizeY, height ), y => Marshal.Copy( data, y * _SizeX, pv + y * width, _SizeX ) );
 

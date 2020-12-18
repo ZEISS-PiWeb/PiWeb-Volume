@@ -14,6 +14,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 	using System;
 	using System.Buffers;
+	using System.Collections.Generic;
 	using System.IO;
 	using System.Threading.Tasks;
 
@@ -22,7 +23,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 	/// <summary>
 	/// A single layer of a discrete volume.
 	/// </summary>
-	public sealed class VolumeSlice
+	public readonly struct VolumeSlice
 	{
 		#region constructors
 
@@ -77,16 +78,16 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="direction">The direction.</param>
 		/// <param name="index">The index.</param>
 		/// <param name="volumeMetadata">The volume metadata.</param>
-		/// <param name="data">The data.</param>
+		/// <param name="slices">The data.</param>
 		/// <returns></returns>
 		/// <exception cref="System.ArgumentOutOfRangeException">direction - null</exception>
-		internal static VolumeSlice Extract( Direction direction, ushort index, VolumeMetadata volumeMetadata, byte[][] data )
+		internal static VolumeSlice Extract( Direction direction, ushort index, VolumeMetadata volumeMetadata, IReadOnlyList<VolumeSlice> slices )
 		{
 			return direction switch
 			{
-				Direction.X => ReadSliceX( direction, index, data, volumeMetadata ),
-				Direction.Y => ReadSliceY( direction, index, data, volumeMetadata ),
-				Direction.Z => ReadSliceZ( direction, index, data, volumeMetadata ),
+				Direction.X => ReadSliceX( direction, index, slices, volumeMetadata ),
+				Direction.Y => ReadSliceY( direction, index, slices, volumeMetadata ),
+				Direction.Z => ReadSliceZ( direction, index, slices, volumeMetadata ),
 				_ => throw new ArgumentOutOfRangeException( nameof(direction), direction, null )
 			};
 		}
@@ -136,7 +137,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			return new VolumeSlice( direction, index, result );
 		}
 
-		private static VolumeSlice ReadSliceX( Direction direction, ushort index, byte[][] data, VolumeMetadata volumeMetadata )
+		private static VolumeSlice ReadSliceX( Direction direction, ushort index, IReadOnlyList<VolumeSlice> slices, VolumeMetadata volumeMetadata )
 		{
 			var sx = volumeMetadata.SizeX;
 			var sy = volumeMetadata.SizeY;
@@ -149,7 +150,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			{
 				for( var y = 0; y < sy; y++ )
 				{
-					result[ z * sy + y ] = data[ z ][ y * sx + index ];
+					result[ z * sy + y ] = slices[ z ].Data[ y * sx + index ];
 				}
 			} );
 
@@ -177,7 +178,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			return new VolumeSlice( direction, index, result );
 		}
 
-		private static VolumeSlice ReadSliceY( Direction direction, ushort index, byte[][] data, VolumeMetadata volumeMetadata )
+		private static VolumeSlice ReadSliceY( Direction direction, ushort index, IReadOnlyList<VolumeSlice> slices, VolumeMetadata volumeMetadata )
 		{
 			var sx = volumeMetadata.SizeX;
 			var sz = volumeMetadata.SizeZ;
@@ -185,7 +186,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			var bufferSize = sx * sz;
 			var result = new byte[bufferSize];
 
-			Parallel.For( 0, sz, z => { Array.Copy( data[ z ], index * sx, result, z * sx, sx ); } );
+			Parallel.For( 0, sz, z => { Array.Copy( slices[ z ].Data, index * sx, result, z * sx, sx ); } );
 
 			return new VolumeSlice( direction, index, result );
 		}
@@ -204,7 +205,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			return new VolumeSlice( direction, index, result );
 		}
 
-		private static VolumeSlice ReadSliceZ( Direction direction, ushort index, byte[][] data, VolumeMetadata volumeMetadata )
+		private static VolumeSlice ReadSliceZ( Direction direction, ushort index, IReadOnlyList<VolumeSlice> slices, VolumeMetadata volumeMetadata )
 		{
 			var sx = volumeMetadata.SizeX;
 			var sy = volumeMetadata.SizeY;
@@ -212,7 +213,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			var bufferSize = sx * sy;
 
 			var result = new byte[bufferSize];
-			Array.Copy( data[ index ], 0, result, 0, bufferSize );
+			Array.Copy( slices[ index ].Data, 0, result, 0, bufferSize );
 
 			return new VolumeSlice( direction, index, result );
 		}

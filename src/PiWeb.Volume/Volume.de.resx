@@ -126,9 +126,6 @@
   <data name="Decompression_ErrorText" xml:space="preserve">
     <value>Fehler bei der Dekompression:  '{0}'.</value>
   </data>
-  <data name="DimensionMismatch_ErrorText" xml:space="preserve">
-    <value>Die Größe der Volumendaten passt nicht zu den angegebenen Dimensionen.</value>
-  </data>
   <data name="FileVersionError_Text" xml:space="preserve">
     <value>Die Volumen-Datei hat die Version {0}. Diese Software kann nur Volumen-Dateien bis Version {1} einlesen.</value>
   </data>

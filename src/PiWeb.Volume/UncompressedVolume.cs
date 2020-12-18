@@ -22,8 +22,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#endregion
 
 	/// <summary>
-	/// TODO: add summary.
+	/// An uncompressed volume. This volume is optimized for speed to make the access
+	/// to slices as fast as possible. The tradeoff for speed is memory.  
 	/// </summary>
+	/// <seealso cref="CompressedVolume"/>
 	public sealed class UncompressedVolume : Volume
 	{
 		#region constructors
@@ -32,11 +34,11 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// Initializes a new instance of the <see cref="UncompressedVolume" /> class.
 		/// </summary>
 		/// <param name="metadata">The metadata.</param>
-		/// <param name="data">The grayscale slice data.</param>
-		public UncompressedVolume( VolumeMetadata metadata, byte[][] data ) : base( metadata )
+		/// <param name="slices">The grayscale slice data.</param>
+		public UncompressedVolume( VolumeMetadata metadata, IReadOnlyList<VolumeSlice> slices ) 
+			: base( metadata )
 		{
-			Data = data;
-
+			Slices = slices;
 			CheckForIntegrity();
 		}
 
@@ -47,7 +49,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <summary>
 		/// The uncompressed voxel data
 		/// </summary>
-		public byte[][] Data { get; }
+		public IReadOnlyList<VolumeSlice> Slices { get; }
 
 		#endregion
 
@@ -59,9 +61,19 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <exception cref="IndexOutOfRangeException"></exception>
 		private void CheckForIntegrity()
 		{
-			//Check data length to fit the dimensions
-			if( Data.Length == 0 || Data.LongLength * Data[ 0 ].LongLength != ( long ) Metadata.SizeX * Metadata.SizeY * Metadata.SizeZ )
-				throw new IndexOutOfRangeException( Resources.GetResource<Volume>( "DimensionMismatch_ErrorText" ) );
+			if( Slices.Count != Metadata.SizeZ  )
+				throw new VolumeIntegrityException( $"Invalid number of slices (expected: {Metadata.SizeZ}, but was {Slices.Count})." );
+
+			var expectedSliceSize = Metadata.SizeX * Metadata.SizeY;
+			var index = 0;
+			foreach( var slice in Slices )
+			{
+				if( slice.Data.Length != expectedSliceSize )
+					throw new VolumeIntegrityException( $"Invalid dimension of slice {index} (expected: {expectedSliceSize}, but was {slice.Data.Length})." );
+				if( slice.Direction != Direction.Z )
+					throw new VolumeIntegrityException( $"Invalid slice direction for slice {index} (expected: {Direction.Z}, but was {slice.Direction})." );
+				index++;
+			}
 		}
 
 		/// <summary>
@@ -76,7 +88,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		{
 			if( options.Encoder == BlockVolume.EncoderID )
 			{
-				return BlockVolume.Create( Data, Metadata, options, progress, ct );
+				return BlockVolume.Create( Slices, Metadata, options, progress, ct );
 			}
 
 			var directionMap = new DirectionMap { [ Direction.Z ] = CompressDirection( Direction.Z, options, progress, ct ) };
@@ -105,7 +117,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			{
 				GetEncodedSliceSize( Metadata, direction, out var encodingSizeX, out var encodingSizeY );
 
-				var inputStreamWrapper = new SliceReader( Metadata, Data, direction, progress, ct );
+				var inputStreamWrapper = new SliceReader( Metadata, Slices, direction, progress, ct );
 				var outputStreamWrapper = new StreamWrapper( outputStream );
 
 				var error = ( VolumeError ) CompressVolume( inputStreamWrapper.Interop, outputStreamWrapper.Interop, encodingSizeX, encodingSizeY, options.Encoder, options.PixelFormat, options.GetOptionsString(), options.Bitrate );
@@ -126,7 +138,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <inheritdoc />
 		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
-			return PreviewCreator.CreatePreview( Data, Metadata, minification );
+			return PreviewCreator.CreatePreview( Slices, Metadata, minification );
 		}
 
 		/// <inheritdoc />
@@ -138,19 +150,19 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( ranges.Count == 0 )
 				return new VolumeSliceCollection();
 
-			return new VolumeSliceCollection( ranges.Select( range => VolumeSliceRange.Extract( range, Metadata, Data ) ) );
+			return new VolumeSliceCollection( ranges.Select( range => VolumeSliceRange.Extract( range, Metadata, Slices ) ) );
 		}
 
 		/// <inheritdoc />
 		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
-			return VolumeSliceRange.Extract( range, Metadata, Data );
+			return VolumeSliceRange.Extract( range, Metadata, Slices );
 		}
 
 		/// <inheritdoc />
 		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
-			return VolumeSlice.Extract( slice.Direction, slice.Index, Metadata, Data );
+			return VolumeSlice.Extract( slice.Direction, slice.Index, Metadata, Slices );
 		}
 
 		/// <summary>
