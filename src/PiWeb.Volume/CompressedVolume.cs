@@ -71,7 +71,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 
 		/// <inheritdoc />
-		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			if( CompressedData[ Direction.Z ] == null )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
@@ -125,7 +125,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="ct">Cancellation token</param>
 		/// <exception cref="VolumeException">Error during decoding</exception>
 		/// <exception cref="NotSupportedException">The volume has no compressed data</exception>
-		public virtual UncompressedVolume Decompress( IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public virtual UncompressedVolume Decompress( IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			if( CompressedData[ Direction.Z ] == null )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
@@ -145,7 +145,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		/// <inheritdoc />
 		/// <exception cref="NotSupportedException">The volume has no compressed data</exception>
-		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			if( ranges == null )
 				throw new ArgumentNullException( nameof(ranges) );
@@ -187,7 +187,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		/// <inheritdoc />
 		/// <exception cref="NotSupportedException">The volume has no compressed data</exception>
-		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			if( CompressedData[ range.Direction ] != null )
 			{
@@ -222,7 +222,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		/// <inheritdoc />
 		/// <exception cref="NotSupportedException">The volume has no compressed data</exception>
-		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			//Videos with a very small number of frames appearantly have issues with av_seek, so we do a full scan instead
 			if( CompressedData[ slice.Direction ] != null )

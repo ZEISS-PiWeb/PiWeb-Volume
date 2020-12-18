@@ -82,7 +82,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="ct"></param>
 		/// <exception cref="IndexOutOfRangeException">The specified data did not match the dimensions of the specified <paramref name="metadata"/>.</exception>
 		/// <exception cref="VolumeException">Error during encoding</exception>
-		public static CompressedVolume CreateCompressed( VolumeMetadata metadata, byte[][] data, VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public static CompressedVolume CreateCompressed( VolumeMetadata metadata, byte[][] data, VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			var volume = new UncompressedVolume( metadata, data );
 			return volume.Compress( options, multiDirection, progress, ct );
@@ -97,7 +97,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
 		/// <param name="ct"></param>
 		/// <exception cref="VolumeException">Error during encoding</exception>
-		public static Volume CreateCompressed( VolumeMetadata metadata, Stream stream, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) )
+		public static Volume CreateCompressed( VolumeMetadata metadata, Stream stream, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			if( options.Encoder == BlockVolume.EncoderID )
 			{
@@ -131,7 +131,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="ct"></param>
 		/// <returns>An enumeration of slice ranges or an empty enumeration.</returns>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) );
+		public abstract VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default );
 
 		/// <summary>
 		/// Gets the specified slice range. This is usually a lot faster than extracting single slices and consumes less memory than a full decompression.
@@ -141,7 +141,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="ct"></param>
 		/// <returns></returns>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) );
+		public abstract VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default );
 
 		/// <summary>
 		/// Gets the specified slice. This is the most memory friendly and usually the fastest approach to get a single slice.
@@ -151,7 +151,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="ct"></param>
 		/// <returns></returns>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) );
+		public abstract VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default );
 
 		/// <summary>
 		/// Creates a smaller volume from the current volume without performing a full decompression.
@@ -160,7 +160,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
 		/// <param name="ct"></param>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default( CancellationToken ) );
+		public abstract UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default );
 
 		internal static void GetEncodedSliceSize( VolumeMetadata metadata, Direction direction, out ushort x, out ushort y )
 		{

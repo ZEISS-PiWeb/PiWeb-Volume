@@ -39,7 +39,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		#region constructors
 
-		internal SliceStreamReader( VolumeMetadata metadata, Stream stream, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default( CancellationToken ) )
+		internal SliceStreamReader( VolumeMetadata metadata, Stream stream, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default )
 		{
 			_Stream = stream;
 

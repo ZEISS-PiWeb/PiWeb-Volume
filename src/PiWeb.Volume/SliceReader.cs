@@ -41,7 +41,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		#region constructors
 
-		internal SliceReader( VolumeMetadata metadata, byte[][] data, Direction readDirection = Direction.Z, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default( CancellationToken ) )
+		internal SliceReader( VolumeMetadata metadata, byte[][] data, Direction readDirection = Direction.Z, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default )
 		{
 			_Data = data;
 			_ReadDirection = readDirection;
