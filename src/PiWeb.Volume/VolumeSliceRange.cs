@@ -67,7 +67,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <returns></returns>
 		internal static VolumeSliceRange Extract( VolumeSliceRangeDefinition definition, VolumeMetadata volumeMetadata, byte[][] data )
 		{
-			var slices = new List<VolumeSlice>();
+			var slices = new List<VolumeSlice>( definition.Length );
 			for( var i = definition.First; i <= definition.Last; i++ )
 			{
 				slices.Add( VolumeSlice.Extract( definition.Direction, i, volumeMetadata, data ) );
