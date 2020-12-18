@@ -13,6 +13,8 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#region usings
 
 	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 	using System.Runtime.InteropServices;
 	using System.Threading;
 	using Zeiss.IMT.PiWeb.Volume.Interop;
@@ -26,7 +28,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		private readonly IProgress<VolumeSliceDefinition> _ProgressNotifier;
 		private readonly CancellationToken _Ct;
 
-		private readonly byte[][] _Data;
+		private readonly VolumeSlice[] _Data;
 
 		private readonly ushort _SizeX;
 		private readonly ushort _SizeY;
@@ -47,11 +49,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			metadata.GetSliceSize( direction, out _SizeX, out _SizeY );
 
 			_SizeZ = metadata.GetSize( direction );
-
-			_Data = new byte[_SizeZ][];
-
-			for( var z = 0; z < _SizeZ; z++ )
-				_Data[ z ] = new byte[_SizeX * _SizeY];
+			_Data = VolumeSliceHelper.CreateSliceData( _SizeX,_SizeY, _SizeZ );
 
 			Interop = new InteropSliceWriter
 			{
@@ -69,7 +67,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		#region methods
 
-		internal byte[][] GetData()
+		internal IReadOnlyList<VolumeSlice> GetData()
 		{
 			return _Data;
 		}
@@ -77,14 +75,16 @@ namespace Zeiss.IMT.PiWeb.Volume
 		internal void WriteSlice( IntPtr line, ushort width, ushort height, ushort z )
 		{
 			_Ct.ThrowIfCancellationRequested();
+			_ProgressNotifier?.Report( new VolumeSliceDefinition( Direction.Z, z ) );
 
 			if( z >= _SizeZ )
 				return;
 
-			_ProgressNotifier?.Report( new VolumeSliceDefinition( Direction.Z, z ) );
-
+			var data = _Data[ z ].Data;
 			for( var y = 0; y < _SizeY; y++ )
-				Marshal.Copy( line + y * width, _Data[ z ], y * _SizeX, _SizeX );
+			{
+				Marshal.Copy( line + y * width, data, y * _SizeX, _SizeX );
+			}
 		}
 
 		#endregion

@@ -14,6 +14,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 	using System;
 	using System.IO;
+	using System.Linq;
 	using System.Threading;
 
 	#endregion
@@ -50,7 +51,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 		#region methods
 
-		internal byte[][] Decompress( IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		internal VolumeSlice[] Decompress( IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			if( _Volume.CompressedData[ Direction.Z ] == null )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
@@ -58,11 +59,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			var decoder = new BlockVolumeDecoder( _Volume.CompressionOptions );
 			var data = _Volume.CompressedData[ Direction.Z ];
 			var input = new MemoryStream( data );
-
-			var result = new byte[_SizeZ][];
-
-			for( var z = 0; z < _SizeZ; z++ )
-				result[ z ] = new byte[_SizeX * _SizeY];
+			var result = VolumeSliceHelper.CreateSliceData( _SizeX, _SizeY, _SizeZ );
 
 			decoder.Decode( input, _Metadata, ( block, index ) =>
 			{
@@ -77,7 +74,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 					if( gz >= _SizeZ || gy >= _SizeY || gx >= _SizeX )
 						continue;
 
-					result[ gz ][ gy * _SizeX + gx ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
+					result[ gz ].Data[ gy * _SizeX + gx ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
 				}
 			}, null, null, progress, ct );
 

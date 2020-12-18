@@ -64,27 +64,27 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// Creates a new, decompressed volume from the specified data
 		/// </summary>
 		/// <param name="metadata">Describes the volumes size and resolution</param>
-		/// <param name="data">The decompressed volume as 8-Bit grayscale values. The array dimensions must match the specified <paramref name="metadata"/> (byte[z][x*y]).</param>
+		/// <param name="slices">The decompressed volume as 8-Bit grayscale values. The array dimensions must match the specified <paramref name="metadata"/> (byte[z][x*y]).</param>
 		/// <exception cref="IndexOutOfRangeException">The specified data did not match the dimensions of the specified <paramref name="metadata"/>.</exception>
-		public static UncompressedVolume CreateUncompressed( VolumeMetadata metadata, byte[][] data )
+		public static UncompressedVolume CreateUncompressed( VolumeMetadata metadata, IReadOnlyList<VolumeSlice> slices )
 		{
-			return new UncompressedVolume( metadata, data );
+			return new UncompressedVolume( metadata, slices );
 		}
 
 		/// <summary>
 		/// Creates a new, decompressed volume from the specified data
 		/// </summary>
 		/// <param name="metadata">Describes the volumes size and resolution</param>
-		/// <param name="data">The decompressed volume as 8-Bit grayscale values. The array dimensions must match the specified <paramref name="metadata"/> (byte[z][x*y]).</param>
+		/// <param name="slices">The decompressed volume as 8-Bit grayscale values. The array dimensions must match the specified <paramref name="metadata"/> (byte[z][x*y]).</param>
 		/// <param name="multiDirection"></param>
 		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
 		/// <param name="options">Codec settings</param>
 		/// <param name="ct"></param>
 		/// <exception cref="IndexOutOfRangeException">The specified data did not match the dimensions of the specified <paramref name="metadata"/>.</exception>
 		/// <exception cref="VolumeException">Error during encoding</exception>
-		public static CompressedVolume CreateCompressed( VolumeMetadata metadata, byte[][] data, VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		public static CompressedVolume CreateCompressed( VolumeMetadata metadata, IReadOnlyList<VolumeSlice> slices, VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
-			var volume = new UncompressedVolume( metadata, data );
+			var volume = new UncompressedVolume( metadata, slices );
 			return volume.Compress( options, multiDirection, progress, ct );
 		}
 

@@ -14,6 +14,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 	using System;
 	using System.Buffers;
+	using System.Collections.Generic;
 	using System.IO;
 	using System.Threading.Tasks;
 
@@ -41,7 +42,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		/// <summary>
 		/// Encodes the specified input data which is a complete volume in z-slices.
 		/// </summary>
-		internal void Encode( byte[][] input, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition> progress )
+		internal void Encode( IReadOnlyList<VolumeSlice> slices, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition> progress )
 		{
 			var z = 0;
 			var buffer = new byte[BlockVolume.N][];
@@ -49,7 +50,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			Encode( () =>
 			{
 				for( var bz = 0; bz < BlockVolume.N && z < metadata.SizeZ; bz++, z++ )
-					buffer[ bz ] = input[ z ];
+					buffer[ bz ] = slices[ z ].Data;
 
 				return buffer;
 			}, output, metadata, progress );

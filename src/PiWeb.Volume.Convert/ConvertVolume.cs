@@ -118,18 +118,15 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 			var sy = metadata.SizeY;
 			var sz = metadata.SizeZ;
 
-			var data = new byte[sz][];
-
-			for( var z = 0; z < sz; z++ )
-				data[ z ] = new byte[sy * sx];
-
+			var data = VolumeSliceHelper.CreateSliceData( sx, sy, sz );
+				
 			var buffer = new byte[sx * sy * 2];
 			for( var z = 0; z < sz; z++ )
 			{
 				progress?.Report( ( double ) z / sz );
 
 				uint16Stream.Read( buffer, 0, sx * sy * 2 );
-				var layer = data[ z ];
+				var layer = data[ z ].Data;
 
 				for( var index = 0; index < sx * sy; index++ )
 					layer[ index ] = buffer[ index * 2 + 1 ];
@@ -155,18 +152,13 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 			var sy = metadata.SizeY;
 			var sz = metadata.SizeZ;
 
-			var data = new byte[sz][];
 			var sliceSize = sx * sy;
-
-			for( var z = 0; z < sz; z++ )
-			{
-				data[ z ] = new byte[sliceSize];
-			}
+			var data = VolumeSliceHelper.CreateSliceData( sx, sy, sz );
 
 			for( var z = 0; z < sz; z++ )
 			{
 				progress?.Report( ( double ) z / sz );
-				uint8Stream.Read( data[ z ], 0, sliceSize );
+				uint8Stream.Read( data[ z ].Data, 0, sliceSize );
 			}
 
 			return new UncompressedVolume( metadata, data );

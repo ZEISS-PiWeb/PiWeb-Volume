@@ -69,12 +69,12 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			return new BlockVolume( metadata, options, directionMap );
 		}
 
-		internal static BlockVolume Create( byte[][] input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress, CancellationToken ct )
+		internal static BlockVolume Create( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress, CancellationToken ct )
 		{
 			var encoder = new BlockVolumeEncoder( options );
 			var output = new MemoryStream();
 
-			encoder.Encode( input, output, metadata, progress );
+			encoder.Encode( slices, output, metadata, progress );
 
 			var directionMap = new DirectionMap
 			{
