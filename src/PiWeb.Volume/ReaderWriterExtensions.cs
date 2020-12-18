@@ -13,6 +13,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#region usings
 
 	using System;
+	using System.Buffers;
 	using System.IO;
 	using System.IO.Compression;
 
@@ -43,17 +44,20 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( stream == null )
 				return null;
 
-			using( var memStream = new MemoryStream( expectedSize ) )
-			{
-				int count;
-				var buffer = new byte[64 * 1024];
-				while( ( count = stream.Read( buffer, 0, buffer.Length ) ) > 0 )
-				{
-					memStream.Write( buffer, 0, count );
-				}
+			using var memStream = new MemoryStream( expectedSize );
+			
+			const int bufferSize = 64 * 1024;
 
-				return memStream.ToArray();
+			int count;
+			var buffer = ArrayPool<byte>.Shared.Rent( bufferSize );
+			
+			while( ( count = stream.Read( buffer, 0, bufferSize ) ) > 0 )
+			{
+				memStream.Write( buffer, 0, count );
 			}
+			ArrayPool<byte>.Shared.Return( buffer );
+
+			return memStream.ToArray();
 		}
 
 		#endregion
