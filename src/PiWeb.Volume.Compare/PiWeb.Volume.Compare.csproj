@@ -35,8 +35,4 @@
       <PackageReference Include="Unity" Version="5.11.1" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Controls" />
-    </ItemGroup>
-
 </Project>
