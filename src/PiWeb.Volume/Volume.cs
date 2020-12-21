@@ -27,7 +27,12 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#endregion
 
 	/// <summary>
+	/// This is the base class for all volume implementations.
 	/// </summary>
+	/// <seealso cref="CompressedVolume"/>
+	/// <seealso cref="UncompressedVolume"/>
+	/// <seealso cref="StreamedVolume"/>
+	/// <seealso cref="BlockVolume"/>
 	public abstract class Volume
 	{
 		#region members
