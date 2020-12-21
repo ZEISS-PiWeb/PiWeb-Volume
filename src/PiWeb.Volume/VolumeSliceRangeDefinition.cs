@@ -13,13 +13,15 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#region usings
 
 	using System;
+	using System.Collections;
+	using System.Collections.Generic;
 
 	#endregion
 
 	/// <summary>
 	/// Describes a continous range of slices in a specific direction.
 	/// </summary>
-	public readonly struct VolumeSliceRangeDefinition
+	public readonly struct VolumeSliceRangeDefinition : IEnumerable<VolumeSliceDefinition>
 	{
 		#region constructors
 
@@ -66,6 +68,21 @@ namespace Zeiss.IMT.PiWeb.Volume
 		#endregion
 		
 		#region methods
+
+		/// <inheritdoc />
+		public IEnumerator<VolumeSliceDefinition> GetEnumerator()
+		{
+			for( var i = First; i <= Last; i++ )
+			{
+				yield return new VolumeSliceDefinition( Direction, i );
+			}
+		}
+
+		/// <inheritdoc />
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
 
 		/// <inheritdoc />
 		public override string ToString()

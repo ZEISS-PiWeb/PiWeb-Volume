@@ -27,7 +27,12 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#endregion
 
 	/// <summary>
+	/// This is the base class for all volume implementations.
 	/// </summary>
+	/// <seealso cref="CompressedVolume"/>
+	/// <seealso cref="UncompressedVolume"/>
+	/// <seealso cref="StreamedVolume"/>
+	/// <seealso cref="BlockVolume"/>
 	public abstract class Volume
 	{
 		#region members
@@ -171,12 +176,14 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <summary>
 		/// Gets the specified slice. This is the most memory friendly and usually the fastest approach to get a single slice.
 		/// </summary>
+		/// <param name="sliceBuffer">The slice buffer that will be filled with the slice data.</param>
 		/// <param name="slice">The requested slice.</param>
 		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
 		/// <param name="logger">The logger to use for log messages</param>
 		/// <param name="ct">The cancellation token to cancel the operation</param>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract VolumeSlice GetSlice( 
+		public abstract void GetSlice( 
+			VolumeSliceBuffer sliceBuffer,
 			VolumeSliceDefinition slice,
 			IProgress<VolumeSliceDefinition> progress = null,
 			ILogger logger = null, 

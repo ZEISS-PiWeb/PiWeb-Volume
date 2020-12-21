@@ -14,7 +14,6 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 	using System;
 	using System.Collections.Generic;
-	using System.Linq;
 	using System.Runtime.InteropServices;
 	using System.Threading;
 	using Zeiss.IMT.PiWeb.Volume.Interop;
@@ -72,7 +71,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			return _Data;
 		}
 
-		internal void WriteSlice( IntPtr line, ushort width, ushort height, ushort z )
+		private void WriteSlice( IntPtr line, ushort width, ushort height, ushort z )
 		{
 			_Ct.ThrowIfCancellationRequested();
 			_ProgressNotifier?.Report( new VolumeSliceDefinition( Direction.Z, z ) );

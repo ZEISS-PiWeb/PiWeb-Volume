@@ -214,43 +214,43 @@ namespace Zeiss.IMT.PiWeb.Volume
 				NameTable = new NameTable()
 			};
 
-			using( var reader = XmlReader.Create( stream, settings ) )
+			using var reader = XmlReader.Create( stream, settings );
+			
+			var result = new VolumeMetadata();
+			reader.MoveToElement();
+			
+			while( reader.Read() )
 			{
-				var result = new VolumeMetadata();
-				reader.MoveToElement();
-				while( reader.Read() )
+				switch( reader.Name )
 				{
-					switch( reader.Name )
-					{
-						case "FileVersion":
-							result.FileVersion = new Version( reader.ReadString() );
-							break;
-						case "SizeX":
-							result.SizeX = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
-							break;
-						case "SizeY":
-							result.SizeY = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
-							break;
-						case "SizeZ":
-							result.SizeZ = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
-							break;
-						case "ResolutionX":
-							result.ResolutionX = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
-							break;
-						case "ResolutionY":
-							result.ResolutionY = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
-							break;
-						case "ResolutionZ":
-							result.ResolutionZ = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
-							break;
-						case "Property":
-							result.Properties.Add( Property.Deserialize( reader ) );
-							break;
-					}
+					case "FileVersion":
+						result.FileVersion = new Version( reader.ReadString() );
+						break;
+					case "SizeX":
+						result.SizeX = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						break;
+					case "SizeY":
+						result.SizeY = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						break;
+					case "SizeZ":
+						result.SizeZ = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						break;
+					case "ResolutionX":
+						result.ResolutionX = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						break;
+					case "ResolutionY":
+						result.ResolutionY = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						break;
+					case "ResolutionZ":
+						result.ResolutionZ = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						break;
+					case "Property":
+						result.Properties.Add( Property.Deserialize( reader ) );
+						break;
 				}
-
-				return result;
 			}
+
+			return result;
 		}
 
 		#endregion

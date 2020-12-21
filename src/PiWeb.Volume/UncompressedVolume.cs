@@ -18,6 +18,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 	using System.IO;
 	using System.Linq;
 	using System.Threading;
+	using System.Threading.Tasks;
 	using Zeiss.IMT.PiWeb.Volume.Block;
 
 	#endregion
@@ -162,21 +163,87 @@ namespace Zeiss.IMT.PiWeb.Volume
 		{
 			var sw = Stopwatch.StartNew();
 
-			var result = VolumeSliceRange.Extract( range, Metadata, _Slices );
+			var sliceRange = new List<VolumeSliceBuffer>( range.Length );
+			foreach( var definition in range )
+			{
+				var buffer = new VolumeSliceBuffer( definition, 0 );
+				GetSlice( buffer, definition, progress, logger, ct );
+
+				sliceRange.Add( buffer );
+			}
+
+			var result = new VolumeSliceRange( range, sliceRange );
 			logger?.Log( LogLevel.Info, $"Extracted '{range}' in {sw.ElapsedMilliseconds} ms." );
 	
 			return result;
 		}
 
 		/// <inheritdoc />
-		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public override void GetSlice( 
+			VolumeSliceBuffer sliceBuffer,
+			VolumeSliceDefinition slice, 
+			IProgress<VolumeSliceDefinition> progress = null, 
+			ILogger logger = null, 
+			CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
-			
-			var result = VolumeSlice.Extract( slice.Direction, slice.Index, Metadata, _Slices );
+			switch(slice.Direction)
+			{
+				case Direction.X: 
+					ReadSliceX( sliceBuffer, slice.Index );
+					break;
+				case Direction.Y:
+					ReadSliceY( sliceBuffer, slice.Index );
+					break;
+				case Direction.Z:
+					ReadSliceZ( sliceBuffer, slice.Index );
+					break;
+			}
 			logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
+		}
 
-			return result;
+		private void ReadSliceX( VolumeSliceBuffer sliceBuffer, ushort index )
+		{
+			var sx = Metadata.SizeX;
+			var sy = Metadata.SizeY;
+			var sz = Metadata.SizeZ;
+
+			var bufferSize = sy * sz;
+			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.X, index ), bufferSize );
+
+			Parallel.For( 0, sz, z =>
+			{
+				// TODO: Copy range
+				for( var y = 0; y < sy; y++ )
+				{
+					sliceBuffer.Data[ z * sy + y ] = _Slices[ z ].Data[ y * sx + index ];
+				}
+			} );
+		}
+
+		private void ReadSliceY( VolumeSliceBuffer sliceBuffer, ushort index )
+		{
+			var sx = Metadata.SizeX;
+			var sz = Metadata.SizeZ;
+
+			var bufferSize = sx * sz;
+			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Y, index ), bufferSize );
+
+			Parallel.For( 0, sz, z => 
+			{
+				Array.Copy( _Slices[ z ].Data, index * sx, sliceBuffer.Data, z * sx, sx ); 
+			} );
+		}
+
+		private void ReadSliceZ( VolumeSliceBuffer sliceBuffer, ushort index )
+		{
+			var sx = Metadata.SizeX;
+			var sy = Metadata.SizeY;
+
+			var bufferSize = sx * sy;
+			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Z, index ), bufferSize );
+
+			_Slices[ index ].Data.CopyTo( sliceBuffer.Data, 0 );
 		}
 
 		/// <summary>

@@ -16,7 +16,6 @@ namespace Zeiss.IMT.PiWeb.Volume
 	using System.Buffers;
 	using System.Collections.Generic;
 	using System.IO;
-	using System.Linq;
 	using System.Runtime.InteropServices;
 	using System.Threading;
 	using Zeiss.IMT.PiWeb.Volume.Interop;
@@ -170,7 +169,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			return Volume.CreateUncompressed( volumeMetadata, _PreviewData );
 		}
 
-		internal void WriteSlice( IntPtr line, ushort width, ushort height, ushort z )
+		private void WriteSlice( IntPtr line, ushort width, ushort height, ushort z )
 		{
 			_Ct.ThrowIfCancellationRequested();
 
@@ -185,8 +184,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			for( int oy = 0, py = 0; py < _PreviewSizeY && oy < height; py++, oy += _Minification )
 			for( int ox = 0, px = 0; px < _PreviewSizeX && ox < width; px++, ox += _Minification )
-				_PreviewData[ pz ].Data[ py * _PreviewSizeX + px ] =
-					Marshal.ReadByte( line, oy * width + ox );
+			{
+				_PreviewData[ pz ].Data[ py * _PreviewSizeX + px ] = Marshal.ReadByte( line, oy * width + ox );
+			}
 		}
 
 		#endregion

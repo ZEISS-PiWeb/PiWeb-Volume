@@ -42,23 +42,31 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		{ }
 
 		internal BlockVolume( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
-			: base( metadata, options, new DirectionMap() )
-		{
-			var encoder = new BlockVolumeEncoder( options );
-			var output = new MemoryStream();
-
-			encoder.Encode( input, output, metadata, progress );
-			CompressedData[ Direction.Z ] = output.ToArray();
-		}
+			: base( metadata, options, CreateDirectionMap( input, metadata, options, progress ) )
+		{ }
 
 		internal BlockVolume( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
-			: base( metadata, options, new DirectionMap() )
+			: base( metadata, options, CreateDirectionMap( slices, metadata, options, progress ) )
+		{ }
+
+		private static DirectionMap CreateDirectionMap( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
 		{
 			var encoder = new BlockVolumeEncoder( options );
 			var output = new MemoryStream();
 
 			encoder.Encode( slices, output, metadata, progress );
-			CompressedData[ Direction.Z ] = output.ToArray();
+
+			return new DirectionMap { [ Direction.Z ] = output.ToArray() };
+		}
+
+		private static DirectionMap CreateDirectionMap( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
+		{
+			var encoder = new BlockVolumeEncoder( options );
+			var output = new MemoryStream();
+
+			encoder.Encode( input, output, metadata, progress );
+			
+			return new DirectionMap { [ Direction.Z ] = output.ToArray() };
 		}
 
 		#endregion
@@ -124,17 +132,19 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		}
 
 		/// <inheritdoc />
-		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public override void GetSlice(
+			VolumeSliceBuffer sliceBuffer,
+			VolumeSliceDefinition slice, 
+			IProgress<VolumeSliceDefinition> progress = null,
+			ILogger logger = null, 
+			CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
 			
-			var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, new[] { new VolumeSliceRangeDefinition( slice.Direction, slice.Index, slice.Index ) } );
-			var data = sliceRangeCollector.CollectSliceRanges( progress, ct );
-
-			var result = data.GetSlice( slice.Direction, slice.Index );
+			var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, slice, sliceBuffer );
+			sliceRangeCollector.CollectSliceRanges( progress, ct );
+			
 			logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
-
-			return result;
 		}
 
 		/// <inheritdoc />

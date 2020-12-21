@@ -21,6 +21,22 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 	/// </summary>
 	internal static class Quantization
 	{
+		#region members
+
+		private static readonly int[] BaseValues =
+		{
+			16, 11, 10, 16, 24, 40, 51, 61,
+			12, 12, 14, 19, 26, 58, 60, 55,
+			14, 13, 16, 24, 40, 57, 69, 56,
+			14, 17, 22, 29, 51, 87, 80, 62,
+			18, 22, 37, 56, 68, 109, 103, 77,
+			24, 35, 55, 64, 81, 104, 113, 92,
+			49, 64, 78, 87, 103, 121, 120, 101,
+			72, 92, 95, 98, 112, 100, 103, 99
+		};
+
+		#endregion
+
 		#region methods
 
 		/// <summary>
@@ -34,18 +50,6 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 				scale = QualityScaling( quality );
 
 			var values = new double[BlockVolume.N3];
-
-			var baseValues = new[]
-			{
-				16, 11, 10, 16, 24, 40, 51, 61,
-				12, 12, 14, 19, 26, 58, 60, 55,
-				14, 13, 16, 24, 40, 57, 69, 56,
-				14, 17, 22, 29, 51, 87, 80, 62,
-				18, 22, 37, 56, 68, 109, 103, 77,
-				24, 35, 55, 64, 81, 104, 113, 92,
-				49, 64, 78, 87, 103, 121, 120, 101,
-				72, 92, 95, 98, 112, 100, 103, 99,
-			};
 
 			var i = 0;
 			for( var z = 0; z < BlockVolume.N; z++ )
@@ -65,7 +69,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 				if( b > c )
 					Swap( ref b, ref c );
 
-				var value = Math.Max( 1, Math.Min( short.MaxValue, ( baseValues[ c + BlockVolume.N * b ] * 2.0 * scale + 50 ) / 100 ) );
+				var value = Math.Max( 1, Math.Min( short.MaxValue, ( BaseValues[ c + BlockVolume.N * b ] * 2.0 * scale + 50 ) / 100 ) );
 				values[ i++ ] = invert ? value : 1.0 / value;
 			}
 

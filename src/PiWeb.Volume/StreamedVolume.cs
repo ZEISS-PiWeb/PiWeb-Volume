@@ -13,23 +13,27 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#region usings
 
 	using System;
+	using System.Buffers;
 	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.IO;
 	using System.Linq;
 	using System.Threading;
+	using Microsoft.CSharp.RuntimeBinder;
 	using Zeiss.IMT.PiWeb.Volume.Block;
 
 	#endregion
 
-	// TODO: add xml summary
-	
-	
+	/// <summary>
+	/// This volume class lazily loads the volume data from an
+	/// underlying stream. 
+	/// </summary>
 	public sealed class StreamedVolume : Volume, IDisposable
 	{
 		#region members
 
 		private readonly bool _LeaveOpen;
+		private readonly Stream _Stream;
 
 		#endregion
 
@@ -44,19 +48,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 		public StreamedVolume( VolumeMetadata metadata, Stream stream, bool leaveOpen = false ) : base( metadata )
 		{
 			_LeaveOpen = leaveOpen;
-			Stream = stream;
+			_Stream = stream ?? throw new ArgumentNullException( nameof(stream) );
 			if( !stream.CanSeek )
 				throw new ArgumentException( "The stream must be seekable." );
 		}
-
-		#endregion
-
-		#region properties
-
-		/// <summary>
-		/// The uncompressed voxel data
-		/// </summary>
-		public Stream Stream { get; }
 
 		#endregion
 
@@ -73,11 +68,11 @@ namespace Zeiss.IMT.PiWeb.Volume
 			{
 				if( options.Encoder == BlockVolume.EncoderID )
 				{
-					Stream.Seek( 0, SeekOrigin.Begin );
-					return new BlockVolume( Stream, Metadata, options, progress );
+					_Stream.Seek( 0, SeekOrigin.Begin );
+					return new BlockVolume( _Stream, Metadata, options, progress );
 				}
 
-				var directionMap = new DirectionMap { [ Direction.Z ] = CompressDirection( options, progress, logger, ct ) };
+				var directionMap = new DirectionMap { [ Direction.Z ] = CompressDirection( options, progress, ct ) };
 
 				return new CompressedVolume( Metadata, options, directionMap );
 			}
@@ -87,15 +82,15 @@ namespace Zeiss.IMT.PiWeb.Volume
 			}
 		}
 
-		private byte[] CompressDirection( VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		private byte[] CompressDirection( VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
-			Stream.Seek( 0, SeekOrigin.Begin );
+			_Stream.Seek( 0, SeekOrigin.Begin );
 
 			using var outputStream = new MemoryStream();
 
 			GetEncodedSliceSize( Metadata, Direction.Z, out var encodingSizeX, out var encodingSizeY );
 
-			var inputStreamWrapper = new SliceStreamReader( Metadata, Stream, progress, ct );
+			var inputStreamWrapper = new SliceStreamReader( Metadata, _Stream, progress, ct );
 			var outputStreamWrapper = new StreamWrapper( outputStream );
 
 			var error = NativeMethods.CompressVolume( inputStreamWrapper.Interop, outputStreamWrapper.Interop, encodingSizeX, encodingSizeY, options.Encoder, options.PixelFormat, options.GetOptionsString(), options.Bitrate );
@@ -117,8 +112,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 		{
 			var sw = Stopwatch.StartNew();
 			
-			Stream.Seek( 0, SeekOrigin.Begin );
-			var result = PreviewCreator.CreatePreview( Stream, Metadata, minification, progress );
+			_Stream.Seek( 0, SeekOrigin.Begin );
+			
+			var result = PreviewCreator.CreatePreview( _Stream, Metadata, minification, progress );
 			logger?.Log( LogLevel.Info, $"Created a preview with minification factor {minification} in {sw.ElapsedMilliseconds} ms." );
 
 			return result;
@@ -149,15 +145,88 @@ namespace Zeiss.IMT.PiWeb.Volume
 		}
 
 		/// <inheritdoc />
-		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public override void GetSlice(
+			VolumeSliceBuffer sliceBuffer,
+			VolumeSliceDefinition slice, 
+			IProgress<VolumeSliceDefinition> progress = null, 
+			ILogger logger = null, 
+			CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
-			
-			Stream.Seek( 0, SeekOrigin.Begin );
-			var result = VolumeSlice.Extract( slice.Direction, slice.Index, Metadata, Stream );
+			switch(slice.Direction)
+			{
+				case Direction.X: 
+					ReadSliceX( sliceBuffer, slice.Index );
+					break;
+				case Direction.Y:
+					ReadSliceY( sliceBuffer, slice.Index );
+					break;
+				case Direction.Z:
+					ReadSliceZ( sliceBuffer, slice.Index );
+					break;
+			}
 			logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
+		}
 
-			return result;
+		private void ReadSliceX( VolumeSliceBuffer sliceBuffer, ushort index )
+		{
+			var sx = Metadata.SizeX;
+			var sy = Metadata.SizeY;
+			var sz = Metadata.SizeZ;
+
+			var bufferSize = sx * sy;
+			
+			// TODO: Warum lesen wir hier das Ergebnis nicht gleich in den Zielbuffer? 
+			var buffer = ArrayPool<byte>.Shared.Rent( bufferSize );
+			
+			var result = new byte[sy * sz];
+
+			_Stream.Seek( 0, SeekOrigin.Begin );
+			for( var z = 0; z < sz; z++ )
+			{
+				_Stream.Read( buffer, 0, bufferSize );
+
+				for( var y = 0; y < sy; y++ )
+				{
+					result[ z * sy + y ] = buffer[ y * sx + index ];
+				}
+			}
+
+			ArrayPool<byte>.Shared.Return( buffer );
+		}
+
+		private void ReadSliceY( VolumeSliceBuffer sliceBuffer, ushort index )
+		{
+			var sx = Metadata.SizeX;
+			var sy = Metadata.SizeY;
+			var sz = Metadata.SizeZ;
+
+			var bufferSize = sx * sy;
+			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Y, index ), bufferSize );
+			
+			// TODO: Warum lesen wir hier das Ergebnis nicht gleich in den Zielbuffer? 
+			var buffer = ArrayPool<byte>.Shared.Rent( bufferSize );
+
+			_Stream.Seek( 0, SeekOrigin.Begin );
+			for( var z = 0; z < sz; z++ )
+			{
+				_Stream.Read( buffer, 0, bufferSize );
+				Array.Copy( buffer, index * sx, sliceBuffer.Data, z * sx, sx );
+			}
+
+			ArrayPool<byte>.Shared.Return( buffer );
+		}
+
+		private void ReadSliceZ( VolumeSliceBuffer sliceBuffer, ushort index )
+		{
+			var sx = Metadata.SizeX;
+			var sy = Metadata.SizeY;
+
+			var bufferSize = sx * sy;
+			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Z, index ), bufferSize );
+
+			_Stream.Seek( ( long ) index * sx * sy, SeekOrigin.Begin );
+			_Stream.Read( sliceBuffer.Data, 0, bufferSize );
 		}
 
 		/// <summary>
@@ -185,7 +254,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		public void Dispose()
 		{
 			if( !_LeaveOpen )
-				Stream?.Dispose();
+				_Stream?.Dispose();
 		}
 
 		#endregion
