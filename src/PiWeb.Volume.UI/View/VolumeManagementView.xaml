@@ -26,6 +26,7 @@
                     Command="{Binding SaveVolumeCommand}"
                     Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"
                     Style="{StaticResource ToolbarButtonStyle}"
+                    ToolTip="Save volume..."
                     DockPanel.Dock="Right">
                     <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/save.png" Style="{StaticResource Icon}" />
                 </Button>
@@ -34,6 +35,7 @@
                     HorizontalAlignment="Right"
                     Command="{Binding OpenVolumeCommand}"
                     Style="{StaticResource ToolbarButtonStyle}"
+                    ToolTip="Open volume..."
                     DockPanel.Dock="Right">
                     <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/folder_open.png" Style="{StaticResource Icon}" />
                 </Button>
@@ -43,6 +45,7 @@
                     Command="{Binding DecompressCommand}"
                     Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"
                     Style="{StaticResource ToolbarButtonStyle}"
+                    ToolTip="Decompress volume"
                     DockPanel.Dock="Right">
                     <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/compress_table.png" Style="{StaticResource Icon}" />
                 </Button>
