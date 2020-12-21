@@ -32,6 +32,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 		private readonly Volume _Preview;
 		private readonly ILogger _Logger;
+		private readonly Dispatcher _Dispatcher;
 		private int _SelectedLayerIndex;
 		private WriteableBitmap _SelectedLayerImage;
 		private int _MaxLayer;
@@ -40,7 +41,6 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 		private bool _ShowPreview;
 		private IDisposable _Subcription;
 		private int _MaxPreviewLayer;
-		private readonly Dispatcher _Dispatcher;
 
 		private DoubleRange _HorizontalRange;
 		private DoubleRange _VerticalRange;
@@ -236,13 +236,13 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 				.FromAsync( ct => Task.Run( () => UpdateLayer( Volume, ( ushort ) _SelectedLayerIndex ), ct ) )
 				.ObserveOn( _Dispatcher )
 				.Subscribe( l =>
-			{
-				SelectedLayer = l;
-				WriteImage( SelectedLayerImage, l );
-				ShowPreview = false;
+				{
+					SelectedLayer = l;
+					WriteImage( SelectedLayerImage, l );
+					ShowPreview = false;
 
-				LayerChanged?.Invoke( this, EventArgs.Empty );
-			} );
+					LayerChanged?.Invoke( this, EventArgs.Empty );
+				} );
 		}
 
 		private Layer UpdateLayer( Volume volume, ushort sliceIndex )

@@ -12,6 +12,8 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Model
 {
 	public readonly struct Layer
 	{
+		#region constructors
+
 		public Layer( byte[] data, int width, int height, int index ) : this()
 		{
 			Data = data;
@@ -20,9 +22,15 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Model
 			Index = index;
 		}
 
+		#endregion
+
+		#region properties
+
 		public byte[] Data { get; }
 		public int Index { get; }
 		public int Width { get; }
 		public int Height { get; }
+
+		#endregion
 	}
 }

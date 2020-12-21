@@ -10,14 +10,14 @@
 
 namespace Zeiss.IMT.PiWeb.Volume.UI.Interfaces
 {
-    public interface IFileService
-    {
-        #region methods
+	public interface IFileService
+	{
+		#region methods
 
-        bool SelectOpenFileName( out string fileName );
-        
-        bool SelectSaveFileName( out string fileName );
+		bool SelectOpenFileName( out string fileName );
 
-        #endregion
-    }
+		bool SelectSaveFileName( out string fileName );
+
+		#endregion
+	}
 }

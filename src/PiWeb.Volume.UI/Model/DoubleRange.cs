@@ -60,9 +60,9 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Model
 
 		public static double Clip( DoubleRange range, double value )
 		{
-			if( range.Contains( value ) ) 
+			if( range.Contains( value ) )
 				return value;
-			
+
 			if( range.Start < range.Stop )
 			{
 				if( value < range.Start ) return range.Start;

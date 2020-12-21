@@ -71,6 +71,10 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 			set => Set( ref _PixelFormat, value );
 		}
 
+		#endregion
+
+		#region methods
+
 		public VolumeCompressionOptions GetOptions()
 		{
 			return new VolumeCompressionOptions( Encoder, PixelFormat, EncoderOptions, Bitrate );
