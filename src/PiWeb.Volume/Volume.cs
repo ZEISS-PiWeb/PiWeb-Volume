@@ -16,10 +16,8 @@ namespace Zeiss.IMT.PiWeb.Volume
 	using System.Collections.Generic;
 	using System.IO;
 	using System.IO.Compression;
-	using System.Runtime.InteropServices;
 	using System.Threading;
 	using Zeiss.IMT.PiWeb.Volume.Block;
-	using Zeiss.IMT.PiWeb.Volume.Interop;
 
 	#endregion
 
@@ -106,15 +104,6 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			return CompressedVolume.Create( stream, Direction.Z, metadata, options, progress, ct );
 		}
-
-		[DllImport( "PiWeb.Volume.Core.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi )]
-		internal static extern int CompressVolume( InteropSliceReader inputStream, InteropStream outputStream, ushort width, ushort height, [MarshalAs( UnmanagedType.LPStr )] string encoderName, [MarshalAs( UnmanagedType.LPStr )] string pixelFormat, [MarshalAs( UnmanagedType.LPStr )] string options, int bitrate );
-
-		[DllImport( "PiWeb.Volume.Core.dll", CallingConvention = CallingConvention.Cdecl )]
-		internal static extern int DecompressVolume( InteropStream inputStream, InteropSliceWriter outputStream );
-
-		[DllImport( "PiWeb.Volume.Core.dll", CallingConvention = CallingConvention.Cdecl )]
-		internal static extern int DecompressSlices( InteropStream inputStream, InteropSliceWriter outputStream, ushort index, ushort count );
 
 		/// <summary>
 		/// Returns the volumes accessibility in the specified direction.
