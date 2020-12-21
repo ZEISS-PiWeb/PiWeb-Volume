@@ -110,32 +110,33 @@ namespace Zeiss.IMT.PiWeb.Volume
 		internal VolumeSliceCollection GetSliceRangeCollection()
 		{
 			return new VolumeSliceCollection(
-				_SlicesX.ToDictionary( k => k.Key, v => new VolumeSlice( Direction.X, v.Key, v.Value.Data ) ),
-				_SlicesY.ToDictionary( k => k.Key, v => new VolumeSlice( Direction.Y, v.Key, v.Value.Data ) ),
-				_SlicesZ.ToDictionary( k => k.Key, v => new VolumeSlice( Direction.Z, v.Key, v.Value.Data ) )
+				_SlicesX.ToDictionary( k => k.Key, v => v.Value.ToVolumeSlice() ),
+				_SlicesY.ToDictionary( k => k.Key, v => v.Value.ToVolumeSlice() ),
+				_SlicesZ.ToDictionary( k => k.Key, v => v.Value.ToVolumeSlice() )
 			);
 		}
 
-		internal VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition definition )
+		internal VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range )
 		{
-			var slices = new List<VolumeSlice>();
-			var set = GetSlices( definition.Direction );
-			for( var s = definition.First; s <= definition.Last; s++ )
+			var slices = new List<VolumeSliceBuffer>( range.Length );
+			var set = GetSlices( range.Direction );
+			
+			foreach( var definition in range )
 			{
-				if( set.TryGetValue( s, out var data ) )
-					slices.Add( new VolumeSlice( definition.Direction, s, data.Data ) );
+				if( set.TryGetValue( definition.Index, out var data ) )
+					slices.Add( data );
 				else
 					throw new ArgumentOutOfRangeException( nameof(definition) );
 			}
 
-			return new VolumeSliceRange( definition, slices );
+			return new VolumeSliceRange( range, slices );
 		}
 
 		internal VolumeSlice GetSlice( Direction direction, ushort index )
 		{
 			var set = GetSlices( direction );
 			if( set.TryGetValue( index, out var data ) )
-				return new VolumeSlice( direction, index, data.Data );
+				return data.ToVolumeSlice();
 
 			throw new ArgumentOutOfRangeException( nameof(index) );
 		}

@@ -14,8 +14,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using System.Runtime.InteropServices;
 	using System.Threading;
+	using System.Threading.Tasks;
 	using Zeiss.IMT.PiWeb.Volume.Interop;
 
 	#endregion
@@ -27,7 +29,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		private readonly IProgress<VolumeSliceDefinition> _ProgressNotifier;
 		private readonly CancellationToken _Ct;
 
-		private readonly VolumeSlice[] _Data;
+		private readonly List<Task<VolumeSlice>> _DataTasks;
 
 		private readonly ushort _SizeX;
 		private readonly ushort _SizeY;
@@ -48,7 +50,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			metadata.GetSliceSize( direction, out _SizeX, out _SizeY );
 
 			_SizeZ = metadata.GetSize( direction );
-			_Data = VolumeSliceHelper.CreateSliceData( _SizeX,_SizeY, _SizeZ );
+			_DataTasks = new List<Task<VolumeSlice>>( _SizeZ );
 
 			Interop = new InteropSliceWriter
 			{
@@ -68,7 +70,12 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		internal IReadOnlyList<VolumeSlice> GetData()
 		{
-			return _Data;
+			// ReSharper disable once CoVariantArrayConversion
+			Task.WaitAll( _DataTasks.ToArray() );
+
+			return _DataTasks
+				.Select( t => t.Result )
+				.ToArray();
 		}
 
 		private void WriteSlice( IntPtr line, ushort width, ushort height, ushort z )
@@ -79,11 +86,20 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( z >= _SizeZ )
 				return;
 
-			var data = _Data[ z ].Data;
+			var length = _SizeX * _SizeY;
+			var data = VolumeArrayPool.Shared.Rent( length );
 			for( var y = 0; y < _SizeY; y++ )
 			{
 				Marshal.Copy( line + y * width, data, y * _SizeX, _SizeX );
 			}
+
+			_DataTasks.Add( Task.Run( () =>
+			{
+				var slice = new VolumeSlice( Direction.Z, z, length, data );
+				VolumeArrayPool.Shared.Return( data );
+
+				return slice;
+			}, _Ct ) );
 		}
 
 		#endregion

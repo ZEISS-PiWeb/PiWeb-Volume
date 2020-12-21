@@ -67,8 +67,8 @@ namespace Zeiss.IMT.PiWeb.Volume
 			var index = 0;
 			foreach( var slice in _Slices )
 			{
-				if( slice.Data.Length != expectedSliceSize )
-					throw new VolumeIntegrityException( $"Invalid dimension of slice {index} (expected: {expectedSliceSize}, but was {slice.Data.Length})." );
+				if( slice.Length != expectedSliceSize )
+					throw new VolumeIntegrityException( $"Invalid dimension of slice {index} (expected: {expectedSliceSize}, but was {slice.Length})." );
 				if( slice.Direction != Direction.Z )
 					throw new VolumeIntegrityException( $"Invalid slice direction for slice {index} (expected: {Direction.Z}, but was {slice.Direction})." );
 				index++;
@@ -208,15 +208,14 @@ namespace Zeiss.IMT.PiWeb.Volume
 			var sy = Metadata.SizeY;
 			var sz = Metadata.SizeZ;
 
-			var bufferSize = sy * sz;
-			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.X, index ), bufferSize );
+			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.X, index ), sy * sz );
 
 			Parallel.For( 0, sz, z =>
 			{
-				// TODO: Copy range
+				var targetArray = sliceBuffer.Data;
 				for( var y = 0; y < sy; y++ )
 				{
-					sliceBuffer.Data[ z * sy + y ] = _Slices[ z ].Data[ y * sx + index ];
+					targetArray[ z * sy + y ] = _Slices[ z ][ y * sx + index ];
 				}
 			} );
 		}
@@ -226,12 +225,11 @@ namespace Zeiss.IMT.PiWeb.Volume
 			var sx = Metadata.SizeX;
 			var sz = Metadata.SizeZ;
 
-			var bufferSize = sx * sz;
-			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Y, index ), bufferSize );
+			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Y, index ), sx * sz );
 
-			Parallel.For( 0, sz, z => 
+			Parallel.For( 0, sz, z =>
 			{
-				Array.Copy( _Slices[ z ].Data, index * sx, sliceBuffer.Data, z * sx, sx ); 
+				_Slices[ z ].CopyDataTo( sliceBuffer.Data, z * sx, index * sx, sx );
 			} );
 		}
 
@@ -243,7 +241,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			var bufferSize = sx * sy;
 			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Z, index ), bufferSize );
 
-			_Slices[ index ].Data.CopyTo( sliceBuffer.Data, 0 );
+			_Slices[ index ].CopyDataTo( sliceBuffer.Data );
 		}
 
 		/// <summary>

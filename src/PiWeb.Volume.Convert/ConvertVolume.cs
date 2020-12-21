@@ -15,6 +15,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 	using System;
 	using System.Diagnostics;
 	using System.IO;
+	using System.Linq;
 
 	#endregion
 
@@ -141,7 +142,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 				var sy = metadata.SizeY;
 				var sz = metadata.SizeZ;
 
-				var data = VolumeSliceHelper.CreateSliceData( sx, sy, sz );
+				var data = VolumeSliceHelper.CreateSliceBuffer( sx, sy, sz );
 				
 				var buffer = new byte[sx * sy * 2];
 				for( var z = 0; z < sz; z++ )
@@ -155,7 +156,13 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 						layer[ index ] = buffer[ index * 2 + 1 ];
 				}
 
-				return new UncompressedVolume( metadata, data );
+				var slices = data
+					.AsParallel()
+					.AsOrdered()
+					.Select( s => s.ToVolumeSlice() )
+					.ToArray();
+				
+				return new UncompressedVolume( metadata, slices );
 			}
 			finally
 			{
@@ -185,7 +192,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 				var sz = metadata.SizeZ;
 
 				var sliceSize = sx * sy;
-				var data = VolumeSliceHelper.CreateSliceData( sx, sy, sz );
+				var data = VolumeSliceHelper.CreateSliceBuffer( sx, sy, sz );
 
 				for( var z = 0; z < sz; z++ )
 				{
@@ -193,7 +200,13 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 					uint8Stream.Read( data[ z ].Data, 0, sliceSize );
 				}
 
-				return new UncompressedVolume( metadata, data );
+				var slices = data
+					.AsParallel()
+					.AsOrdered()
+					.Select( s => s.ToVolumeSlice() )
+					.ToArray();
+
+				return new UncompressedVolume( metadata, slices );
 			}
 			finally
 			{

@@ -40,7 +40,11 @@ namespace Zeiss.IMT.PiWeb.Volume
 		internal VolumeSliceRange( VolumeSliceRangeDefinition definition, IEnumerable<VolumeSliceBuffer> slices )
 		{
 			Definition = definition;
-			_Slices = slices.Select( s => new VolumeSlice( s.Definition, s.Data ) ).ToList();
+			_Slices = slices
+				.AsParallel()
+				.AsOrdered()
+				.Select( s => s.ToVolumeSlice() )
+				.ToList();
 		}
 
 		/// <summary>

@@ -127,13 +127,23 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 				blockIndex => _SlicesZ.ContainsKey( blockIndex.Z ) || _SlicesY.ContainsKey( blockIndex.Y ) ||
 				              _SlicesX.ContainsKey( blockIndex.X ), progress, ct );
 
-			var result = new VolumeSliceCollection(
-				_SlicesX.Values.SelectMany( list => list ).ToDictionary( s => s.Definition.Index, s => new VolumeSlice( s.Definition, s.Data ) ),
-				_SlicesY.Values.SelectMany( list => list ).ToDictionary( s => s.Definition.Index, s => new VolumeSlice( s.Definition, s.Data ) ),
-				_SlicesZ.Values.SelectMany( list => list ).ToDictionary( s => s.Definition.Index, s => new VolumeSlice( s.Definition, s.Data ) )
+			return new VolumeSliceCollection(
+				_SlicesX.Values
+					.SelectMany( list => list )
+					.AsParallel()
+					.AsOrdered()
+					.ToDictionary( s => s.Definition.Index, s => s.ToVolumeSlice() ),
+				_SlicesY.Values
+					.SelectMany( list => list )
+					.AsParallel()
+					.AsOrdered()
+					.ToDictionary( s => s.Definition.Index, s => s.ToVolumeSlice() ),
+				_SlicesZ.Values
+					.SelectMany( list => list )
+					.AsParallel()
+					.AsOrdered()
+					.ToDictionary( s => s.Definition.Index, s => s.ToVolumeSlice() )
 			);
-
-			return result;
 		}
 
 		private void ReadZSlices( byte[] block, BlockIndex index, List<VolumeSliceBuffer> slices )
