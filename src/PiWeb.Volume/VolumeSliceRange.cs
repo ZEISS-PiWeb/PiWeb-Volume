@@ -56,27 +56,6 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		#endregion
 
-		#region methods
-
-		/// <summary>
-		/// Extracts the specified definition.
-		/// </summary>
-		/// <param name="definition">The definition.</param>
-		/// <param name="volumeMetadata">The volume metadata.</param>
-		/// <param name="slices">The data.</param>
-		internal static VolumeSliceRange Extract( VolumeSliceRangeDefinition definition, VolumeMetadata volumeMetadata, IReadOnlyList<VolumeSlice> slices )
-		{
-			var sliceRange = new List<VolumeSlice>( definition.Length );
-			for( var i = definition.First; i <= definition.Last; i++ )
-			{
-				sliceRange.Add( VolumeSlice.Extract( definition.Direction, i, volumeMetadata, slices ) );
-			}
-
-			return new VolumeSliceRange( definition, sliceRange );
-		}
-
-		#endregion
-
 		#region interface IReadOnlyList<VolumeSlice>
 
 		/// <inheritdoc />
