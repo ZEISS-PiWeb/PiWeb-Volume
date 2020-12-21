@@ -54,33 +54,28 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Model
 		public bool Contains( double value )
 		{
 			if( Start < Stop )
-			{
 				return value >= Start && value <= Stop;
-			}
-			else
-			{
-				return value >= Stop && value <= Start;
-			}
+			return value >= Stop && value <= Start;
 		}
 
 		public static double Clip( DoubleRange range, double value )
 		{
-			if( !range.Contains( value ) )
+			if( range.Contains( value ) ) 
+				return value;
+			
+			if( range.Start < range.Stop )
 			{
-				if( range.Start < range.Stop )
-				{
-					if( value < range.Start ) return range.Start;
-					if( value > range.Stop ) return range.Stop;
-				}
-				else if( range.Start > range.Stop )
-				{
-					if( value > range.Start ) return range.Start;
-					if( value < range.Stop ) return range.Stop;
-				}
-				else
-				{
-					return range.Start;
-				}
+				if( value < range.Start ) return range.Start;
+				if( value > range.Stop ) return range.Stop;
+			}
+			else if( range.Start > range.Stop )
+			{
+				if( value > range.Start ) return range.Start;
+				if( value < range.Stop ) return range.Stop;
+			}
+			else
+			{
+				return range.Start;
 			}
 
 			return value;

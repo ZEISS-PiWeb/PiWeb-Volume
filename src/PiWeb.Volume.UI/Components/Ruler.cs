@@ -136,12 +136,9 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
 
             ctx.PushGuidelineSet( new GuidelineSet( new[] { pen.Thickness / 2 }, new[] { pen.Thickness / 2 } ) );
 
-            var valueRange = new DoubleRange( ValueRange.Value.Start, ValueRange.Value.Stop );
-
-            if( Invert )
-	            valueRange = valueRange.Invert();
-            
-            var valueRangeBase = new DoubleRange( valueRange.Start, valueRange.Stop );
+            var valueRange = Invert 
+	            ? new DoubleRange( ValueRange.Value.Stop, ValueRange.Value.Start ) 
+	            : new DoubleRange( ValueRange.Value.Start, ValueRange.Value.Stop );
 
             var w = ActualWidth;
             var h = ActualHeight;
@@ -158,52 +155,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
                 h = ActualWidth;
             }
 
-            ctx.DrawRectangle( Background, null, new Rect( 0, 0, w, h ) );
-            ctx.DrawLine( pen, new Point( 0, h ), new Point( w, h ) );
-
-            var step = CalculateStep( valueRange.Size, w );
-
-            var drawingRange = new DoubleRange( 0, w );
-
-            if( HighlightedRange.HasValue && HighlightedRange.Value.Size > 0 )
-            {
-	            var highlightedRange = HighlightedRange.Value;
-                var highlightedValueRange = new DoubleRange( DoubleRange.Clip( valueRangeBase, highlightedRange.Start ), DoubleRange.Clip( valueRangeBase, highlightedRange.Stop ) );
-
-                var highlightedDrawingRange = new DoubleRange(
-                    Math.Floor( DoubleRange.Transform( highlightedValueRange.Start, valueRangeBase, drawingRange ) ), Math.Floor( DoubleRange.Transform( highlightedValueRange.Stop, valueRangeBase, drawingRange ) ) );
-
-                if( Invert )
-                    highlightedDrawingRange.Invert();
-
-                ctx.DrawRectangle( HighlightBrush, null, new Rect( highlightedDrawingRange.Lower, 0, highlightedDrawingRange.Size, h ) );
-            }
-
-            var sign = valueRange.Start > valueRange.Stop ? -1.0 : 1.0;
-
-            for( var i = 0; i < ( int ) ( valueRange.Size / step ); i++ )
-            {
-                var firstValue = Math.Floor( valueRange.Start / step ) * step;
-
-                var value = firstValue + sign * ( step + i * step );
-
-                var x = Math.Floor( DoubleRange.Transform( value, valueRange, drawingRange ) );
-
-                if( Math.Abs( value % ( 10 * step ) ) < 1e-9 )
-                {
-                    var text = value.ToString( "0.###", CultureInfo.CurrentCulture );
-                    var formattedText = new FormattedText( text, CultureInfo.CurrentCulture, FlowDirection, FontFamily.GetTypefaces().First(), FontSize, Foreground );
-
-                    if( x + 3 + formattedText.Width < w )
-                        ctx.DrawText( formattedText, new Point( x + 3, 0 ) );
-
-                    ctx.DrawLine( pen, new Point( x, 0 ), new Point( x, h ) );
-                }
-                else
-                {
-                    ctx.DrawLine( pen, new Point( x, h * 0.75 ), new Point( x, h ) );
-                }
-            }
+            DrawRuler( ctx, w, h, pen, valueRange );
 
             if( Orientation == Orientation.Vertical )
             {
@@ -212,6 +164,63 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
             }
 
             ctx.Pop();
+        }
+
+        private void DrawRuler( DrawingContext ctx, double w, double h, Pen pen, DoubleRange valueRange )
+        {
+	        ctx.DrawRectangle( Background, null, new Rect( 0, 0, w, h ) );
+	        ctx.DrawLine( pen, new Point( 0, h ), new Point( w, h ) );
+
+	        var step = CalculateStep( valueRange.Size, w );
+	        var drawingRange = new DoubleRange( 0, w );
+
+	        DrawHighlight( ctx, h, valueRange, drawingRange );
+
+	        var sign = valueRange.Start > valueRange.Stop ? -1.0 : 1.0;
+
+	        for( var i = 0; i < ( int ) ( valueRange.Size / step ); i++ )
+	        {
+		        var firstValue = Math.Floor( valueRange.Start / step ) * step;
+		        var value = firstValue + sign * ( step + i * step );
+
+		        var x = Math.Floor( DoubleRange.Transform( value, valueRange, drawingRange ) );
+
+		        if( Math.Abs( value % ( 10 * step ) ) < 1e-9 )
+		        {
+			        DrawText( ctx, value, x, w );
+			        ctx.DrawLine( pen, new Point( x, 0 ), new Point( x, h ) );
+		        }
+		        else
+		        {
+			        ctx.DrawLine( pen, new Point( x, h * 0.75 ), new Point( x, h ) );
+		        }
+	        }
+        }
+
+        private void DrawHighlight( DrawingContext ctx, double h, DoubleRange valueRange, DoubleRange drawingRange )
+        {
+	        if( !HighlightedRange.HasValue || HighlightedRange.Value.Size <= 0 ) 
+		        return;
+	        
+	        var highlightedRange = HighlightedRange.Value;
+	        var highlightedValueRange = new DoubleRange( DoubleRange.Clip( valueRange, highlightedRange.Start ), DoubleRange.Clip( valueRange, highlightedRange.Stop ) );
+
+	        var highlightedDrawingRange = new DoubleRange(
+		        Math.Floor( DoubleRange.Transform( highlightedValueRange.Start, valueRange, drawingRange ) ), Math.Floor( DoubleRange.Transform( highlightedValueRange.Stop, valueRange, drawingRange ) ) );
+
+	        if( Invert )
+		        highlightedDrawingRange.Invert();
+
+	        ctx.DrawRectangle( HighlightBrush, null, new Rect( highlightedDrawingRange.Lower, 0, highlightedDrawingRange.Size, h ) );
+        }
+
+        private void DrawText( DrawingContext ctx, double value, double x, double w )
+        {
+	        var text = value.ToString( "0.###", CultureInfo.CurrentCulture );
+	        var formattedText = new FormattedText( text, CultureInfo.CurrentCulture, FlowDirection, FontFamily.GetTypefaces().First(), FontSize, Foreground, 96 );
+
+	        if( x + 3 + formattedText.Width < w )
+		        ctx.DrawText( formattedText, new Point( x + 3, 0 ) );
         }
 
         #endregion
