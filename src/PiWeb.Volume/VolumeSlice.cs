@@ -207,15 +207,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		private static VolumeSlice ReadSliceZ( Direction direction, ushort index, IReadOnlyList<VolumeSlice> slices, VolumeMetadata volumeMetadata )
 		{
-			var sx = volumeMetadata.SizeX;
-			var sy = volumeMetadata.SizeY;
-
-			var bufferSize = sx * sy;
-
-			var result = new byte[bufferSize];
-			Array.Copy( slices[ index ].Data, 0, result, 0, bufferSize );
-
-			return new VolumeSlice( direction, index, result );
+			return new VolumeSlice( direction, index, slices[ index ].Data );
 		}
 
 		#endregion
