@@ -42,23 +42,31 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		{ }
 
 		internal BlockVolume( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
-			: base( metadata, options, new DirectionMap() )
-		{
-			var encoder = new BlockVolumeEncoder( options );
-			var output = new MemoryStream();
-
-			encoder.Encode( input, output, metadata, progress );
-			CompressedData[ Direction.Z ] = output.ToArray();
-		}
+			: base( metadata, options, CreateDirectionMap( input, metadata, options, progress ) )
+		{ }
 
 		internal BlockVolume( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
-			: base( metadata, options, new DirectionMap() )
+			: base( metadata, options, CreateDirectionMap( slices, metadata, options, progress ) )
+		{ }
+
+		private static DirectionMap CreateDirectionMap( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
 		{
 			var encoder = new BlockVolumeEncoder( options );
 			var output = new MemoryStream();
 
 			encoder.Encode( slices, output, metadata, progress );
-			CompressedData[ Direction.Z ] = output.ToArray();
+
+			return new DirectionMap { [ Direction.Z ] = output.ToArray() };
+		}
+
+		private static DirectionMap CreateDirectionMap( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
+		{
+			var encoder = new BlockVolumeEncoder( options );
+			var output = new MemoryStream();
+
+			encoder.Encode( input, output, metadata, progress );
+			
+			return new DirectionMap { [ Direction.Z ] = output.ToArray() };
 		}
 
 		#endregion
