@@ -32,10 +32,12 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 		private readonly IFileService _FileService;
 		private readonly IMessageService _MessageService;
 		private readonly IViewService _ViewService;
+		private readonly ILogger _Logger = new ConsoleLogger();
+		
 		private VolumeViewModel _VolumeViewModel;
 		private string _FileName;
-		private double _Progress;
 		private string _ProgressMessage;
+		private double _Progress;
 		private bool _IsLoading;
 
 		#endregion
@@ -136,9 +138,9 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 			progress.ProgressChanged += OnProgressChanged;
 
 			if (volume is UncompressedVolume uncompressedVolume)
-				await Task.Run( () => uncompressedVolume.Save( stream, options, multiDirection, progress ) );
+				await Task.Run( () => uncompressedVolume.Save( stream, options, multiDirection, progress, _Logger ) );
 			else if (volume is StreamedVolume streamedVolume)
-				await Task.Run( () => streamedVolume.Save( stream, options, progress ) );
+				await Task.Run( () => streamedVolume.Save( stream, options, progress, _Logger ) );
 
 			progress.ProgressChanged -= OnProgressChanged;
 
@@ -171,14 +173,14 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 			progress.ProgressChanged += OnProgressChanged;
 
-			var decompressedVolume = await Task.Run( () => volume.Decompress( progress ) );
+			var decompressedVolume = await Task.Run( () => volume.Decompress( progress, _Logger ) );
 
 			progress.ProgressChanged -= OnProgressChanged;
 
 			ProgressMessage = null;
 			Progress = 0.0;
 			
-			VolumeViewModel = new VolumeViewModel( decompressedVolume, decompressedVolume, 1 );
+			VolumeViewModel = new VolumeViewModel( decompressedVolume, decompressedVolume, 1, _Logger );
 
 			IsLoading = false;
 		}
@@ -219,14 +221,14 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 			progress.ProgressChanged += OnProgressChanged;
 
-			var preview = await Task.Run( () => volume.CreatePreview( 4, progress ) );
+			var preview = await Task.Run( () => volume.CreatePreview( 4, progress, _Logger ) );
 
 			progress.ProgressChanged -= OnProgressChanged;
 
 			ProgressMessage = null;
 			Progress = 0.0;
 		
-			VolumeViewModel = new VolumeViewModel( volume, preview, 4 );
+			VolumeViewModel = new VolumeViewModel( volume, preview, 4, _Logger );
 
 			IsLoading = false;
 		}
@@ -260,14 +262,14 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 				loadOptionsViewModel.Minimum,
 				loadOptionsViewModel.Maximum,
 				loadOptionsViewModel.Streamed,
-				progress ) );
+				progress, _Logger ) );
 
 			progress.ProgressChanged -= OnProgressChanged;
 
 			ProgressMessage = null;
 			Progress = 0.0;
 
-			VolumeViewModel = new VolumeViewModel( volume, volume, 1 );
+			VolumeViewModel = new VolumeViewModel( volume, volume, 1, _Logger );
 			IsLoading = false;
 		}
 
@@ -289,7 +291,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 				loadOptionsViewModel.Minimum,
 				loadOptionsViewModel.Maximum,
 				loadOptionsViewModel.Streamed,
-				progress ) );
+				progress, _Logger ) );
 
 			progress.ProgressChanged -= OnProgressChanged;
 
@@ -299,17 +301,17 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 				previewProgress.ProgressChanged += OnProgressChanged;
 
-				var preview = await Task.Run( () => streamed.CreatePreview( 4, previewProgress ) );
+				var preview = await Task.Run( () => streamed.CreatePreview( 4, previewProgress, _Logger ) );
 
 				previewProgress.ProgressChanged -= OnProgressChanged;
 
-				VolumeViewModel = new VolumeViewModel( streamed, preview, 4 );
+				VolumeViewModel = new VolumeViewModel( streamed, preview, 4, _Logger );
 			}
 			else
 			{
 				scv.Close();
 
-				VolumeViewModel = new VolumeViewModel( volume, volume, 1 );
+				VolumeViewModel = new VolumeViewModel( volume, volume, 1, _Logger );
 			}
 
 			ProgressMessage = null;

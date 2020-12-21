@@ -43,5 +43,15 @@ namespace Zeiss.IMT.PiWeb.Volume
 		public ushort Index { get; }
 
 		#endregion
+		
+		#region methods
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"Slice {Index}, direction {Direction}";
+		}
+
+		#endregion
 	}
 }

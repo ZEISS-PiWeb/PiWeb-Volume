@@ -105,17 +105,23 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="other"></param>
 		public void Add( VolumeSliceCollection other )
 		{
-			foreach( var slice in other._SlicesX )
-				if( !_SlicesX.ContainsKey( slice.Key ) )
-					_SlicesX[ slice.Key ] = slice.Value;
+			foreach( var (key, slice) in other._SlicesX )
+			{
+				if( !_SlicesX.ContainsKey( key ) )
+					_SlicesX[ key ] = slice;
+			}
 
-			foreach( var slice in other._SlicesY )
-				if( !_SlicesY.ContainsKey( slice.Key ) )
-					_SlicesY[ slice.Key ] = slice.Value;
+			foreach( var (key, slice) in other._SlicesY )
+			{
+				if( !_SlicesY.ContainsKey( key ) )
+					_SlicesY[ key ] = slice;
+			}
 
-			foreach( var slice in other._SlicesZ )
-				if( !_SlicesZ.ContainsKey( slice.Key ) )
-					_SlicesZ[ slice.Key ] = slice.Value;
+			foreach( var (key, slice) in other._SlicesZ )
+			{
+				if( !_SlicesZ.ContainsKey( key ) )
+					_SlicesZ[ key ] = slice;
+			}
 		}
 
 		/// <summary>

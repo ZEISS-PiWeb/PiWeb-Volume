@@ -31,6 +31,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 		#region members
 
 		private readonly Volume _Preview;
+		private readonly ILogger _Logger;
 		private int _SelectedLayerIndex;
 		private WriteableBitmap _SelectedLayerImage;
 		private int _MaxLayer;
@@ -51,11 +52,12 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 		#region constructors
 
-		public VolumeViewModel( Volume model, Volume preview, ushort minification )
+		public VolumeViewModel( Volume model, Volume preview, ushort minification, ILogger logger )
 		{
 			Volume = model;
 			Minification = minification;
 			_Preview = preview;
+			_Logger = logger;
 			_Direction = Direction.Z;
 			_Dispatcher = Dispatcher.CurrentDispatcher;
 			_SelectedLayerIndex = model.Metadata.GetSize( Direction.Z ) / 2;
@@ -230,7 +232,10 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 		private void UpdateLayerAsync()
 		{
 			_Subcription?.Dispose();
-			_Subcription = Observable.FromAsync( ct => Task.Run( () => UpdateLayer( Volume, ( ushort ) _SelectedLayerIndex ), ct ) ).ObserveOn( _Dispatcher ).Subscribe( l =>
+			_Subcription = Observable
+				.FromAsync( ct => Task.Run( () => UpdateLayer( Volume, ( ushort ) _SelectedLayerIndex ), ct ) )
+				.ObserveOn( _Dispatcher )
+				.Subscribe( l =>
 			{
 				SelectedLayer = l;
 				WriteImage( SelectedLayerImage, l );
@@ -242,7 +247,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 		private Layer UpdateLayer( Volume volume, ushort sliceIndex )
 		{
-			var slice = volume.GetSlice( new VolumeSliceDefinition( _Direction, sliceIndex ) );
+			var slice = volume.GetSlice( new VolumeSliceDefinition( _Direction, sliceIndex ), logger: _Logger );
 			volume.Metadata.GetSliceSize( _Direction, out var width, out var height );
 
 			return new Layer( slice.Data, width, height, sliceIndex );
