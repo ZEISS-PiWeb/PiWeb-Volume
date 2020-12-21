@@ -16,7 +16,6 @@ namespace Zeiss.IMT.PiWeb.Volume
 	using System.Buffers;
 	using System.Collections.Generic;
 	using System.IO;
-	using System.Linq;
 	using System.Runtime.InteropServices;
 	using System.Threading;
 	using Zeiss.IMT.PiWeb.Volume.Interop;
