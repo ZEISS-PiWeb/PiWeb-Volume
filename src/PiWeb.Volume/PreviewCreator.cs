@@ -32,6 +32,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		private readonly CancellationToken _Ct;
 
 		private readonly VolumeSlice[] _PreviewData;
+		private byte[] _Buffer = Array.Empty<byte>();
 
 		private readonly ushort _PreviewSizeX;
 		private readonly ushort _PreviewSizeY;
@@ -76,7 +77,6 @@ namespace Zeiss.IMT.PiWeb.Volume
 		internal static UncompressedVolume CreatePreview( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, ushort minification )
 		{
 			var sizeX = metadata.SizeX;
-			var sizeY = metadata.SizeY;
 			var sizeZ = metadata.SizeZ;
 			var previewSizeX = ( ushort ) ( ( metadata.SizeX - 1 ) / minification + 1 );
 			var previewSizeY = ( ushort ) ( ( metadata.SizeY - 1 ) / minification + 1 );
@@ -89,11 +89,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			for( ushort z = 0, oz = 0; z < previewSizeZ && oz < sizeZ; z++, oz += minification )
 			{
-				var position = 0;
-
-				for( ushort y = 0, oy = 0; y < previewSizeY && oy < sizeY; y++, oy += minification )
-				for( ushort x = 0, ox = 0; x < previewSizeX && ox < sizeX; x++, ox += minification )
-					result[ z ].Data[ position++ ] = slices[ oz ].Data[ oy * sizeX + ox ];
+				CreateMinifiedSlice( minification, previewSizeX, previewSizeY, sizeX, slices[ oz ].Data, result[ z ].Data );
 			}
 
 			var volumeMetadata = new VolumeMetadata( 
@@ -130,11 +126,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 				if( oz % minification == 0 )
 				{
 					stream.Read( sliceBuffer, 0, sliceBufferSize );
-					var position = 0;
-
-					for( ushort y = 0, oy = 0; y < previewSizeY && oy < sizeY; y++, oy += minification )
-					for( ushort x = 0, ox = 0; x < previewSizeX && ox < sizeX; x++, ox += minification )
-						result[ z ].Data[ position++ ] = sliceBuffer[ oy * sizeX + ox ];
+					CreateMinifiedSlice( minification, previewSizeX, previewSizeY, sizeX, sliceBuffer, result[ z ].Data );
 
 					z++;
 				}
@@ -168,6 +160,15 @@ namespace Zeiss.IMT.PiWeb.Volume
 			
 			return Volume.CreateUncompressed( volumeMetadata, _PreviewData );
 		}
+		
+		private static void CreateMinifiedSlice( ushort minification, ushort previewSizeX, ushort previewSizeY, ushort stride, byte[] srcBuffer, byte[] destBuffer )
+		{
+			var position = 0;
+
+			for( ushort y = 0, oy = 0; y < previewSizeY; y++, oy += minification )
+			for( ushort x = 0, ox = 0; x < previewSizeX; x++, ox += minification )
+				destBuffer[ position++ ] = srcBuffer[ oy * stride + ox ];
+		}
 
 		private void WriteSlice( IntPtr line, ushort width, ushort height, ushort z )
 		{
@@ -182,11 +183,17 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( pz >= _PreviewSizeZ )
 				return;
 
-			for( int oy = 0, py = 0; py < _PreviewSizeY && oy < height; py++, oy += _Minification )
-			for( int ox = 0, px = 0; px < _PreviewSizeX && ox < width; px++, ox += _Minification )
-			{
-				_PreviewData[ pz ].Data[ py * _PreviewSizeX + px ] = Marshal.ReadByte( line, oy * width + ox );
-			}
+			var size = width * height;
+			EnsureBufferSize( size );
+
+			Marshal.Copy( line, _Buffer, 0, size );
+			CreateMinifiedSlice( _Minification, _PreviewSizeX, _PreviewSizeY, width, _Buffer, _PreviewData[ pz ].Data );
+		}
+
+		private void EnsureBufferSize( int bufferSize )
+		{
+			if( _Buffer.Length < bufferSize )
+				_Buffer = new byte[bufferSize];
 		}
 
 		#endregion
