@@ -10,30 +10,30 @@
 
 namespace Zeiss.IMT.PiWeb.Volume.UI.Model
 {
-    #region usings
+	#region usings
 
-    using System;
+	using System;
 
-    #endregion
+	#endregion
 
-    public class VolumeProgressEventArgs : EventArgs
-    {
-        #region constructors
+	public class VolumeProgressEventArgs : EventArgs
+	{
+		#region constructors
 
-        public VolumeProgressEventArgs( double progress, string message )
-        {
-            Progress = progress;
-            Message = message;
-        }
+		public VolumeProgressEventArgs( double progress, string message )
+		{
+			Progress = progress;
+			Message = message;
+		}
 
-        #endregion
+		#endregion
 
-        #region properties
+		#region properties
 
-        public double Progress { get; }
+		public double Progress { get; }
 
-        public string Message { get; }
+		public string Message { get; }
 
-        #endregion
-    }
+		#endregion
+	}
 }

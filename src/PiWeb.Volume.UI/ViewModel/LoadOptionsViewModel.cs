@@ -21,7 +21,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 		#region members
 
 		private static bool _Extrapolate;
-		private static byte _Minimum = 0;
+		private static byte _Minimum;
 		private static byte _Maximum = 255;
 
 		private bool _Streamed;
@@ -42,7 +42,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 			get => _Extrapolate;
 			set => Set( ref _Extrapolate, value );
 		}
-		
+
 		public byte Minimum
 		{
 			get => _Minimum;

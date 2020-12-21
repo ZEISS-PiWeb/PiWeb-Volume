@@ -10,44 +10,44 @@
 
 namespace Zeiss.IMT.PiWeb.Volume.UI.Model
 {
-    #region usings
+	#region usings
 
-    using System;
+	using System;
 
-    #endregion
+	#endregion
 
-    public class VolumeProgress : IProgress<VolumeSliceDefinition>
-    {
-        #region members
+	public class VolumeProgress : IProgress<VolumeSliceDefinition>
+	{
+		#region members
 
-        private readonly Volume _Volume;
+		private readonly Volume _Volume;
 
-        #endregion
+		#endregion
 
-        #region constructors
+		#region constructors
 
-        public VolumeProgress( Volume volume )
-        {
-            _Volume = volume;
-        }
+		public VolumeProgress( Volume volume )
+		{
+			_Volume = volume;
+		}
 
-        #endregion
+		#endregion
 
-        #region events
+		#region events
 
-        public event EventHandler<VolumeProgressEventArgs> ProgressChanged;
+		public event EventHandler<VolumeProgressEventArgs> ProgressChanged;
 
-        #endregion
+		#endregion
 
-        #region interface IProgress<VolumeSliceDefinition>
+		#region interface IProgress<VolumeSliceDefinition>
 
-        public void Report( VolumeSliceDefinition value )
-        {
-            var target = _Volume.Metadata.GetSize( value.Direction );
+		public void Report( VolumeSliceDefinition value )
+		{
+			var target = _Volume.Metadata.GetSize( value.Direction );
 
-            ProgressChanged?.Invoke( this, new VolumeProgressEventArgs( ( double ) value.Index / target, $"Loaded slice {value.Index} of {target}" ) );
-        }
+			ProgressChanged?.Invoke( this, new VolumeProgressEventArgs( ( double ) value.Index / target, $"Loaded slice {value.Index} of {target}" ) );
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
