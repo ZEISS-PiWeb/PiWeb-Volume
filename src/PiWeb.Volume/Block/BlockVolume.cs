@@ -14,13 +14,14 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.IO;
 	using System.Threading;
 
 	#endregion
 
 	/// <summary>
-	/// A Volume that is not compressed in slices, but in blocks.
+	/// A Volume that is not compressed in slices, but in blocks. This is optimal for performance/memory tradeoff.
 	/// </summary>
 	internal class BlockVolume : CompressedVolume
 	{
@@ -38,7 +39,26 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 		internal BlockVolume( VolumeMetadata metadata, VolumeCompressionOptions options, DirectionMap compressedData )
 			: base( metadata, options, compressedData )
+		{ }
+
+		internal BlockVolume( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
+			: base( metadata, options, new DirectionMap() )
 		{
+			var encoder = new BlockVolumeEncoder( options );
+			var output = new MemoryStream();
+
+			encoder.Encode( input, output, metadata, progress );
+			CompressedData[ Direction.Z ] = output.ToArray();
+		}
+
+		internal BlockVolume( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
+			: base( metadata, options, new DirectionMap() )
+		{
+			var encoder = new BlockVolumeEncoder( options );
+			var output = new MemoryStream();
+
+			encoder.Encode( slices, output, metadata, progress );
+			CompressedData[ Direction.Z ] = output.ToArray();
 		}
 
 		#endregion
@@ -46,42 +66,20 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		#region methods
 
 		/// <inheritdoc />
-		public override UncompressedVolume Decompress( IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		public override UncompressedVolume Decompress( IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
-			var decompressor = new BlockVolumeDecompressor( this );
-			var data = decompressor.Decompress( progress, ct );
-
-			return new UncompressedVolume( Metadata, data );
-		}
-
-		internal static BlockVolume Create( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress, CancellationToken ct )
-		{
-			var encoder = new BlockVolumeEncoder( options );
-			var output = new MemoryStream();
-
-			encoder.Encode( input, output, metadata, progress );
-
-			var directionMap = new DirectionMap
+			var sw = Stopwatch.StartNew();
+			try
 			{
-				[ Direction.Z ] = output.ToArray()
-			};
+				var decompressor = new BlockVolumeDecompressor( this );
+				var data = decompressor.Decompress( progress, ct );
 
-			return new BlockVolume( metadata, options, directionMap );
-		}
-
-		internal static BlockVolume Create( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress, CancellationToken ct )
-		{
-			var encoder = new BlockVolumeEncoder( options );
-			var output = new MemoryStream();
-
-			encoder.Encode( slices, output, metadata, progress );
-
-			var directionMap = new DirectionMap
+				return new UncompressedVolume( Metadata, data );
+			}
+			finally
 			{
-				[ Direction.Z ] = output.ToArray()
-			};
-
-			return new BlockVolume( metadata, options, directionMap );
+				logger?.Log( LogLevel.Info, $"Decompressed block volume in {sw.ElapsedMilliseconds} ms." );
+			}
 		}
 
 		internal static (ushort X, ushort Y, ushort Z) GetBlockCount( VolumeMetadata metadata )
@@ -111,40 +109,58 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		}
 
 		/// <inheritdoc />
-		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
 			if( CompressedData[ Direction.Z ] == null )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
+			var sw = Stopwatch.StartNew();
+			
 			var previewCreator = new BlockVolumePreviewCreator( this, minification );
-			return previewCreator.CreatePreview( progress, ct );
+			var result = previewCreator.CreatePreview( progress, ct );
+			logger?.Log( LogLevel.Info, $"Created a preview with minification factor {minification} in {sw.ElapsedMilliseconds} ms." );
+
+			return result;
 		}
 
 		/// <inheritdoc />
-		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
+			var sw = Stopwatch.StartNew();
+			
 			var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, new[] { new VolumeSliceRangeDefinition( slice.Direction, slice.Index, slice.Index ) } );
 			var data = sliceRangeCollector.CollectSliceRanges( progress, ct );
 
-			return data.GetSlice( slice.Direction, slice.Index );
+			var result = data.GetSlice( slice.Direction, slice.Index );
+			logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
+
+			return result;
 		}
 
 		/// <inheritdoc />
-		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
+			var sw = Stopwatch.StartNew();
+
 			var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, new[] { range } );
 			var data = sliceRangeCollector.CollectSliceRanges( progress, ct );
 
-			return data.GetSliceRange( range );
+			var result = data.GetSliceRange( range );
+			logger?.Log( LogLevel.Info, $"Extracted '{range}' in {sw.ElapsedMilliseconds} ms." );
+
+			return result;
 		}
 
 		/// <inheritdoc />
-		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
-			var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, ranges );
-			var data = sliceRangeCollector.CollectSliceRanges( progress, ct );
+			var sw = Stopwatch.StartNew();
 
-			return data;
+			var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, ranges );
+			var result = sliceRangeCollector.CollectSliceRanges( progress, ct );
+			logger?.Log( LogLevel.Info, $"Extracted '{ranges.Count}' slice ranges in {sw.ElapsedMilliseconds} ms." );
+
+			return result;
 		}
 
 		#endregion

@@ -13,6 +13,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 	#region usings
 
 	using System;
+	using System.Diagnostics;
 	using System.IO;
 
 	#endregion
@@ -40,25 +41,35 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 			byte minValue,
 			byte maxValue,
 			bool streamed,
-			IProgress<double> progress )
+			IProgress<double> progress,
+			ILogger logger = null )
 		{
-			var vgi = Vgi.Parse( vgiStream );
-
-			dataStream.Seek( vgi.HeaderLength, SeekOrigin.Begin );
-
-			switch( vgi.BitDepth )
+			var sw = Stopwatch.StartNew();
+			try
 			{
-				case 16:
-					var uint16Stream = extraPolate
-						? new Uint16Stream( dataStream, minValue, maxValue )
-						: new Uint16Stream( dataStream );
-					return FromUint8( uint16Stream, vgi, streamed, progress );
-				case 8:
-					var uint8Stream = extraPolate
-						? new Uint8Stream( dataStream, minValue, maxValue )
-						: new Uint8Stream( dataStream );
-					return FromUint8( uint8Stream, vgi, streamed, progress );
-				default: throw new NotSupportedException( "This converter can only convert 8 bit and 16 bit volumes." );
+				var vgi = Vgi.Parse( vgiStream );
+
+				dataStream.Seek( vgi.HeaderLength, SeekOrigin.Begin );
+
+				switch( vgi.BitDepth )
+				{
+					case 16:
+						var uint16Stream = extraPolate
+							? new Uint16Stream( dataStream, minValue, maxValue )
+							: new Uint16Stream( dataStream );
+						return FromUint8( uint16Stream, vgi, streamed, progress, logger );
+					case 8:
+						var uint8Stream = extraPolate
+							? new Uint8Stream( dataStream, minValue, maxValue )
+							: new Uint8Stream( dataStream );
+						return FromUint8( uint8Stream, vgi, streamed, progress, logger );
+					default: throw new NotSupportedException( "This converter can only convert 8 bit and 16 bit volumes." );
+				}
+			}
+			finally
+			{
+				logger?.Log( LogLevel.Info, $"Loaded VGI volume data in {sw.ElapsedMilliseconds} ms." );
+
 			}
 		}
 
@@ -79,25 +90,34 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 			byte minValue,
 			byte maxValue,
 			bool streamed,
-			IProgress<double> progress )
+			IProgress<double> progress,
+			ILogger logger = null )
 		{
-			var scv = Scv.Parse( scvStream );
-
-			scvStream.Seek( scv.HeaderLength, SeekOrigin.Begin );
-
-			switch( scv.BitDepth )
+			var sw = Stopwatch.StartNew();
+			try
 			{
-				case 16:
-					var uint16Stream = extraPolate
-						? new Uint16Stream( scvStream, minValue, maxValue )
-						: new Uint16Stream( scvStream );
-					return FromUint8( uint16Stream, scv, streamed, progress );
-				case 8:
-					var uint8Stream = extraPolate
-						? new Uint8Stream( scvStream, minValue, maxValue )
-						: new Uint8Stream( scvStream );
-					return FromUint8( uint8Stream, scv, streamed, progress );
-				default: throw new NotSupportedException( "This converter can only convert 8 bit and 16 bit volumes." );
+				var scv = Scv.Parse( scvStream );
+
+				scvStream.Seek( scv.HeaderLength, SeekOrigin.Begin );
+
+				switch( scv.BitDepth )
+				{
+					case 16:
+						var uint16Stream = extraPolate
+							? new Uint16Stream( scvStream, minValue, maxValue )
+							: new Uint16Stream( scvStream );
+						return FromUint8( uint16Stream, scv, streamed, progress, logger );
+					case 8:
+						var uint8Stream = extraPolate
+							? new Uint8Stream( scvStream, minValue, maxValue )
+							: new Uint8Stream( scvStream );
+						return FromUint8( uint8Stream, scv, streamed, progress, logger );
+					default: throw new NotSupportedException( "This converter can only convert 8 bit and 16 bit volumes." );
+				}
+			}
+			finally
+			{
+				logger?.Log( LogLevel.Info, $"Loaded SCV volume data in {sw.ElapsedMilliseconds} ms." );
 			}
 		}
 
@@ -109,30 +129,38 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		/// <param name="metadata">Metadata</param>
 		/// <param name="streamed"></param>
 		/// <param name="progress">Progress</param>
-		public static Volume FromUint16( Stream uint16Stream, VolumeMetadata metadata, bool streamed, IProgress<double> progress )
+		public static Volume FromUint16( Stream uint16Stream, VolumeMetadata metadata, bool streamed, IProgress<double> progress, ILogger logger = null )
 		{
-			if( streamed )
-				return new StreamedVolume( metadata, uint16Stream );
-
-			var sx = metadata.SizeX;
-			var sy = metadata.SizeY;
-			var sz = metadata.SizeZ;
-
-			var data = VolumeSliceHelper.CreateSliceData( sx, sy, sz );
-				
-			var buffer = new byte[sx * sy * 2];
-			for( var z = 0; z < sz; z++ )
+			var sw = Stopwatch.StartNew();
+			try
 			{
-				progress?.Report( ( double ) z / sz );
+				if( streamed )
+					return new StreamedVolume( metadata, uint16Stream );
 
-				uint16Stream.Read( buffer, 0, sx * sy * 2 );
-				var layer = data[ z ].Data;
+				var sx = metadata.SizeX;
+				var sy = metadata.SizeY;
+				var sz = metadata.SizeZ;
 
-				for( var index = 0; index < sx * sy; index++ )
-					layer[ index ] = buffer[ index * 2 + 1 ];
+				var data = VolumeSliceHelper.CreateSliceData( sx, sy, sz );
+				
+				var buffer = new byte[sx * sy * 2];
+				for( var z = 0; z < sz; z++ )
+				{
+					progress?.Report( ( double ) z / sz );
+
+					uint16Stream.Read( buffer, 0, sx * sy * 2 );
+					var layer = data[ z ].Data;
+
+					for( var index = 0; index < sx * sy; index++ )
+						layer[ index ] = buffer[ index * 2 + 1 ];
+				}
+
+				return new UncompressedVolume( metadata, data );
 			}
-
-			return new UncompressedVolume( metadata, data );
+			finally
+			{
+				logger?.Log( LogLevel.Info, $"Loaded UINT16 volume data in {sw.ElapsedMilliseconds} ms." );
+			}
 		}
 
 		/// <summary>
@@ -143,25 +171,34 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		/// <param name="metadata">Metadata</param>
 		/// <param name="streamed"></param>
 		/// <param name="progress">Progress</param>
-		public static Volume FromUint8( Stream uint8Stream, VolumeMetadata metadata, bool streamed, IProgress<double> progress )
+		public static Volume FromUint8( Stream uint8Stream, VolumeMetadata metadata, bool streamed, IProgress<double> progress, ILogger logger = null )
 		{
-			if( streamed )
-				return new StreamedVolume( metadata, uint8Stream );
-
-			var sx = metadata.SizeX;
-			var sy = metadata.SizeY;
-			var sz = metadata.SizeZ;
-
-			var sliceSize = sx * sy;
-			var data = VolumeSliceHelper.CreateSliceData( sx, sy, sz );
-
-			for( var z = 0; z < sz; z++ )
+			var sw = Stopwatch.StartNew();
+			try
 			{
-				progress?.Report( ( double ) z / sz );
-				uint8Stream.Read( data[ z ].Data, 0, sliceSize );
-			}
 
-			return new UncompressedVolume( metadata, data );
+				if( streamed )
+					return new StreamedVolume( metadata, uint8Stream );
+
+				var sx = metadata.SizeX;
+				var sy = metadata.SizeY;
+				var sz = metadata.SizeZ;
+
+				var sliceSize = sx * sy;
+				var data = VolumeSliceHelper.CreateSliceData( sx, sy, sz );
+
+				for( var z = 0; z < sz; z++ )
+				{
+					progress?.Report( ( double ) z / sz );
+					uint8Stream.Read( data[ z ].Data, 0, sliceSize );
+				}
+
+				return new UncompressedVolume( metadata, data );
+			}
+			finally
+			{
+				logger?.Log( LogLevel.Info, $"Loaded UINT8 volume data in {sw.ElapsedMilliseconds} ms." );
+			}
 		}
 
 		#endregion

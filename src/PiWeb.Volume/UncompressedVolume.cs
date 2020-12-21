@@ -14,6 +14,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.IO;
 	using System.Linq;
 	using System.Threading;
@@ -77,20 +78,27 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// Compresses the volume with the specified compression options.
 		/// </summary>
 		/// <exception cref="VolumeException">Error during encoding</exception>
-		public CompressedVolume Compress( VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		public CompressedVolume Compress( VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
-			if( options.Encoder == BlockVolume.EncoderID )
-				return BlockVolume.Create( _Slices, Metadata, options, progress, ct );
-
-			var directionMap = new DirectionMap { [ Direction.Z ] = CompressDirection( Direction.Z, options, progress, ct ) };
-
-			if( multiDirection )
+			var sw = Stopwatch.StartNew();
+			try
 			{
-				directionMap[ Direction.X ] = CompressDirection( Direction.X, options, progress, ct );
-				directionMap[ Direction.Y ] = CompressDirection( Direction.Y, options, progress, ct );
-			}
+				if( options.Encoder == BlockVolume.EncoderID )
+					return new BlockVolume( _Slices, Metadata, options, progress );
 
-			return new CompressedVolume( Metadata, options, directionMap );
+				var directionMap = new DirectionMap { [ Direction.Z ] = CompressDirection( Direction.Z, options, progress, logger, ct ) };
+				if( multiDirection )
+				{
+					directionMap[ Direction.X ] = CompressDirection( Direction.X, options, progress, logger, ct );
+					directionMap[ Direction.Y ] = CompressDirection( Direction.Y, options, progress, logger, ct );
+				}
+
+				return new CompressedVolume( Metadata, options, directionMap );
+			}
+			finally
+			{
+				logger?.Log( LogLevel.Info, $"Compressed volume with encoder '{options.Encoder}' in {sw.ElapsedMilliseconds} ms." );
+			}
 		}
 
 		/// <summary>
@@ -98,22 +106,24 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// </summary>
 		/// <exception cref="VolumeException">Error during encoding</exception>
 		/// <exception cref="NotSupportedException">The volume has no decompressed data</exception>
-		private byte[] CompressDirection( Direction direction, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		private byte[] CompressDirection( Direction direction, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
-			using( var outputStream = new MemoryStream() )
-			{
-				GetEncodedSliceSize( Metadata, direction, out var encodingSizeX, out var encodingSizeY );
+			var sw = Stopwatch.StartNew();
+			
+			using var outputStream = new MemoryStream();
+			GetEncodedSliceSize( Metadata, direction, out var encodingSizeX, out var encodingSizeY );
 
-				var inputStreamWrapper = new SliceReader( Metadata, _Slices, direction, progress, ct );
-				var outputStreamWrapper = new StreamWrapper( outputStream );
+			var inputStreamWrapper = new SliceReader( Metadata, _Slices, direction, progress, ct );
+			var outputStreamWrapper = new StreamWrapper( outputStream );
 
-				var error = NativeMethods.CompressVolume( inputStreamWrapper.Interop, outputStreamWrapper.Interop, encodingSizeX, encodingSizeY, options.Encoder, options.PixelFormat, options.GetOptionsString(), options.Bitrate );
+			var error = NativeMethods.CompressVolume( inputStreamWrapper.Interop, outputStreamWrapper.Interop, encodingSizeX, encodingSizeY, options.Encoder, options.PixelFormat, options.GetOptionsString(), options.Bitrate );
+			if( error != VolumeError.Success )
+				throw new VolumeException( error, Resources.FormatResource<Volume>( "Compression_ErrorText", error ) );
 
-				if( error != VolumeError.Success )
-					throw new VolumeException( error, Resources.FormatResource<Volume>( "Compression_ErrorText", error ) );
-
-				return outputStream.ToArray();
-			}
+			var result = outputStream.ToArray();
+			logger?.Log( LogLevel.Debug, $"Compressed direction {direction} with encoder {options.Encoder} in {sw.ElapsedMilliseconds} ms." );
+			
+			return result;
 		}
 
 		/// <inheritdoc />
@@ -123,47 +133,67 @@ namespace Zeiss.IMT.PiWeb.Volume
 		}
 
 		/// <inheritdoc />
-		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
-			return PreviewCreator.CreatePreview( _Slices, Metadata, minification );
+			var sw = Stopwatch.StartNew();
+			
+			var result = PreviewCreator.CreatePreview( _Slices, Metadata, minification );
+			logger?.Log( LogLevel.Info, $"Created a preview with minification factor {minification} in {sw.ElapsedMilliseconds} ms." );
+
+			return result;
 		}
 
 		/// <inheritdoc />
-		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
 			if( ranges == null )
 				throw new ArgumentNullException( nameof(ranges) );
 
-			if( ranges.Count == 0 )
-				return new VolumeSliceCollection();
+			var sw = Stopwatch.StartNew();
 
-			return new VolumeSliceCollection( ranges.Select( range => VolumeSliceRange.Extract( range, Metadata, _Slices ) ) );
+			var result = new VolumeSliceCollection( ranges.Select( range => GetSliceRange( range, progress, logger, ct ) ) );
+			logger?.Log( LogLevel.Info, $"Extracted '{ranges.Count}' slice ranges in {sw.ElapsedMilliseconds} ms." );
+
+			return result;
 		}
 
 		/// <inheritdoc />
-		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
-			return VolumeSliceRange.Extract( range, Metadata, _Slices );
+			var sw = Stopwatch.StartNew();
+
+			var result = VolumeSliceRange.Extract( range, Metadata, _Slices );
+			logger?.Log( LogLevel.Info, $"Extracted '{range}' in {sw.ElapsedMilliseconds} ms." );
+	
+			return result;
 		}
 
 		/// <inheritdoc />
-		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
-			return VolumeSlice.Extract( slice.Direction, slice.Index, Metadata, _Slices );
+			var sw = Stopwatch.StartNew();
+			
+			var result = VolumeSlice.Extract( slice.Direction, slice.Index, Metadata, _Slices );
+			logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
+
+			return result;
 		}
 
 		/// <summary>
 		/// Compresses and saves the volume in the specified stream.
 		/// </summary>
-		/// <param name="stream">The stream.</param>
-		/// <param name="options">The options.</param>
-		/// <param name="multiDirection">if set to <c>true</c> [multi direction].</param>
-		/// <param name="progress">The progress.</param>
-		/// <param name="ct">The ct.</param>
-		public void Save( Stream stream, VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		public void Save( Stream stream, VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
-			var compressed = Compress( options, multiDirection, progress, ct );
-			compressed.Save( stream );
+			var sw = Stopwatch.StartNew();
+			try
+			{
+				var compressed = Compress( options, multiDirection, progress, logger, ct );
+				compressed.Save( stream );
+			}
+			finally
+			{
+				logger?.Log( LogLevel.Info, $"Saved volume to stream in {sw.ElapsedMilliseconds} ms." );
+			}
 		}
 
 		#endregion

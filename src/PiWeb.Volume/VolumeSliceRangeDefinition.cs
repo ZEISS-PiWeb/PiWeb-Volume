@@ -64,5 +64,15 @@ namespace Zeiss.IMT.PiWeb.Volume
 		public ushort Length => (ushort)( Last - First + 1 );
 
 		#endregion
+		
+		#region methods
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"Slice range {First}-{Last}, direction {Direction}";
+		}
+
+		#endregion
 	}
 }

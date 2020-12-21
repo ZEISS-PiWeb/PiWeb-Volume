@@ -14,6 +14,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.IO;
 	using System.IO.Compression;
 	using System.Threading;
@@ -63,10 +64,16 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// </summary>
 		/// <param name="metadata">Describes the volumes size and resolution</param>
 		/// <param name="slices">The decompressed volume as 8-Bit grayscale values. The array dimensions must match the specified <paramref name="metadata"/> (byte[z][x*y]).</param>
+		/// <param name="logger">The logger to use for log messages</param>
 		/// <exception cref="IndexOutOfRangeException">The specified data did not match the dimensions of the specified <paramref name="metadata"/>.</exception>
-		public static UncompressedVolume CreateUncompressed( VolumeMetadata metadata, IReadOnlyList<VolumeSlice> slices )
+		public static UncompressedVolume CreateUncompressed( VolumeMetadata metadata, IReadOnlyList<VolumeSlice> slices, ILogger logger = null )
 		{
-			return new UncompressedVolume( metadata, slices );
+			var sw = Stopwatch.StartNew();
+			
+			var result = new UncompressedVolume( metadata, slices );
+			logger?.Log( LogLevel.Info, $"Created uncompressed volume {sw.ElapsedMilliseconds} ms." );
+
+			return result;
 		}
 
 		/// <summary>
@@ -77,13 +84,21 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="multiDirection"></param>
 		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
 		/// <param name="options">Codec settings</param>
-		/// <param name="ct"></param>
+		/// <param name="logger">The logger to use for log messages</param>
+		/// <param name="ct">The cancellation token to cancel the operation</param>
 		/// <exception cref="IndexOutOfRangeException">The specified data did not match the dimensions of the specified <paramref name="metadata"/>.</exception>
 		/// <exception cref="VolumeException">Error during encoding</exception>
-		public static CompressedVolume CreateCompressed( VolumeMetadata metadata, IReadOnlyList<VolumeSlice> slices, VolumeCompressionOptions options, bool multiDirection = false, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		public static CompressedVolume CreateCompressed( 
+			VolumeMetadata metadata, 
+			IReadOnlyList<VolumeSlice> slices, 
+			VolumeCompressionOptions options, 
+			bool multiDirection = false, 
+			IProgress<VolumeSliceDefinition> progress = null, 
+			ILogger logger = null, 
+			CancellationToken ct = default )
 		{
 			var volume = new UncompressedVolume( metadata, slices );
-			return volume.Compress( options, multiDirection, progress, ct );
+			return volume.Compress( options, multiDirection, progress,logger, ct );
 		}
 
 		/// <summary>
@@ -93,16 +108,27 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="stream">A stream to the slice data</param>
 		/// <param name="options">Codec settings</param>
 		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
-		/// <param name="ct"></param>
+		/// <param name="logger">The logger to use for log messages</param>
 		/// <exception cref="VolumeException">Error during encoding</exception>
-		public static Volume CreateCompressed( VolumeMetadata metadata, Stream stream, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		public static Volume CreateCompressed(
+			VolumeMetadata metadata,
+			Stream stream,
+			VolumeCompressionOptions options,
+			IProgress<VolumeSliceDefinition> progress = null,
+			ILogger logger = null )
 		{
-			if( options.Encoder == BlockVolume.EncoderID )
+			var sw = Stopwatch.StartNew();
+			try
 			{
-				return BlockVolume.Create( stream, metadata, options, progress, ct );
-			}
+				if( options.Encoder == BlockVolume.EncoderID )
+					return new BlockVolume( stream, metadata, options, progress );
 
-			return CompressedVolume.Create( stream, Direction.Z, metadata, options, progress, ct );
+				return new CompressedVolume( stream, metadata, options, progress );
+			}
+			finally
+			{
+				logger?.Log( LogLevel.Info, $"Compressed volume from stream in {sw.ElapsedMilliseconds} ms." );
+			}
 		}
 
 		/// <summary>
@@ -117,39 +143,58 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// </summary>
 		/// <param name="ranges">The required slice ranges.</param>
 		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
-		/// <param name="ct"></param>
+		/// <param name="logger">The logger to use for log messages</param>
+		/// <param name="ct">The cancellation token to cancel the operation</param>
 		/// <returns>An enumeration of slice ranges or an empty enumeration.</returns>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default );
+		public abstract VolumeSliceCollection GetSliceRanges(
+			IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, 
+			IProgress<VolumeSliceDefinition> progress = null, 
+			ILogger logger = null, 
+			CancellationToken ct = default );
 
 		/// <summary>
 		/// Gets the specified slice range. This is usually a lot faster than extracting single slices and consumes less memory than a full decompression.
 		/// </summary>
 		/// <param name="range">The requested slice range.</param>
 		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
-		/// <param name="ct"></param>
+		/// <param name="logger">The logger to use for log messages</param>
+		/// <param name="ct">The cancellation token to cancel the operation</param>
 		/// <returns></returns>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default );
+		public abstract VolumeSliceRange GetSliceRange( 
+			VolumeSliceRangeDefinition range, 
+			IProgress<VolumeSliceDefinition> progress = null, 
+			ILogger logger = null, 
+			CancellationToken ct = default );
 
 		/// <summary>
 		/// Gets the specified slice. This is the most memory friendly and usually the fastest approach to get a single slice.
 		/// </summary>
 		/// <param name="slice">The requested slice.</param>
 		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
-		/// <param name="ct"></param>
-		/// <returns></returns>
+		/// <param name="logger">The logger to use for log messages</param>
+		/// <param name="ct">The cancellation token to cancel the operation</param>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default );
+		public abstract VolumeSlice GetSlice( 
+			VolumeSliceDefinition slice,
+			IProgress<VolumeSliceDefinition> progress = null,
+			ILogger logger = null, 
+			CancellationToken ct = default );
 
 		/// <summary>
 		/// Creates a smaller volume from the current volume without performing a full decompression.
 		/// </summary>
 		/// <param name="minification">The stride factor in X, Y and Z direction. The size of the preview will be the CompleteSize divided by <paramref name="minification"/> ^ 3</param>
 		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
-		/// <param name="ct"></param>
+		/// <param name="logger">The logger to use for log messages</param>
+		/// <param name="ct">The cancellation token to cancel the operation</param>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default );
+		public abstract UncompressedVolume CreatePreview( 
+			ushort minification, 
+			IProgress<VolumeSliceDefinition> progress = null, 
+			ILogger logger = null, 
+			CancellationToken ct = default );
 
 		internal static void GetEncodedSliceSize( VolumeMetadata metadata, Direction direction, out ushort x, out ushort y )
 		{
@@ -171,31 +216,36 @@ namespace Zeiss.IMT.PiWeb.Volume
 					throw new ArgumentOutOfRangeException( nameof(direction), direction, null );
 			}
 		}
-
-
+		
 		/// <summary>
 		/// Loads volume data from the specified data stream.
 		/// </summary>
-		/// <param name="stream">The stream.</param>
-		/// <returns></returns>
 		/// <exception cref="VolumeException">Error during decoding</exception>
 		/// <exception cref="NotSupportedException">The volume has no compressed data</exception>
 		/// <exception cref="InvalidOperationException">One or more entries are missing in the archive.</exception>
-		public static CompressedVolume Load( Stream stream )
+		public static CompressedVolume Load( Stream stream, ILogger logger = null )
 		{
-			if( !stream.CanSeek )
-				stream = new MemoryStream( stream.StreamToArray() );
+			var sw = Stopwatch.StartNew();
+			try
+			{
+				if( !stream.CanSeek )
+					stream = new MemoryStream( stream.StreamToArray() );
 
-			using var archive = new ZipArchive( stream );
+				using var archive = new ZipArchive( stream );
 			
-			var metaData = ReadVolumeMetadata( archive );
-			var compressionOptions = ReadVolumeCompressionOptions( archive );
-			var directionMap = ReadVolumeVoxels( archive );
+				var metaData = ReadVolumeMetadata( archive );
+				var compressionOptions = ReadVolumeCompressionOptions( archive );
+				var directionMap = ReadVolumeVoxels( archive );
 
-			if( compressionOptions?.Encoder == BlockVolume.EncoderID )
-				return new BlockVolume( metaData, compressionOptions, directionMap );
+				if( compressionOptions?.Encoder == BlockVolume.EncoderID )
+					return new BlockVolume( metaData, compressionOptions, directionMap );
 			
-			return new CompressedVolume( metaData, compressionOptions, directionMap );
+				return new CompressedVolume( metaData, compressionOptions, directionMap );
+			}
+			finally
+			{
+				logger?.Log( LogLevel.Info, $"Loaded volume from stream in {sw.ElapsedMilliseconds} ms." );
+			}
 		}
 
 		private static DirectionMap ReadVolumeVoxels( ZipArchive archive )
