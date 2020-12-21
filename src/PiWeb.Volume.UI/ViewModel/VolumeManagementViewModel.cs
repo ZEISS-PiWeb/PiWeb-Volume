@@ -215,7 +215,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 		{
 			await using var stream = File.OpenRead( FileName );
 
-			var volume = Volume.Load( stream );
+			var volume = Volume.Load( stream, _Logger );
 
 			var progress = new VolumeProgress( volume );
 
