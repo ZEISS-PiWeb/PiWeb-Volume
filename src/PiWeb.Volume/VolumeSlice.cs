@@ -36,6 +36,18 @@ namespace Zeiss.IMT.PiWeb.Volume
 			Data = data ?? throw new ArgumentNullException( nameof(data) );
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="VolumeSlice"/> class.
+		/// </summary>
+		/// <param name="definition">The definition.</param>
+		/// <param name="data">The data. Must not be null.</param>
+		internal VolumeSlice( VolumeSliceDefinition definition, byte[] data )
+		{
+			Direction = definition.Direction;
+			Index = definition.Index;
+			Data = data ?? throw new ArgumentNullException( nameof(data) );
+		}
+
 		#endregion
 
 		#region properties

@@ -15,6 +15,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 	using System.Collections;
 	using System.Collections.Generic;
+	using System.Linq;
 
 	#endregion
 
@@ -36,10 +37,21 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// </summary>
 		/// <param name="definition">The definition.</param>
 		/// <param name="slices">The slices.</param>
+		internal VolumeSliceRange( VolumeSliceRangeDefinition definition, IEnumerable<VolumeSliceBuffer> slices )
+		{
+			Definition = definition;
+			_Slices = slices.Select( s => new VolumeSlice( s.Definition, s.Data ) ).ToList();
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="VolumeSliceRange"/> class.
+		/// </summary>
+		/// <param name="definition">The definition.</param>
+		/// <param name="slices">The slices.</param>
 		internal VolumeSliceRange( VolumeSliceRangeDefinition definition, IEnumerable<VolumeSlice> slices )
 		{
 			Definition = definition;
-			_Slices = new List<VolumeSlice>( slices );
+			_Slices = slices.ToList();
 		}
 
 		#endregion

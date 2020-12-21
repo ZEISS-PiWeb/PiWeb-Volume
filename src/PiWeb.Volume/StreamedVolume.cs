@@ -19,6 +19,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 	using System.IO;
 	using System.Linq;
 	using System.Threading;
+	using Microsoft.CSharp.RuntimeBinder;
 	using Zeiss.IMT.PiWeb.Volume.Block;
 
 	#endregion
@@ -144,26 +145,30 @@ namespace Zeiss.IMT.PiWeb.Volume
 		}
 
 		/// <inheritdoc />
-		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public override void GetSlice(
+			VolumeSliceBuffer sliceBuffer,
+			VolumeSliceDefinition slice, 
+			IProgress<VolumeSliceDefinition> progress = null, 
+			ILogger logger = null, 
+			CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
-			try
+			switch(slice.Direction)
 			{
-				return slice.Direction switch
-				{
-					Direction.X => ReadSliceX( slice.Index ),
-					Direction.Y => ReadSliceY( slice.Index ),
-					Direction.Z => ReadSliceZ( slice.Index ),
-					_ => throw new ArgumentOutOfRangeException( nameof(slice.Direction), slice.Direction, null )
-				};
+				case Direction.X: 
+					ReadSliceX( sliceBuffer, slice.Index );
+					break;
+				case Direction.Y:
+					ReadSliceY( sliceBuffer, slice.Index );
+					break;
+				case Direction.Z:
+					ReadSliceZ( sliceBuffer, slice.Index );
+					break;
 			}
-			finally
-			{
-				logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
-			}
+			logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
 		}
 
-		private VolumeSlice ReadSliceX( ushort index )
+		private void ReadSliceX( VolumeSliceBuffer sliceBuffer, ushort index )
 		{
 			var sx = Metadata.SizeX;
 			var sy = Metadata.SizeY;
@@ -188,18 +193,16 @@ namespace Zeiss.IMT.PiWeb.Volume
 			}
 
 			ArrayPool<byte>.Shared.Return( buffer );
-
-			return new VolumeSlice( Direction.X, index, result );
 		}
 
-		private VolumeSlice ReadSliceY( ushort index )
+		private void ReadSliceY( VolumeSliceBuffer sliceBuffer, ushort index )
 		{
 			var sx = Metadata.SizeX;
 			var sy = Metadata.SizeY;
 			var sz = Metadata.SizeZ;
 
-			var result = new byte[sx * sz];
 			var bufferSize = sx * sy;
+			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Y, index ), bufferSize );
 			
 			// TODO: Warum lesen wir hier das Ergebnis nicht gleich in den Zielbuffer? 
 			var buffer = ArrayPool<byte>.Shared.Rent( bufferSize );
@@ -208,26 +211,22 @@ namespace Zeiss.IMT.PiWeb.Volume
 			for( var z = 0; z < sz; z++ )
 			{
 				_Stream.Read( buffer, 0, bufferSize );
-				Array.Copy( buffer, index * sx, result, z * sx, sx );
+				Array.Copy( buffer, index * sx, sliceBuffer.Data, z * sx, sx );
 			}
 
 			ArrayPool<byte>.Shared.Return( buffer );
-
-			return new VolumeSlice( Direction.Y, index, result );
 		}
 
-		private VolumeSlice ReadSliceZ( ushort index )
+		private void ReadSliceZ( VolumeSliceBuffer sliceBuffer, ushort index )
 		{
 			var sx = Metadata.SizeX;
 			var sy = Metadata.SizeY;
 
 			var bufferSize = sx * sy;
-			var result = new byte[bufferSize];
+			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Z, index ), bufferSize );
 
 			_Stream.Seek( ( long ) index * sx * sy, SeekOrigin.Begin );
-			_Stream.Read( result, 0, bufferSize );
-
-			return new VolumeSlice( Direction.Z, index, result );
+			_Stream.Read( sliceBuffer.Data, 0, bufferSize );
 		}
 
 		/// <summary>

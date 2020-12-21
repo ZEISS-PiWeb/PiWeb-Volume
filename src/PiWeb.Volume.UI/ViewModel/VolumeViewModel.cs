@@ -33,15 +33,19 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 		private readonly Volume _Preview;
 		private readonly ILogger _Logger;
 		private readonly Dispatcher _Dispatcher;
+		
 		private int _SelectedLayerIndex;
-		private WriteableBitmap _SelectedLayerImage;
 		private int _MaxLayer;
-		private Direction _Direction;
-		private WriteableBitmap _PreviewLayerImage;
-		private bool _ShowPreview;
-		private IDisposable _Subcription;
 		private int _MaxPreviewLayer;
 
+		private Direction _Direction;
+		private WriteableBitmap _SelectedLayerImage;
+		private WriteableBitmap _PreviewLayerImage;
+		
+		private bool _ShowPreview;
+		private IDisposable _Subcription;
+
+		private VolumeSliceBuffer _SliceBuffer = new VolumeSliceBuffer();
 		private DoubleRange _HorizontalRange;
 		private DoubleRange _VerticalRange;
 
@@ -235,10 +239,10 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 			_Subcription = Observable
 				.FromAsync( ct => Task.Run( () => UpdateLayer( Volume, ( ushort ) _SelectedLayerIndex ), ct ) )
 				.ObserveOn( _Dispatcher )
-				.Subscribe( l =>
+				.Subscribe( layer =>
 				{
-					SelectedLayer = l;
-					WriteImage( SelectedLayerImage, l );
+					SelectedLayer = layer;
+					WriteImage( SelectedLayerImage, layer );
 					ShowPreview = false;
 
 					LayerChanged?.Invoke( this, EventArgs.Empty );
@@ -247,13 +251,13 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
 		private Layer UpdateLayer( Volume volume, ushort sliceIndex )
 		{
-			var slice = volume.GetSlice( new VolumeSliceDefinition( _Direction, sliceIndex ), logger: _Logger );
+			volume.GetSlice( _SliceBuffer, new VolumeSliceDefinition( _Direction, sliceIndex ), logger: _Logger );
 			volume.Metadata.GetSliceSize( _Direction, out var width, out var height );
 
-			return new Layer( slice.Data, width, height, sliceIndex );
+			return new Layer( _SliceBuffer.Data, width, height, sliceIndex );
 		}
 
-		private void WriteImage( WriteableBitmap bitmap, Layer layer )
+		private static void WriteImage( WriteableBitmap bitmap, Layer layer )
 		{
 			bitmap.WritePixels( new Int32Rect( 0, 0, layer.Width, layer.Height ), layer.Data, layer.Width, 0 );
 		}

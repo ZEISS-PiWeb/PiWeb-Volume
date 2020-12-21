@@ -132,17 +132,19 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		}
 
 		/// <inheritdoc />
-		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public override void GetSlice(
+			VolumeSliceBuffer sliceBuffer,
+			VolumeSliceDefinition slice, 
+			IProgress<VolumeSliceDefinition> progress = null,
+			ILogger logger = null, 
+			CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
 			
-			var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, new[] { new VolumeSliceRangeDefinition( slice.Direction, slice.Index, slice.Index ) } );
-			var data = sliceRangeCollector.CollectSliceRanges( progress, ct );
-
-			var result = data.GetSlice( slice.Direction, slice.Index );
+			var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, slice, sliceBuffer );
+			sliceRangeCollector.CollectSliceRanges( progress, ct );
+			
 			logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
-
-			return result;
 		}
 
 		/// <inheritdoc />

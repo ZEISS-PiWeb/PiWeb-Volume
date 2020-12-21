@@ -242,24 +242,26 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		/// <inheritdoc />
 		/// <exception cref="NotSupportedException">The volume has no compressed data</exception>
-		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public override void GetSlice( 
+			VolumeSliceBuffer sliceBuffer,
+			VolumeSliceDefinition slice, 
+			IProgress<VolumeSliceDefinition> progress = null, 
+			ILogger logger = null, 
+			CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
 			try
 			{
 				//Videos with a very small number of frames appearantly have issues with av_seek, so we do a full scan instead
-				var sliceRangeDefinitions = new[] { new VolumeSliceRangeDefinition( slice.Direction, slice.Index, slice.Index ) };
 				if( CompressedData[ slice.Direction ] != null )
 				{
 					using var input = new MemoryStream( CompressedData[ slice.Direction ] );
 					var inputWrapper = new StreamWrapper( input );
-					var outputWrapper = new VolumeSliceRangeCollector( Metadata, slice.Direction, sliceRangeDefinitions, progress, ct );
+					var outputWrapper = new VolumeSliceRangeCollector( Metadata, slice.Direction, slice, sliceBuffer, progress, ct );
 
 					var error = NativeMethods.DecompressSlices( inputWrapper.Interop, outputWrapper.Interop, slice.Index, 1 );
 					if( error != VolumeError.Success )
 						throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
-
-					return outputWrapper.GetSlice( slice.Direction, slice.Index );
 				}
 
 				if( CompressedData[ Direction.Z ] == null )
@@ -269,12 +271,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 				{
 					var inputWrapper = new StreamWrapper( input );
 
-					var rangeReader = new VolumeSliceRangeCollector( Metadata, Direction.Z, sliceRangeDefinitions, progress, ct );
+					var rangeReader = new VolumeSliceRangeCollector( Metadata, Direction.Z, slice, sliceBuffer, progress, ct );
 					var error = NativeMethods.DecompressVolume( inputWrapper.Interop, rangeReader.Interop );
 					if( error != VolumeError.Success )
 						throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
-
-					return rangeReader.GetSlice( slice.Direction, slice.Index );
 				}
 			}
 			finally
