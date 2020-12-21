@@ -30,7 +30,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 	{
 		#region members
 
-		internal DirectionMap CompressedData;
+		internal readonly DirectionMap CompressedData;
 
 		#endregion
 
@@ -81,7 +81,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			var inputWrapper = new StreamWrapper( input );
 			var previewCreator = new PreviewCreator( Metadata, minification, progress, ct );
 
-			var error = ( VolumeError ) DecompressVolume( inputWrapper.Interop, previewCreator.Interop );
+			var error = NativeMethods.DecompressVolume( inputWrapper.Interop, previewCreator.Interop );
 			if( error != VolumeError.Success )
 				throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
 
@@ -107,7 +107,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			var inputStreamWrapper = new SliceStreamReader( metadata, stream, progress, ct );
 			var outputStreamWrapper = new StreamWrapper( outputStream );
 
-			var error = ( VolumeError ) CompressVolume( inputStreamWrapper.Interop, outputStreamWrapper.Interop, encodingSizeX, encodingSizeY, options.Encoder, options.PixelFormat, options.GetOptionsString(), options.Bitrate );
+			var error = NativeMethods.CompressVolume( inputStreamWrapper.Interop, outputStreamWrapper.Interop, encodingSizeX, encodingSizeY, options.Encoder, options.PixelFormat, options.GetOptionsString(), options.Bitrate );
 
 			if( error != VolumeError.Success )
 				throw new VolumeException( error, Resources.FormatResource<Volume>( "Compression_ErrorText", error ) );
@@ -131,7 +131,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			var inputWrapper = new StreamWrapper( input );
 			var outputWrapper = new FullVolumeWriter( Metadata, Direction.Z, progress, ct );
 
-			var error = ( VolumeError ) DecompressVolume( inputWrapper.Interop, outputWrapper.Interop );
+			var error = NativeMethods.DecompressVolume( inputWrapper.Interop, outputWrapper.Interop );
 			if( error != VolumeError.Success )
 				throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
 
@@ -171,7 +171,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			var inputWrapper = new StreamWrapper( input );
 			var rangeReader = new VolumeSliceRangeCollector( Metadata, direction, combinedRanges, progress, ct );
 
-			var error = ( VolumeError ) DecompressVolume( inputWrapper.Interop, rangeReader.Interop );
+			var error = NativeMethods.DecompressVolume( inputWrapper.Interop, rangeReader.Interop );
 			if( error != VolumeError.Success )
 				throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
 
@@ -188,7 +188,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 				var inputWrapper = new StreamWrapper( input );
 				var rangeReader = new VolumeSliceRangeCollector( Metadata, range.Direction, new[] { range }, progress, ct );
 
-				var error = ( VolumeError ) DecompressSlices( inputWrapper.Interop, rangeReader.Interop, range.First, range.Length );
+				var error = NativeMethods.DecompressSlices( inputWrapper.Interop, rangeReader.Interop, range.First, range.Length );
 				if( error != VolumeError.Success )
 					throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
 
@@ -203,7 +203,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 				var inputWrapper = new StreamWrapper( input );
 				var rangeReader = new VolumeSliceRangeCollector( Metadata, Direction.Z, new[] { range }, progress, ct );
 
-				var error = ( VolumeError ) DecompressVolume( inputWrapper.Interop, rangeReader.Interop );
+				var error = NativeMethods.DecompressVolume( inputWrapper.Interop, rangeReader.Interop );
 				if( error != VolumeError.Success )
 					throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
 
@@ -216,13 +216,14 @@ namespace Zeiss.IMT.PiWeb.Volume
 		public override VolumeSlice GetSlice( VolumeSliceDefinition slice, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
 			//Videos with a very small number of frames appearantly have issues with av_seek, so we do a full scan instead
+			var sliceRangeDefinitions = new[] { new VolumeSliceRangeDefinition( slice.Direction, slice.Index, slice.Index ) };
 			if( CompressedData[ slice.Direction ] != null )
 			{
 				using var input = new MemoryStream( CompressedData[ slice.Direction ] );
 				var inputWrapper = new StreamWrapper( input );
-				var outputWrapper = new VolumeSliceRangeCollector( Metadata, slice.Direction, new[] { new VolumeSliceRangeDefinition( slice.Direction, slice.Index, slice.Index ) }, progress, ct );
+				var outputWrapper = new VolumeSliceRangeCollector( Metadata, slice.Direction, sliceRangeDefinitions, progress, ct );
 
-				var error = ( VolumeError ) DecompressSlices( inputWrapper.Interop, outputWrapper.Interop, slice.Index, 1 );
+				var error = NativeMethods.DecompressSlices( inputWrapper.Interop, outputWrapper.Interop, slice.Index, 1 );
 				if( error != VolumeError.Success )
 					throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
 
@@ -236,8 +237,8 @@ namespace Zeiss.IMT.PiWeb.Volume
 			{
 				var inputWrapper = new StreamWrapper( input );
 
-				var rangeReader = new VolumeSliceRangeCollector( Metadata, Direction.Z, new[] { new VolumeSliceRangeDefinition( slice.Direction, slice.Index, slice.Index ) }, progress, ct );
-				var error = ( VolumeError ) DecompressVolume( inputWrapper.Interop, rangeReader.Interop );
+				var rangeReader = new VolumeSliceRangeCollector( Metadata, Direction.Z, sliceRangeDefinitions, progress, ct );
+				var error = NativeMethods.DecompressVolume( inputWrapper.Interop, rangeReader.Interop );
 				if( error != VolumeError.Success )
 					throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
 

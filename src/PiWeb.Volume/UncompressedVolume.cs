@@ -120,7 +120,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 				var inputStreamWrapper = new SliceReader( Metadata, Slices, direction, progress, ct );
 				var outputStreamWrapper = new StreamWrapper( outputStream );
 
-				var error = ( VolumeError ) CompressVolume( inputStreamWrapper.Interop, outputStreamWrapper.Interop, encodingSizeX, encodingSizeY, options.Encoder, options.PixelFormat, options.GetOptionsString(), options.Bitrate );
+				var error = NativeMethods.CompressVolume( inputStreamWrapper.Interop, outputStreamWrapper.Interop, encodingSizeX, encodingSizeY, options.Encoder, options.PixelFormat, options.GetOptionsString(), options.Bitrate );
 
 				if( error != VolumeError.Success )
 					throw new VolumeException( error, Resources.FormatResource<Volume>( "Compression_ErrorText", error ) );
