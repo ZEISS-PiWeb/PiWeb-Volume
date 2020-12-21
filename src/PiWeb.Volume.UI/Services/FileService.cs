@@ -17,6 +17,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Services
 
     #endregion
 
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class FileService : IFileService
     {
         #region constants
