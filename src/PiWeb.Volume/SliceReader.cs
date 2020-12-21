@@ -72,7 +72,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		#region methods
 
-		internal bool ReadSlice( IntPtr pv, ushort width, ushort height )
+		private bool ReadSlice( IntPtr pv, ushort width, ushort height )
 		{
 			_Ct.ThrowIfCancellationRequested();
 

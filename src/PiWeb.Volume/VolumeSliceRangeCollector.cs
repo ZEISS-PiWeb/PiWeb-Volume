@@ -127,27 +127,27 @@ namespace Zeiss.IMT.PiWeb.Volume
 			};
 		}
 
-		internal void WriteSlice( IntPtr slice, ushort width, ushort height, ushort index )
+		private void WriteSlice( IntPtr slice, ushort width, ushort height, ushort index )
 		{
 			_Ct.ThrowIfCancellationRequested();
 
 			switch( _Direction )
 			{
 				case Direction.X:
-					WriteXSlice( slice, width, height, index );
+					WriteXSlice( slice, width, index );
 					break;
 				case Direction.Y:
-					WriteYSlice( slice, width, height, index );
+					WriteYSlice( slice, width, index );
 					break;
 				case Direction.Z:
-					WriteZSlice( slice, width, height, index );
+					WriteZSlice( slice, width, index );
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();
 			}
 		}
 
-		internal void WriteXSlice( IntPtr slice, ushort width, ushort height, ushort x )
+		private void WriteXSlice( IntPtr slice, ushort width, ushort x )
 		{
 			_ProgressNotifier?.Report( new VolumeSliceDefinition( Direction.X, x ) );
 
@@ -161,7 +161,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 				Marshal.Copy( slice + z * width, sliceX, z * _Y, _Y );
 		}
 
-		internal void WriteYSlice( IntPtr slice, ushort width, ushort height, ushort y )
+		private void WriteYSlice( IntPtr slice, ushort width, ushort y )
 		{
 			_ProgressNotifier?.Report( new VolumeSliceDefinition( Direction.Y, y ) );
 
@@ -174,7 +174,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			Parallel.For( 0, _Z, z => Marshal.Copy( slice + z * width, sliceY, z * _X, _X ) );
 		}
 
-		internal void WriteZSlice( IntPtr slice, ushort width, ushort height, ushort z )
+		private void WriteZSlice( IntPtr slice, ushort width, ushort z )
 		{
 			_ProgressNotifier?.Report( new VolumeSliceDefinition( Direction.Z, z ) );
 
