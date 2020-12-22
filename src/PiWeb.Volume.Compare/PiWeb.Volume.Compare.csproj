@@ -15,14 +15,6 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    </PropertyGroup>
-
     <ItemGroup>      
       <ProjectReference Include="..\PiWeb.Volume.Convert\PiWeb.Volume.Convert.csproj" />      
       <ProjectReference Include="..\PiWeb.Volume.UI\PiWeb.Volume.UI.csproj" />

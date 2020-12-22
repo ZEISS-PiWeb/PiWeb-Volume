@@ -22,8 +22,4 @@
         <ProjectReference Include="..\PiWeb.Volume\PiWeb.Volume.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="System.Buffers" Version="4.5.1" />
-    </ItemGroup>
-
 </Project>
