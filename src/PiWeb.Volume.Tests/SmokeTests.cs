@@ -27,10 +27,8 @@ namespace Zeiss.IMT.PiWeb.Volume.Tests
 	{
 		#region members
 
-		private static readonly string SamplesPath = Path.Combine( Path.GetDirectoryName( typeof( SampleFile ).Assembly.Location )!, "..\\..\\testdata" );
-
 		public static SampleFile[] AllSamples { get; } = Directory
-			.GetFiles( SamplesPath, "*.volx", SearchOption.AllDirectories )
+			.GetFiles( Paths.TestData, "*.volx", SearchOption.AllDirectories )
 			.Select( f => new SampleFile( f ) )
 			.ToArray();
 
