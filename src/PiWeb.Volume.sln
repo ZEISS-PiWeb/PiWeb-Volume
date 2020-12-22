@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume.Compare", "PiW
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume.UI", "PiWeb.Volume.UI\PiWeb.Volume.UI.csproj", "{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume.Tests", "PiWeb.Volume.Tests\PiWeb.Volume.Tests.csproj", "{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
@@ -48,6 +50,10 @@ Global
 		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Release|x64.Build.0 = Release|Any CPU
 		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Debug|x64.Build.0 = Debug|Any CPU
+		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Release|x64.ActiveCfg = Release|Any CPU
+		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Release|x64.Build.0 = Release|Any CPU
+		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Debug|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
