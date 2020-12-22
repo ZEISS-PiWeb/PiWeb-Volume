@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <Platforms>x64</Platforms>
+        <RootNamespace>Zeiss.IMT.PiWeb.Volume.Tests</RootNamespace>
+        <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+        <AssemblyTitle>PiWeb.Volume.Tests</AssemblyTitle>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="NUnit" Version="3.12.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="$(SolutionDir)\PiWeb.Volume\PiWeb.Volume.csproj" />
+    </ItemGroup>
+
+</Project>
