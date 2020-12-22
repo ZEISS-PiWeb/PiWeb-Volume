@@ -2,13 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <Platforms>x64</Platforms>        
-        <RootNamespace>Zeiss.IMT.PiWeb.Volume.UI</RootNamespace>       
-        <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-        <AssemblyTitle>PiWeb.Volume.UI</AssemblyTitle>
-        <Product>PiWeb.Volume.UI</Product>
         <UseWPF>true</UseWPF>
         <IsPackable>false</IsPackable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

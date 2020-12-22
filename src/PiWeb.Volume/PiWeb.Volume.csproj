@@ -1,23 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Platforms>x64</Platforms>    
-    <RootNamespace>Zeiss.IMT.PiWeb.Volume</RootNamespace>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Volume.snk</AssemblyOriginatorKeyFile>
-    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <PackageVersion>1.2.1</PackageVersion>
-    <LangVersion>8</LangVersion>
-    <AssemblyVersion>1.2.1</AssemblyVersion>
-    <FileVersion>1.2.1</FileVersion>    
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -45,17 +31,6 @@
     <ProjectReference Include="..\PiWeb.Volume.Core\PiWeb.Volume.Core.vcxproj" PrivateAssets="all" />
   </ItemGroup>
   
-  <ItemGroup>
-    <None Include="Volume.snk" />
-
-    <EmbeddedResource Include="Volume.de.resx">
-      <DependentUpon>Volume.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Volume.resx">
-      <DependentUpon>Volume.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-
   <ItemGroup>
     <None Include="$(SolutionDir)\PiWeb.Volume.Core\lib\*.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
     <None Include="$(SolutionDir)\..\bin\$(Configuration)\PiWeb.Volume.Core.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />

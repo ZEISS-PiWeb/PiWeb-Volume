@@ -1,15 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
     <PropertyGroup>
-        <Platforms>x64</Platforms>
         <OutputType>WinExe</OutputType>
-        <RootNamespace>Zeiss.IMT.PiWeb.Volume.Compare</RootNamespace>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-        <AssemblyTitle>PiWeb.Volume.Compare</AssemblyTitle>
-        <Product>PiWeb.Volume.Compare</Product>
         <UseWPF>true</UseWPF>
         <IsPackable>false</IsPackable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

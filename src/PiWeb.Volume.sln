@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29209.62
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4C91B12E-F488-4A22-8AE3-D71D626EDDD5}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PiWeb.Volume.Core", "PiWeb.Volume.Core\PiWeb.Volume.Core.vcxproj", "{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume", "PiWeb.Volume\PiWeb.Volume.csproj", "{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}"

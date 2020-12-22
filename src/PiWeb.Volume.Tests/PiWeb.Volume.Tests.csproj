@@ -2,13 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <Platforms>x64</Platforms>
-        <RootNamespace>Zeiss.IMT.PiWeb.Volume.Tests</RootNamespace>
-        <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-        <AssemblyTitle>PiWeb.Volume.Tests</AssemblyTitle>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
