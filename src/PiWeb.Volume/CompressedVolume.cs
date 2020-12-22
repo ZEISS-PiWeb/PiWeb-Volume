@@ -343,6 +343,12 @@ namespace Zeiss.IMT.PiWeb.Volume
 			}
 		}
 
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"Compressed volume {Metadata} [{CompressedData}]";
+		}
+
 		#endregion
 	}
 }

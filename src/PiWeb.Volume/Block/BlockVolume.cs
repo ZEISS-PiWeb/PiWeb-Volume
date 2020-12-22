@@ -173,6 +173,12 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			return result;
 		}
 
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"Block volume {Metadata} [{CompressedData}]";
+		}
+
 		#endregion
 	}
 }
