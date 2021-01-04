@@ -250,9 +250,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 			CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
+			
 			try
 			{
-				//Videos with a very small number of frames appearantly have issues with av_seek, so we do a full scan instead
 				if( CompressedData[ slice.Direction ] != null )
 				{
 					using var input = new MemoryStream( CompressedData[ slice.Direction ] );
@@ -262,8 +262,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 					var error = NativeMethods.DecompressSlices( inputWrapper.Interop, outputWrapper.Interop, slice.Index, 1 );
 					if( error != VolumeError.Success )
 						throw new VolumeException( error, Resources.FormatResource<Volume>( "Decompression_ErrorText", error ) );
-				}
 
+					return;
+				}
+				
 				if( CompressedData[ Direction.Z ] == null )
 					throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
