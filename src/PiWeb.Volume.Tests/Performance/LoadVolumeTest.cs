@@ -19,23 +19,29 @@ namespace Zeiss.IMT.PiWeb.Volume.Tests.Performance
 
 	#endregion
 
-	[InProcess, IterationCount(3), WarmupCount(0)]
+	[InProcess, IterationCount(5), WarmupCount(1)]
 	[MemoryDiagnoser]
 	public class LoadVolumeTest
 	{
 		#region members
 
-		private static readonly string SamplePath = Path.Combine( Paths.TestData, "volume.volx" );
-
+		private static readonly string SamplePath = Path.Combine( Paths.TestData, "testcube_singledirection.volx" );
+		private byte[] _VolumeData;
+		
 		#endregion
 
 		#region methods
 		
+		[GlobalSetup]
+		public void Setup()
+		{
+			_VolumeData = File.ReadAllBytes( SamplePath );
+		}
+		
 		[Benchmark]
 		public Volume LoadVolume()
 		{
-			using var stream = File.OpenRead( SamplePath );
-			return Volume.Load( stream );
+			return Volume.Load( new MemoryStream( _VolumeData ) );
 		}
 
 		[Test]

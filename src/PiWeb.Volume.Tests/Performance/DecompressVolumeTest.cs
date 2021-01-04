@@ -5,13 +5,13 @@ namespace Zeiss.IMT.PiWeb.Volume.Tests.Performance
 	using BenchmarkDotNet.Running;
 	using NUnit.Framework;
 
-	[InProcess, IterationCount(3), WarmupCount(0)]
+	[InProcess, IterationCount(5), WarmupCount(1)]
 	[MemoryDiagnoser]
 	public class DecompressVolumeTest
 	{
 		#region members
 
-		private static readonly string SamplePath = Path.Combine( Paths.TestData, "volume.volx" );
+		private static readonly string SamplePath = Path.Combine( Paths.TestData, "testcube_singledirection.volx" );
 		
 		private CompressedVolume _SampleCompressedVolume;
 
@@ -22,7 +22,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Tests.Performance
 		[GlobalSetup]
 		public void Setup()
 		{
-			_SampleCompressedVolume = Volume.Load( File.OpenRead( SamplePath ) );
+			_SampleCompressedVolume = Volume.Load( new MemoryStream( File.ReadAllBytes( SamplePath ) ) );
 		}
 	
 		[Benchmark]
