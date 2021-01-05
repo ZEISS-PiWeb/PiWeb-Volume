@@ -13,9 +13,11 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 	#region usings
 
 	using System;
+	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.IO;
 	using System.Linq;
+	using System.Threading.Tasks;
 
 	#endregion
 
@@ -174,10 +176,6 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		/// Creates an uncompressed volume from a stream that contains uint8 values that represent grayscale voxels.
 		/// The voxels must be ordered in z, y, x direction (slice by slice, row by row).
 		/// </summary>
-		/// <param name="uint8Stream">Stream containing the uint8 data.</param>
-		/// <param name="metadata">Metadata</param>
-		/// <param name="streamed"></param>
-		/// <param name="progress">Progress</param>
 		public static Volume FromUint8( Stream uint8Stream, VolumeMetadata metadata, bool streamed, IProgress<double> progress, ILogger logger = null )
 		{
 			var sw = Stopwatch.StartNew();
@@ -192,21 +190,25 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 				var sz = metadata.SizeZ;
 
 				var sliceSize = sx * sy;
-				var data = VolumeSliceHelper.CreateSliceBuffer( sx, sy, sz );
+				var slices = new List<Task<VolumeSlice>>( sz );
 
-				for( var z = 0; z < sz; z++ )
+				for( ushort z = 0; z < sz; z++ )
 				{
+					var definition = new VolumeSliceDefinition( Direction.Z, z );
 					progress?.Report( ( double ) z / sz );
-					uint8Stream.Read( data[ z ].Data, 0, sliceSize );
+					
+					var buffer = new VolumeSliceBuffer( definition, sliceSize );
+					uint8Stream.Read( buffer.Data, 0, sliceSize );
+
+					slices.Add( Task.Run( () => buffer.ToVolumeSlice() ) );
 				}
 
-				var slices = data
-					.AsParallel()
-					.AsOrdered()
-					.Select( s => s.ToVolumeSlice() )
+				Task.WaitAll( slices.ToArray() );
+				var allSlices = slices
+					.Select( s => s.Result )
 					.ToArray();
-
-				return new UncompressedVolume( metadata, slices );
+				
+				return new UncompressedVolume( metadata, allSlices );
 			}
 			finally
 			{
