@@ -120,8 +120,6 @@ namespace Zeiss.IMT.PiWeb.Volume
 			_Compressed.DecompressTo( destination, destinationIndex, startIndex, count );
 		}
 		
-		// TODO: Aufrufer dieser Methode sollten die untere Überladung nutzen, wenn möglich
-
 		/// <summary>
 		/// Decompresses the stored data into a temporary buffer that must be disposed after usage.
 		/// Please note that the buffer is invalid after disposing the <see cref="VolumeSliceData"/>

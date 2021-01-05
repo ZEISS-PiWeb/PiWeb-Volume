@@ -2,6 +2,7 @@
 
 using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 #endregion
@@ -17,3 +18,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct( "PiWeb" )]
 [assembly: AssemblyCopyright( "Copyright © 2017 Carl Zeiss Innovationszentrum für Messtechnik GmbH" )]
 [assembly: AssemblyTrademark( "PiWeb" )]
+
+[assembly: InternalsVisibleTo( "PiWeb.Volume.Tests" )]

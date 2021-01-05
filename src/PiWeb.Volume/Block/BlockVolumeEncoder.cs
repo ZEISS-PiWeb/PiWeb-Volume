@@ -49,7 +49,6 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			
 			Encode( () =>
 			{
-				// TODO: ist das effizient?
 				using var data = slices[ z ].Decompress();
 				
 				for( var bz = 0; bz < BlockVolume.N && z < metadata.SizeZ; bz++, z++ )
