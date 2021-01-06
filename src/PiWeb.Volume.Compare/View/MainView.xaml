@@ -11,6 +11,7 @@
     xmlns:effects="clr-namespace:Zeiss.IMT.PiWeb.Volume.UI.Effects;assembly=PiWeb.Volume.UI"
     xmlns:converters="clr-namespace:Zeiss.IMT.PiWeb.Volume.UI.Converters;assembly=PiWeb.Volume.UI"
     xmlns:viewModel1="clr-namespace:Zeiss.IMT.PiWeb.Volume.UI.ViewModel;assembly=PiWeb.Volume.UI"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
     Title="PiWeb Volume Comparer"
     Width="1440"
     Height="576"
@@ -22,6 +23,12 @@
         <converters:MultiplicationConverter x:Key="MultiplicationConverter" Factor="0.00390625" />
         <converters:MultiplicationConverter x:Key="NegativeConverter" Factor="-1" />
 
+        <x:Array Type="{x:Type BitmapScalingMode}" x:Key="BitmapScalingModes" >
+            <BitmapScalingMode>Fant</BitmapScalingMode>
+            <BitmapScalingMode>Linear</BitmapScalingMode>
+            <BitmapScalingMode>NearestNeighbor</BitmapScalingMode>
+        </x:Array>
+        
         <Style TargetType="components:Spectrum">
             <Setter Property="Background" Value="#202020"/>
             <Setter Property="Foreground" Value="White" />
@@ -45,7 +52,7 @@
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
             <Setter Property="Stretch" Value="None" />
             <Setter Property="Source" Value="{Binding SelectedLayerImage}" />
-            <Setter Property="RenderOptions.BitmapScalingMode" Value="NearestNeighbor"/>
+            <Setter Property="RenderOptions.BitmapScalingMode" Value="{Binding ElementName=MainPanel, Path=DataContext.BitmapScalingMode}"/>
             <Setter Property="LayoutTransform">
                 <Setter.Value>
                     <ScaleTransform ScaleX="1" ScaleY="-1" />
@@ -92,9 +99,16 @@
             VerticalAlignment="Center"
             DataContext="{Binding LeftVolume}" />
 
-        <DockPanel Grid.Row="0" Grid.Column="1">
+        <DockPanel Grid.Row="0" Grid.Column="1" x:Name="MainPanel">
             <TextBlock VerticalAlignment="Center" DockPanel.Dock="Left">Slice:</TextBlock>
 
+            <ComboBox ItemsSource="{Binding Source={StaticResource BitmapScalingModes}}"
+                      VerticalAlignment="Center"
+                      Margin="8,0,0,0"
+                      SelectedItem="{Binding BitmapScalingMode}" 
+                      DockPanel.Dock="Right" 
+                      Width="64"/>
+            
             <xctk:IntegerUpDown
                 Width="64"
                 VerticalAlignment="Center"

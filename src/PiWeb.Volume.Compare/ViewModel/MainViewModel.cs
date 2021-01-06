@@ -14,6 +14,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Compare.ViewModel
 
 	using System;
 	using System.Buffers;
+	using System.Linq;
 	using System.Reactive.Linq;
 	using System.Threading;
 	using System.Threading.Tasks;
@@ -48,6 +49,8 @@ namespace Zeiss.IMT.PiWeb.Volume.Compare.ViewModel
 		private double _ContrastLow;
 		private double _ContrastHigh = 256;
 
+		private BitmapScalingMode _BitmapScalingMode = BitmapScalingMode.Fant;
+
 		#endregion
 
 		#region constructors
@@ -67,6 +70,12 @@ namespace Zeiss.IMT.PiWeb.Volume.Compare.ViewModel
 		#endregion
 
 		#region properties
+
+		public BitmapScalingMode BitmapScalingMode
+		{
+			get => _BitmapScalingMode;
+			set => Set( ref _BitmapScalingMode, value );
+		}
 
 		public SpectrumData[] LeftSpectrum
 		{
@@ -138,23 +147,26 @@ namespace Zeiss.IMT.PiWeb.Volume.Compare.ViewModel
 
 		private void OnVolumeChanged( object sender, EventArgs e )
 		{
+			if( sender == LeftVolume && LeftVolume.VolumeViewModel != null && RightVolume.VolumeViewModel != null )
+				LeftVolume.VolumeViewModel.SelectedLayerIndex = RightVolume.VolumeViewModel.SelectedLayerIndex;
+
+			if( sender == RightVolume && RightVolume.VolumeViewModel != null && LeftVolume.VolumeViewModel != null )
+				RightVolume.VolumeViewModel.SelectedLayerIndex = LeftVolume.VolumeViewModel.SelectedLayerIndex;
+
 			_LayerChangedSubscription?.Dispose();
-			if( LeftVolume.VolumeViewModel is null || RightVolume.VolumeViewModel is null )
-				return;
 
-			var leftObservable = Observable.FromEventPattern<EventArgs>( LeftVolume.VolumeViewModel, nameof(VolumeViewModel.LayerChanged) );
-			var rightObservable = Observable.FromEventPattern<EventArgs>( RightVolume.VolumeViewModel, nameof(VolumeViewModel.LayerChanged) );
-
-			_LayerChangedSubscription = leftObservable
-				.Merge( rightObservable )
+			_LayerChangedSubscription = new[] { LeftVolume.VolumeViewModel, RightVolume.VolumeViewModel }
+				.Where( v => v != null )
+				.Select( v => Observable.FromEventPattern<EventArgs>( v, nameof(VolumeViewModel.LayerChanged) ) )
+				.Merge()
 				.Sample( TimeSpan.FromMilliseconds( 50 ) )
 				.Subscribe( _ => OnLayerChanged() );
 		}
 
 		private void OnLayerChanged()
 		{
-			var left = LeftVolume.VolumeViewModel.SelectedLayer;
-			var right = RightVolume.VolumeViewModel.SelectedLayer;
+			var left = LeftVolume.VolumeViewModel?.SelectedLayer;
+			var right = RightVolume.VolumeViewModel?.SelectedLayer;
 
 			LeftSpectrum = null;
 			RightSpectrum = null;
@@ -166,60 +178,69 @@ namespace Zeiss.IMT.PiWeb.Volume.Compare.ViewModel
 				if( data.Left is null || data.Right is null || data.Delta is null )
 					return;
 
-				LeftSpectrum = new[] { data.Left };
+				if( data.Left != null )
+					LeftSpectrum = new[] { data.Left };
 				RightSpectrum = new[] { data.Right };
 				DeltaSpectrum = data.Delta;
 			} );
 		}
 
-		private async Task<(SpectrumData Left, SpectrumData[] Delta, SpectrumData Right)> CreateSpectrum( Layer left, Layer right, CancellationToken ct )
+		private async Task<(SpectrumData Left, SpectrumData[] Delta, SpectrumData Right)> CreateSpectrum( Layer? left, Layer? right, CancellationToken ct )
 		{
-			if( left.Data.Length != right.Data.Length )
-				return await Task.FromResult<(SpectrumData, SpectrumData[], SpectrumData)>( ( null, null, null ) );
-
 			return await Task.Run( () =>
 			{
 				ct.ThrowIfCancellationRequested();
 
+
 				var leftData = new SpectrumData( "Voxels", Colors.LightGray );
-				foreach( var value in left.Data )
-					leftData.Values[ value ]++;
+				var rightData = new SpectrumData( "Voxels", Colors.LightGray );
+
+				if( left.HasValue )
+				{
+					foreach( var value in left.Value.Data )
+						leftData.Values[ value ]++;
+				}
 
 				ct.ThrowIfCancellationRequested();
 
-				var rightData = new SpectrumData( "Voxels", Colors.LightGray );
-				foreach( var value in right.Data )
-					rightData.Values[ value ]++;
+				if( right.HasValue )
+				{
+					foreach( var value in right.Value.Data )
+						rightData.Values[ value ]++;
+				}
 
 				ct.ThrowIfCancellationRequested();
 
 				var deltaMax = new SpectrumData( "Maximum deviation", Colors.IndianRed );
 				var deltaAvg = new SpectrumData( "Average deviation", Colors.DodgerBlue );
 
-				const int spectrumLength = 256;
-				var counts = ArrayPool<long>.Shared.Rent( spectrumLength );
-
-				for( var i = 0; i < left.Data.Length; i++ )
+				if( left.HasValue && right.HasValue && left.Value.Data.Length == right.Value.Data.Length )
 				{
-					var leftValue = left.Data[ i ];
-					var rightValue = right.Data[ i ];
-					var delta = Math.Abs( leftValue - rightValue );
+					const int spectrumLength = 256;
+					var counts = ArrayPool<long>.Shared.Rent( spectrumLength );
 
-					counts[ leftValue ]++;
-					deltaAvg.Values[ leftValue ] += delta;
-					deltaMax.Values[ leftValue ] = Math.Max( deltaMax.Values[ leftValue ], delta );
+					for( var i = 0; i < left.Value.Data.Length; i++ )
+					{
+						var leftValue = left.Value.Data[ i ];
+						var rightValue = right.Value.Data[ i ];
+						var delta = Math.Abs( leftValue - rightValue );
+
+						counts[ leftValue ]++;
+						deltaAvg.Values[ leftValue ] += delta;
+						deltaMax.Values[ leftValue ] = Math.Max( deltaMax.Values[ leftValue ], delta );
+					}
+
+					for( var i = 0; i < spectrumLength; i++ )
+					{
+						var count = counts[ i ];
+						if( count == 0 )
+							continue;
+
+						deltaAvg.Values[ i ] /= count;
+					}
+
+					ArrayPool<long>.Shared.Return( counts );
 				}
-
-				for( var i = 0; i < spectrumLength; i++ )
-				{
-					var count = counts[ i ];
-					if( count == 0 )
-						continue;
-
-					deltaAvg.Values[ i ] /= count;
-				}
-
-				ArrayPool<long>.Shared.Return( counts );
 
 				return ( leftData, new[] { deltaAvg, deltaMax }, rightData );
 			}, ct );
