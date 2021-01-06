@@ -54,5 +54,15 @@ namespace Zeiss.IMT.PiWeb.Volume
 		}
 
 		#endregion
+		
+		#region methods
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"direction data X {_X?.Length ?? 0}, Y {_Y?.Length ?? 0}, Z {_Z?.Length ?? 0} bytes";
+		}
+
+		#endregion
 	}
 }

@@ -253,6 +253,12 @@ namespace Zeiss.IMT.PiWeb.Volume
 			return result;
 		}
 
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"Size {SizeX}x{SizeY}x{SizeZ}, Resolution {ResolutionX}x{ResolutionY}x{ResolutionZ}";
+		}
+
 		#endregion
 	}
 }

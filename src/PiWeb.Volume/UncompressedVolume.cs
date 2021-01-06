@@ -263,6 +263,15 @@ namespace Zeiss.IMT.PiWeb.Volume
 			}
 		}
 
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			var compressedSize = _Slices.Sum( s => s.CompressedLength );
+			var uncompressedSize = _Slices.Sum( s => s.Length );
+			
+			return $"Uncompressed volume {Metadata} [Slice size compressed {compressedSize}, uncompressed {uncompressedSize} bytes]";
+		}
+
 		#endregion
 	}
 }
