@@ -9,8 +9,6 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Volume.snk</AssemblyOriginatorKeyFile>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
@@ -46,7 +44,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="Volume.snk" />
 
     <EmbeddedResource Include="Volume.de.resx">
       <DependentUpon>Volume.cs</DependentUpon>
