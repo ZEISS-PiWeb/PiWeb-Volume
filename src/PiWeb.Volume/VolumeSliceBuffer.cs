@@ -22,10 +22,17 @@ namespace Zeiss.IMT.PiWeb.Volume
 	/// </summary>
 	public class VolumeSliceBuffer
 	{
+		#region members
+
+		private int _Size;
+
+		#endregion
+
 		#region constructors
 
 		public VolumeSliceBuffer()
-		{ }
+		{
+		}
 
 		public VolumeSliceBuffer( VolumeSliceDefinition definition, int size )
 		{
@@ -42,14 +49,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 		public VolumeSliceDefinition Definition { get; private set; }
 
 		/// <summary>
-		/// The actual size of the data buffer.
-		/// </summary>
-		public int Size { get; private set; }
-
-		/// <summary>
 		/// The buffer that holds the slice data. Please note that the length of this buffer might not
 		/// match the data length inside the buffer (buffer might be larger than necessary). Please use
-		/// the property <see cref="Size"/> to query the actual size of the data buffer. 
+		/// the property <see cref="_Size"/> to query the actual size of the data buffer. 
 		/// </summary>
 		public byte[] Data { get; private set; } = Array.Empty<byte>();
 
@@ -64,11 +66,19 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="size">The minimum number of bytes that should be storable in <see cref="Data"/>.</param>
 		public void Initialize( VolumeSliceDefinition definition, int size )
 		{
-			Size = size;
+			_Size = size;
 			Definition = definition;
-			
+
 			if( Data.Length < size )
 				Data = new byte[size];
+		}
+
+		/// <summary>
+		/// Converts this buffer to a <see cref="VolumeSlice"/>.
+		/// </summary>
+		public VolumeSlice ToVolumeSlice()
+		{
+			return new VolumeSlice( Definition, _Size, Data );
 		}
 
 		#endregion

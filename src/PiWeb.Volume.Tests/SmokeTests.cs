@@ -25,7 +25,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Tests
 	[TestFixture]
 	public class SmokeTests
 	{
-		#region members
+		#region properties
 
 		public static SampleFile[] AllSamples { get; } = Directory
 			.GetFiles( Paths.TestData, "*.volx", SearchOption.AllDirectories )
@@ -41,9 +41,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Tests
 		{
 			using var stream = File.OpenRead( file.Filename );
 			var logger = new ConsoleLogger();
-			
+
 			var compressedVolume = Volume.Load( stream, logger );
-			
+
 			Assert.That( compressedVolume, Is.Not.Null );
 			Assert.That( compressedVolume.Metadata, Is.Not.Null );
 		}
@@ -53,10 +53,10 @@ namespace Zeiss.IMT.PiWeb.Volume.Tests
 		{
 			using var stream = File.OpenRead( file.Filename );
 			var logger = new ConsoleLogger();
-			
+
 			var compressedVolume = Volume.Load( stream, logger );
 			var decompressedVolume = compressedVolume.Decompress( logger: logger );
-			
+
 			Assert.That( decompressedVolume, Is.Not.Null );
 			Assert.That( decompressedVolume.Metadata, Is.Not.Null );
 		}
@@ -66,10 +66,10 @@ namespace Zeiss.IMT.PiWeb.Volume.Tests
 		{
 			using var stream = File.OpenRead( file.Filename );
 			var logger = new ConsoleLogger();
-			
+
 			var compressedVolume = Volume.Load( stream, logger );
 			var preview = compressedVolume.CreatePreview( 4, logger: logger );
-			
+
 			Assert.That( preview, Is.Not.Null );
 			Assert.That( preview.Metadata, Is.Not.Null );
 		}
@@ -79,11 +79,11 @@ namespace Zeiss.IMT.PiWeb.Volume.Tests
 		{
 			using var stream = File.OpenRead( file.Filename );
 			var logger = new ConsoleLogger();
-			
+
 			var compressedVolume = Volume.Load( stream, logger );
 			var decompressedVolume = compressedVolume.Decompress( logger: logger );
 			var preview = decompressedVolume.CreatePreview( 4, logger: logger );
-			
+
 			Assert.That( preview, Is.Not.Null );
 			Assert.That( preview.Metadata, Is.Not.Null );
 		}
@@ -93,7 +93,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Tests
 		{
 			var tempPath = Path.GetTempFileName();
 			using var stream = File.OpenRead( file.Filename );
-			
+
 			using( var tempStream = File.OpenWrite( tempPath ) )
 			{
 				var logger = new ConsoleLogger();

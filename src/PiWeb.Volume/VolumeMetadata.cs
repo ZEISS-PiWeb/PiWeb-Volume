@@ -103,7 +103,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		public ICollection<Property> Properties
 		{
 			get => _Properties;
-			set => _Properties = value ?? new List<Property>();
+			set => _Properties = value ?? Array.Empty<Property>();
 		}
 
 		#endregion

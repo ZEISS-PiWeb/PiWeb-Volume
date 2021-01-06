@@ -100,14 +100,14 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			Parallel.For( 0, Math.Min( _SizeZ, height ), z =>
 			{
-				var input = _Slices[ z ].Data;
+				using var input = _Slices[ z ].Decompress();
 				var output = _Buffer;
-				long inputIndex = _CurrentSlice;
-				long outputIndex = z * width;
+				int inputIndex = _CurrentSlice;
+				int outputIndex = z * width;
 
 				for( var y = 0; y < _SizeY; y++ )
 				{
-					output[ outputIndex ] = input[ inputIndex ];
+					output[ outputIndex ] = input.Data[ inputIndex ];
 					outputIndex++;
 					inputIndex += sx;
 				}
@@ -126,8 +126,11 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			ReportProgress();
 
-			Parallel.For( 0, Math.Min( _SizeZ, height ), z => Marshal.Copy( _Slices[ z ].Data, _CurrentSlice * _SizeX, pv + z * width, _SizeX ) );
-
+			Parallel.For( 0, Math.Min( _SizeZ, height ), z =>
+			{
+				using var data = _Slices[ z ].Decompress();
+				Marshal.Copy( data.Data.Array, data.Data.Offset + _CurrentSlice * _SizeX, pv + z * width, _SizeX );
+			} );
 			_CurrentSlice++;
 
 			return true;
@@ -141,9 +144,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			ReportProgress();
 
-			var data = _Slices[ _CurrentSlice ].Data;
+			using var data = _Slices[ _CurrentSlice ].Decompress();
 
-			Parallel.For( 0, Math.Min( _SizeY, height ), y => Marshal.Copy( data, y * _SizeX, pv + y * width, _SizeX ) );
+			// ReSharper disable once AccessToDisposedClosure
+			Parallel.For( 0, Math.Min( _SizeY, height ), y => Marshal.Copy( data.Data.Array, data.Data.Offset + y * _SizeX, pv + y * width, _SizeX ) );
 
 			_CurrentSlice++;
 

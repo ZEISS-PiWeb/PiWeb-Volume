@@ -13,8 +13,11 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 	#region usings
 
 	using System;
+	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.IO;
+	using System.Linq;
+	using System.Threading.Tasks;
 
 	#endregion
 
@@ -57,12 +60,14 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 						var uint16Stream = extraPolate
 							? new Uint16Stream( dataStream, minValue, maxValue )
 							: new Uint16Stream( dataStream );
-						return FromUint8( uint16Stream, vgi, streamed, progress, logger );
+						return streamed ? new StreamedVolume( vgi, uint16Stream ) : FromUint8( uint16Stream, vgi, progress, logger );
+					
 					case 8:
 						var uint8Stream = extraPolate
 							? new Uint8Stream( dataStream, minValue, maxValue )
 							: new Uint8Stream( dataStream );
-						return FromUint8( uint8Stream, vgi, streamed, progress, logger );
+						return streamed ? new StreamedVolume( vgi, uint8Stream ) : FromUint8( uint8Stream, vgi, progress, logger );
+					
 					default: throw new NotSupportedException( "This converter can only convert 8 bit and 16 bit volumes." );
 				}
 			}
@@ -106,12 +111,14 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 						var uint16Stream = extraPolate
 							? new Uint16Stream( scvStream, minValue, maxValue )
 							: new Uint16Stream( scvStream );
-						return FromUint8( uint16Stream, scv, streamed, progress, logger );
+						return streamed ? new StreamedVolume( scv, uint16Stream ) : FromUint8( uint16Stream, scv, progress, logger );
 					case 8:
 						var uint8Stream = extraPolate
 							? new Uint8Stream( scvStream, minValue, maxValue )
 							: new Uint8Stream( scvStream );
-						return FromUint8( uint8Stream, scv, streamed, progress, logger );
+
+						return streamed ? new StreamedVolume( scv, uint8Stream ) : FromUint8( uint8Stream, scv, progress, logger );
+
 					default: throw new NotSupportedException( "This converter can only convert 8 bit and 16 bit volumes." );
 				}
 			}
@@ -134,14 +141,11 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 			var sw = Stopwatch.StartNew();
 			try
 			{
-				if( streamed )
-					return new StreamedVolume( metadata, uint16Stream );
-
 				var sx = metadata.SizeX;
 				var sy = metadata.SizeY;
 				var sz = metadata.SizeZ;
 
-				var data = VolumeSliceHelper.CreateSliceData( sx, sy, sz );
+				var data = VolumeSliceHelper.CreateSliceBuffer( sx, sy, sz );
 				
 				var buffer = new byte[sx * sy * 2];
 				for( var z = 0; z < sz; z++ )
@@ -155,7 +159,13 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 						layer[ index ] = buffer[ index * 2 + 1 ];
 				}
 
-				return new UncompressedVolume( metadata, data );
+				var slices = data
+					.AsParallel()
+					.AsOrdered()
+					.Select( s => s.ToVolumeSlice() )
+					.ToArray();
+				
+				return new UncompressedVolume( metadata, slices );
 			}
 			finally
 			{
@@ -167,33 +177,35 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 		/// Creates an uncompressed volume from a stream that contains uint8 values that represent grayscale voxels.
 		/// The voxels must be ordered in z, y, x direction (slice by slice, row by row).
 		/// </summary>
-		/// <param name="uint8Stream">Stream containing the uint8 data.</param>
-		/// <param name="metadata">Metadata</param>
-		/// <param name="streamed"></param>
-		/// <param name="progress">Progress</param>
-		public static Volume FromUint8( Stream uint8Stream, VolumeMetadata metadata, bool streamed, IProgress<double> progress, ILogger logger = null )
+		public static Volume FromUint8( Stream uint8Stream, VolumeMetadata metadata, IProgress<double> progress, ILogger logger = null )
 		{
 			var sw = Stopwatch.StartNew();
 			try
 			{
-
-				if( streamed )
-					return new StreamedVolume( metadata, uint8Stream );
-
 				var sx = metadata.SizeX;
 				var sy = metadata.SizeY;
 				var sz = metadata.SizeZ;
 
 				var sliceSize = sx * sy;
-				var data = VolumeSliceHelper.CreateSliceData( sx, sy, sz );
+				var slices = new List<Task<VolumeSlice>>( sz );
 
-				for( var z = 0; z < sz; z++ )
+				for( ushort z = 0; z < sz; z++ )
 				{
+					var definition = new VolumeSliceDefinition( Direction.Z, z );
 					progress?.Report( ( double ) z / sz );
-					uint8Stream.Read( data[ z ].Data, 0, sliceSize );
+					
+					var buffer = new VolumeSliceBuffer( definition, sliceSize );
+					uint8Stream.Read( buffer.Data, 0, sliceSize );
+
+					slices.Add( Task.Run( () => buffer.ToVolumeSlice() ) );
 				}
 
-				return new UncompressedVolume( metadata, data );
+				Task.WaitAll( slices.ToArray() );
+				var allSlices = slices
+					.Select( s => s.Result )
+					.ToArray();
+				
+				return new UncompressedVolume( metadata, allSlices );
 			}
 			finally
 			{

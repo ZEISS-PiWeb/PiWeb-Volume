@@ -23,12 +23,12 @@ namespace Zeiss.IMT.PiWeb.Volume
 	{
 		#region methods
 
-		public static VolumeSlice[] CreateSliceData( ushort sizeX, ushort sizeY, ushort sizeZ )
+		public static VolumeSliceBuffer[] CreateSliceBuffer( ushort sizeX, ushort sizeY, ushort sizeZ )
 		{
 			var previewSliceSize = sizeX * sizeY;
 			return Enumerable
 				.Range( 0, sizeZ )
-				.Select( i => new VolumeSlice( Direction.Z, ( ushort ) i, new byte[previewSliceSize] ) )
+				.Select( i => new VolumeSliceBuffer( new VolumeSliceDefinition( Direction.Z, ( ushort ) i ), previewSliceSize ) )
 				.ToArray();
 		}
 

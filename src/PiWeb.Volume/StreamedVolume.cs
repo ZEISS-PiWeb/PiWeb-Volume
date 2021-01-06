@@ -156,19 +156,19 @@ namespace Zeiss.IMT.PiWeb.Volume
 			switch(slice.Direction)
 			{
 				case Direction.X: 
-					ReadSliceX( sliceBuffer, slice.Index );
+					ReadSliceX( sliceBuffer, slice.Index, ct );
 					break;
 				case Direction.Y:
-					ReadSliceY( sliceBuffer, slice.Index );
+					ReadSliceY( sliceBuffer, slice.Index, ct );
 					break;
 				case Direction.Z:
-					ReadSliceZ( sliceBuffer, slice.Index );
+					ReadSliceZ( sliceBuffer, slice.Index, ct );
 					break;
 			}
 			logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
 		}
 
-		private void ReadSliceX( VolumeSliceBuffer sliceBuffer, ushort index )
+		private void ReadSliceX( VolumeSliceBuffer sliceBuffer, ushort index, CancellationToken ct )
 		{
 			var sx = Metadata.SizeX;
 			var sy = Metadata.SizeY;
@@ -176,48 +176,42 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			var bufferSize = sx * sy;
 			
-			// TODO: Warum lesen wir hier das Ergebnis nicht gleich in den Zielbuffer? 
-			var buffer = ArrayPool<byte>.Shared.Rent( bufferSize );
+			var buffer = VolumeArrayPool.Shared.Rent( bufferSize );
 			
-			var result = new byte[sy * sz];
-
 			_Stream.Seek( 0, SeekOrigin.Begin );
 			for( var z = 0; z < sz; z++ )
 			{
+				ct.ThrowIfCancellationRequested();
 				_Stream.Read( buffer, 0, bufferSize );
 
 				for( var y = 0; y < sy; y++ )
 				{
-					result[ z * sy + y ] = buffer[ y * sx + index ];
+					sliceBuffer.Data[ z * sy + y ] = buffer[ y * sx + index ];
 				}
 			}
 
-			ArrayPool<byte>.Shared.Return( buffer );
+			VolumeArrayPool.Shared.Return( buffer );
 		}
 
-		private void ReadSliceY( VolumeSliceBuffer sliceBuffer, ushort index )
+		private void ReadSliceY( VolumeSliceBuffer sliceBuffer, ushort index, CancellationToken ct )
 		{
 			var sx = Metadata.SizeX;
 			var sy = Metadata.SizeY;
 			var sz = Metadata.SizeZ;
 
-			var bufferSize = sx * sy;
+			var bufferSize = sx * sz;
 			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Y, index ), bufferSize );
 			
-			// TODO: Warum lesen wir hier das Ergebnis nicht gleich in den Zielbuffer? 
-			var buffer = ArrayPool<byte>.Shared.Rent( bufferSize );
-
-			_Stream.Seek( 0, SeekOrigin.Begin );
+			_Stream.Seek( index * sx, SeekOrigin.Begin );
 			for( var z = 0; z < sz; z++ )
 			{
-				_Stream.Read( buffer, 0, bufferSize );
-				Array.Copy( buffer, index * sx, sliceBuffer.Data, z * sx, sx );
+				ct.ThrowIfCancellationRequested();
+				_Stream.Read( sliceBuffer.Data, z * sx, sx );
+				_Stream.Seek( sx * ( sy - 1 ), SeekOrigin.Current );
 			}
-
-			ArrayPool<byte>.Shared.Return( buffer );
 		}
 
-		private void ReadSliceZ( VolumeSliceBuffer sliceBuffer, ushort index )
+		private void ReadSliceZ( VolumeSliceBuffer sliceBuffer, ushort index, CancellationToken ct )
 		{
 			var sx = Metadata.SizeX;
 			var sy = Metadata.SizeY;
@@ -225,6 +219,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			var bufferSize = sx * sy;
 			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Z, index ), bufferSize );
 
+			ct.ThrowIfCancellationRequested();
 			_Stream.Seek( ( long ) index * sx * sy, SeekOrigin.Begin );
 			_Stream.Read( sliceBuffer.Data, 0, bufferSize );
 		}

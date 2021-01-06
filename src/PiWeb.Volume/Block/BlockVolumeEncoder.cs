@@ -46,11 +46,13 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		{
 			var z = 0;
 			var buffer = new byte[BlockVolume.N][];
-
+			
 			Encode( () =>
 			{
+				using var data = slices[ z ].Decompress();
+				
 				for( var bz = 0; bz < BlockVolume.N && z < metadata.SizeZ; bz++, z++ )
-					buffer[ bz ] = slices[ z ].Data;
+					buffer[ bz ] = data.Data.ToArray();
 
 				return buffer;
 			}, output, metadata, progress );

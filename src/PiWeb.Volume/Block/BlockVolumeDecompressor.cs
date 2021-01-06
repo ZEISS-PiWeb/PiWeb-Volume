@@ -14,6 +14,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 	using System;
 	using System.IO;
+	using System.Linq;
 	using System.Threading;
 
 	#endregion
@@ -58,7 +59,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			var decoder = new BlockVolumeDecoder( _Volume.CompressionOptions );
 			var data = _Volume.CompressedData[ Direction.Z ];
 			var input = new MemoryStream( data );
-			var result = VolumeSliceHelper.CreateSliceData( _SizeX, _SizeY, _SizeZ );
+			var result = VolumeSliceHelper.CreateSliceBuffer( _SizeX, _SizeY, _SizeZ );
 
 			decoder.Decode( input, _Metadata, ( block, index ) =>
 			{
@@ -77,7 +78,11 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 				}
 			}, null, null, progress, ct );
 
-			return result;
+			return result
+				.AsParallel()
+				.AsOrdered()
+				.Select( s => s.ToVolumeSlice() )
+				.ToArray();
 		}
 
 		#endregion

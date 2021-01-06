@@ -68,7 +68,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			var data = _Volume.CompressedData[ Direction.Z ];
 			var input = new MemoryStream( data );
 
-			var result = VolumeSliceHelper.CreateSliceData( _PreviewSizeX,_PreviewSizeY, _PreviewSizeZ );
+			var result = VolumeSliceHelper.CreateSliceBuffer( _PreviewSizeX,_PreviewSizeY, _PreviewSizeZ );
 
 			decoder.Decode( input, _Metadata, ( block, index ) =>
 			{
@@ -90,7 +90,6 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 					if( px * _Minification != gx || py * _Minification != gy || pz * _Minification != gz )
 						continue;
 
-
 					result[ pz ].Data[ py * _PreviewSizeX + px ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
 				}
 			}, null, null, progress, ct );
@@ -102,8 +101,14 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 				_Metadata.ResolutionX * _Minification,
 				_Metadata.ResolutionY * _Minification,
 				_Metadata.ResolutionZ * _Minification );
-			
-			return new UncompressedVolume( volumeMetadata, result );
+
+			var slices = result
+				.AsParallel()
+				.AsOrdered()
+				.Select( b => b.ToVolumeSlice() )
+				.ToArray();
+				
+			return new UncompressedVolume( volumeMetadata, slices );
 		}
 
 		#endregion
