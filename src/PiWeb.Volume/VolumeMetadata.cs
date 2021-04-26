@@ -47,7 +47,19 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="resolutionX">The resolution x.</param>
 		/// <param name="resolutionY">The resolution y.</param>
 		/// <param name="resolutionZ">The resolution z.</param>
-		public VolumeMetadata( ushort sizeX, ushort sizeY, ushort sizeZ, double resolutionX, double resolutionY, double resolutionZ )
+		/// <param name="positionX">The position x.</param>
+		/// <param name="positionY">The position y.</param>
+		/// <param name="positionZ">The position z.</param>
+		public VolumeMetadata(
+			ushort sizeX,
+			ushort sizeY,
+			ushort sizeZ,
+			double resolutionX,
+			double resolutionY,
+			double resolutionZ,
+			ushort positionX = 0,
+			ushort positionY = 0,
+			ushort positionZ = 0 )
 		{
 			SizeX = sizeX;
 			SizeY = sizeY;
@@ -56,6 +68,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 			ResolutionX = resolutionX;
 			ResolutionY = resolutionY;
 			ResolutionZ = resolutionZ;
+			PositionX = positionX;
+			PositionY = positionY;
+			PositionZ = positionZ;
 		}
 
 		#endregion
@@ -67,6 +82,21 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// </summary>
 		public Version FileVersion { get; private set; } = Volume.FileVersion;
 
+		/// <summary>
+		/// The number of Voxels in X-Dimension.
+		/// </summary>
+		public ushort PositionX { get; private set; } = 0;
+
+		/// <summary>
+		/// The number of Voxels in Y-Dimension.
+		/// </summary>
+		public ushort PositionY { get; private set; } = 0;
+
+		/// <summary>
+		/// The number of Voxels in Z-Dimension.
+		/// </summary>
+		public ushort PositionZ { get; private set; } = 0;
+		
 		/// <summary>
 		/// The number of Voxels in X-Dimension.
 		/// </summary>
@@ -111,10 +141,8 @@ namespace Zeiss.IMT.PiWeb.Volume
 		#region methods
 
 		/// <summary>
-		/// 
+		/// Returns the size in the specified direction.
 		/// </summary>
-		/// <param name="direction"></param>
-		/// <returns></returns>
 		public ushort GetSize( Direction direction )
 		{
 			return direction switch
@@ -187,6 +215,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 				writer.WriteElementString( "ResolutionX", ResolutionX.ToString( CultureInfo.InvariantCulture ) );
 				writer.WriteElementString( "ResolutionY", ResolutionY.ToString( CultureInfo.InvariantCulture ) );
 				writer.WriteElementString( "ResolutionZ", ResolutionZ.ToString( CultureInfo.InvariantCulture ) );
+				
+				writer.WriteElementString( "PositionX", PositionX.ToString( CultureInfo.InvariantCulture ) );
+				writer.WriteElementString( "PositionY", PositionY.ToString( CultureInfo.InvariantCulture ) );
+				writer.WriteElementString( "PositionZ", PositionZ.ToString( CultureInfo.InvariantCulture ) );
 
 				if( Properties.Count > 0 )
 				{
@@ -246,6 +278,15 @@ namespace Zeiss.IMT.PiWeb.Volume
 						break;
 					case "Property":
 						result.Properties.Add( Property.Deserialize( reader ) );
+						break;
+					case "PositionX":
+						result.PositionX = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						break;
+					case "PositionY":
+						result.PositionY = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						break;
+					case "PositionZ":
+						result.PositionZ = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 						break;
 				}
 			}

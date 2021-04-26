@@ -13,10 +13,9 @@ using System.Runtime.InteropServices;
 [assembly: Guid( "cec0c392-38ec-11e9-b210-d663bd873d93" )]
 [assembly: ComVisible( false )]
 [assembly: CLSCompliant( false )]
-[assembly: AssemblyVersion( "1.0.0.0" )]
+[assembly: AssemblyVersion( "1.3.0.0" )]
 [assembly: AssemblyCompany( "Carl Zeiss Innovationszentrum für Messtechnik GmbH" )]
 [assembly: AssemblyProduct( "PiWeb" )]
 [assembly: AssemblyCopyright( "Copyright © 2017 Carl Zeiss Innovationszentrum für Messtechnik GmbH" )]
 [assembly: AssemblyTrademark( "PiWeb" )]
-
 [assembly: InternalsVisibleTo( "PiWeb.Volume.Tests" )]
