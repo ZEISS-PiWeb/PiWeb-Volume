@@ -42,6 +42,16 @@
                 
                 <Button
                     HorizontalAlignment="Right"
+                    Command="{Binding CreatePreviewCommand}"
+                    Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Style="{StaticResource ToolbarButtonStyle}"
+                    ToolTip="Create preview"
+                    DockPanel.Dock="Right">
+                    <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/assembly.png" Style="{StaticResource Icon}" />
+                </Button>
+                
+                <Button
+                    HorizontalAlignment="Right"
                     Command="{Binding DecompressCommand}"
                     Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"
                     Style="{StaticResource ToolbarButtonStyle}"
