@@ -17,7 +17,6 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 	using System.Diagnostics;
 	using System.IO;
 	using System.Linq;
-	using System.Threading.Tasks;
 
 	#endregion
 
@@ -61,20 +60,19 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 							? new Uint16Stream( dataStream, minValue, maxValue )
 							: new Uint16Stream( dataStream );
 						return streamed ? new StreamedVolume( vgi, uint16Stream ) : FromUint8( uint16Stream, vgi, progress, logger );
-					
+
 					case 8:
 						var uint8Stream = extraPolate
 							? new Uint8Stream( dataStream, minValue, maxValue )
 							: new Uint8Stream( dataStream );
 						return streamed ? new StreamedVolume( vgi, uint8Stream ) : FromUint8( uint8Stream, vgi, progress, logger );
-					
+
 					default: throw new NotSupportedException( "This converter can only convert 8 bit and 16 bit volumes." );
 				}
 			}
 			finally
 			{
 				logger?.Log( LogLevel.Info, $"Loaded VGI volume data in {sw.ElapsedMilliseconds} ms." );
-
 			}
 		}
 
@@ -146,14 +144,14 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 				var sz = metadata.SizeZ;
 
 				var data = VolumeSliceHelper.CreateSliceBuffer( sx, sy, sz );
-				
-				var buffer = new byte[sx * sy * 2];
+
+				var buffer = new byte[ sx * sy * 2 ];
 				for( var z = 0; z < sz; z++ )
 				{
-					progress?.Report( ( double ) z / sz );
+					progress?.Report( (double)z / sz );
 
 					uint16Stream.Read( buffer, 0, sx * sy * 2 );
-					var layer = data[ z ].Data;
+					var layer = data[ z ];
 
 					for( var index = 0; index < sx * sy; index++ )
 						layer[ index ] = buffer[ index * 2 + 1 ];
@@ -162,9 +160,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 				var slices = data
 					.AsParallel()
 					.AsOrdered()
-					.Select( s => s.ToVolumeSlice() )
+					.Select( ( s, i ) => new VolumeSlice( new VolumeSliceDefinition( Direction.Z, (ushort)i ), s ) )
 					.ToArray();
-				
+
 				return new UncompressedVolume( metadata, slices );
 			}
 			finally
@@ -187,25 +185,20 @@ namespace Zeiss.IMT.PiWeb.Volume.Convert
 				var sz = metadata.SizeZ;
 
 				var sliceSize = sx * sy;
-				var slices = new List<Task<VolumeSlice>>( sz );
+				var slices = new List<VolumeSlice>( sz );
 
 				for( ushort z = 0; z < sz; z++ )
 				{
 					var definition = new VolumeSliceDefinition( Direction.Z, z );
-					progress?.Report( ( double ) z / sz );
-					
-					var buffer = new VolumeSliceBuffer( definition, sliceSize );
-					uint8Stream.Read( buffer.Data, 0, sliceSize );
+					progress?.Report( (double)z / sz );
 
-					slices.Add( Task.Run( () => buffer.ToVolumeSlice() ) );
+					var buffer = new byte[ sliceSize ];
+					uint8Stream.Read( buffer, 0, sliceSize );
+
+					slices.Add( new VolumeSlice( definition, buffer ) );
 				}
 
-				Task.WaitAll( slices.ToArray() );
-				var allSlices = slices
-					.Select( s => s.Result )
-					.ToArray();
-				
-				return new UncompressedVolume( metadata, allSlices );
+				return new UncompressedVolume( metadata, slices );
 			}
 			finally
 			{

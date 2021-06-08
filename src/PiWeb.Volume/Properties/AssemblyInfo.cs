@@ -19,3 +19,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright( "Copyright © 2017 Carl Zeiss Innovationszentrum für Messtechnik GmbH" )]
 [assembly: AssemblyTrademark( "PiWeb" )]
 [assembly: InternalsVisibleTo( "PiWeb.Volume.Tests" )]
+[assembly: InternalsVisibleTo( "PiWeb.Volume.Convert" )]

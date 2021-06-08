@@ -46,13 +46,11 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		{
 			var z = 0;
 			var buffer = new byte[BlockVolume.N][];
-			
+
 			Encode( () =>
 			{
-				using var data = slices[ z ].Decompress();
-				
 				for( var bz = 0; bz < BlockVolume.N && z < metadata.SizeZ; bz++, z++ )
-					buffer[ bz ] = data.Data.ToArray();
+					buffer[ bz ] = slices[ z ].Data;
 
 				return buffer;
 			}, output, metadata, progress );
@@ -168,7 +166,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 							isShort |= IsShort( value );
 					}
 
-					//resultLength has 16 bits: 
+					//resultLength has 16 bits:
 					//Bit  0 - 11: index of last value that is greater than 0
 					//Bit 12 - 13: number of bytes of the first value of the block
 					//Bit 14 - 15: number of bytes of the other values of the block

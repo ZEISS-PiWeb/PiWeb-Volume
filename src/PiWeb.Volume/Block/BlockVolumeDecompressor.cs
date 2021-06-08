@@ -74,14 +74,14 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 					if( gz >= _SizeZ || gy >= _SizeY || gx >= _SizeX )
 						continue;
 
-					result[ gz ].Data[ gy * _SizeX + gx ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
+					result[ gz ][ gy * _SizeX + gx ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
 				}
 			}, null, null, progress, ct );
 
 			return result
 				.AsParallel()
 				.AsOrdered()
-				.Select( s => s.ToVolumeSlice() )
+				.Select( ( s, i ) => new VolumeSlice( new VolumeSliceDefinition( Direction.Z, (ushort)i ), s ) )
 				.ToArray();
 		}
 

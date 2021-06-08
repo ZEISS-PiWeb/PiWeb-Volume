@@ -34,7 +34,7 @@
     <PackageLicenseUrl>https://github.com/ZEISS-PiWeb/PiWeb-Volume/blob/master/LICENSE.md</PackageLicenseUrl>
     <PackageIconUrl>https://github.com/ZEISS-PiWeb/PiWeb-Volume/raw/master/logo6464.png</PackageIconUrl>
     <PackageTags>Carl Zeiss PiWeb Volume</PackageTags>
-    <PackageReleaseNotes>NuGet package is now .NET Standard 2.0 compatible</PackageReleaseNotes>
+    <PackageReleaseNotes>Added a position to volume metadata</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Copyright>© Carl Zeiss IZfM Dresden</Copyright>
     <VersionPrefix>1.1.0</VersionPrefix>

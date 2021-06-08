@@ -31,9 +31,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 		private readonly IProgress<VolumeSliceDefinition> _ProgressNotifier;
 		private readonly CancellationToken _Ct;
 
-		private readonly Dictionary<ushort, VolumeSliceBuffer> _SlicesX = new Dictionary<ushort, VolumeSliceBuffer>();
-		private readonly Dictionary<ushort, VolumeSliceBuffer> _SlicesY = new Dictionary<ushort, VolumeSliceBuffer>();
-		private readonly Dictionary<ushort, VolumeSliceBuffer> _SlicesZ = new Dictionary<ushort, VolumeSliceBuffer>();
+		private readonly Dictionary<ushort, byte[]> _SlicesX = new Dictionary<ushort, byte[]>();
+		private readonly Dictionary<ushort, byte[]> _SlicesY = new Dictionary<ushort, byte[]>();
+		private readonly Dictionary<ushort, byte[]> _SlicesZ = new Dictionary<ushort, byte[]>();
 
 		private readonly ushort _X;
 		private readonly ushort _Y;
@@ -42,31 +42,6 @@ namespace Zeiss.IMT.PiWeb.Volume
 		#endregion
 
 		#region constructors
-
-		internal VolumeSliceRangeCollector( VolumeMetadata metaData, Direction direction, VolumeSliceDefinition definition, VolumeSliceBuffer sliceBuffer, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default )
-		{
-			if( direction != Direction.Z && definition.Direction != direction )
-				throw new ArgumentException( "Collecting slices ranges for different directions than input is only allowed for z-directed input" );
-
-			_Direction = direction;
-			_ProgressNotifier = progressNotifier;
-			_Ct = ct;
-
-			_X = metaData.SizeX;
-			_Y = metaData.SizeY;
-			_Z = metaData.SizeZ;
-
-			metaData.GetSliceSize( definition.Direction, out var x, out var y );
-			sliceBuffer.Initialize( definition, x * y );
-
-			var set = GetSlices( definition.Direction );
-			set[ definition.Index ] = sliceBuffer;
-
-			Interop = new InteropSliceWriter
-			{
-				WriteSlice = WriteSlice
-			};
-		}
 
 		internal VolumeSliceRangeCollector( VolumeMetadata metaData, Direction direction, IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default )
 		{
@@ -87,7 +62,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 				foreach( var definition in range )
 				{
 					metaData.GetSliceSize( range.Direction, out var x, out var y );
-					set[ definition.Index ] = new VolumeSliceBuffer( definition, x * y );
+					set[ definition.Index ] = new byte[ x * y ];
 				}
 			}
 
@@ -110,23 +85,23 @@ namespace Zeiss.IMT.PiWeb.Volume
 		internal VolumeSliceCollection GetSliceRangeCollection()
 		{
 			return new VolumeSliceCollection(
-				_SlicesX.ToDictionary( k => k.Key, v => v.Value.ToVolumeSlice() ),
-				_SlicesY.ToDictionary( k => k.Key, v => v.Value.ToVolumeSlice() ),
-				_SlicesZ.ToDictionary( k => k.Key, v => v.Value.ToVolumeSlice() )
+				_SlicesX.ToDictionary( k => k.Key, v => new VolumeSlice( new VolumeSliceDefinition( Direction.X, v.Key ), v.Value ) ),
+				_SlicesY.ToDictionary( k => k.Key, v => new VolumeSlice( new VolumeSliceDefinition( Direction.Y, v.Key ), v.Value ) ),
+				_SlicesZ.ToDictionary( k => k.Key, v => new VolumeSlice( new VolumeSliceDefinition( Direction.Z, v.Key ), v.Value ) )
 			);
 		}
 
 		internal VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range )
 		{
-			var slices = new List<VolumeSliceBuffer>( range.Length );
+			var slices = new List<VolumeSlice>( range.Length );
 			var set = GetSlices( range.Direction );
-			
+
 			foreach( var definition in range )
 			{
 				if( set.TryGetValue( definition.Index, out var data ) )
-					slices.Add( data );
+					slices.Add( new VolumeSlice( new VolumeSliceDefinition( range.Direction, definition.Index ), data ) );
 				else
-					throw new ArgumentOutOfRangeException( nameof(definition) );
+					throw new ArgumentOutOfRangeException( nameof( definition ) );
 			}
 
 			return new VolumeSliceRange( range, slices );
@@ -136,20 +111,20 @@ namespace Zeiss.IMT.PiWeb.Volume
 		{
 			var set = GetSlices( direction );
 			if( set.TryGetValue( index, out var data ) )
-				return data.ToVolumeSlice();
+				return new VolumeSlice( new VolumeSliceDefinition( direction, index ), data );
 
-			throw new ArgumentOutOfRangeException( nameof(index) );
+			throw new ArgumentOutOfRangeException( nameof( index ) );
 		}
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		private Dictionary<ushort, VolumeSliceBuffer> GetSlices( Direction direction )
+		private Dictionary<ushort, byte[]> GetSlices( Direction direction )
 		{
 			return direction switch
 			{
 				Direction.X => _SlicesX,
 				Direction.Y => _SlicesY,
 				Direction.Z => _SlicesZ,
-				_ => throw new ArgumentOutOfRangeException( nameof(direction), direction, null )
+				_           => throw new ArgumentOutOfRangeException( nameof( direction ), direction, null )
 			};
 		}
 
@@ -180,11 +155,11 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( x >= _X )
 				return;
 
-			if( !_SlicesX.TryGetValue( x, out var sliceX ) ) 
+			if( !_SlicesX.TryGetValue( x, out var sliceX ) )
 				return;
-			
+
 			for( var z = 0; z < _Z; z++ )
-				Marshal.Copy( slice + z * width, sliceX.Data, z * _Y, _Y );
+				Marshal.Copy( slice + z * width, sliceX, z * _Y, _Y );
 		}
 
 		private void WriteYSlice( IntPtr slice, ushort width, ushort y )
@@ -197,7 +172,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( !_SlicesY.TryGetValue( y, out var sliceY ) )
 				return;
 
-			Parallel.For( 0, _Z, z => Marshal.Copy( slice + z * width, sliceY.Data, z * _X, _X ) );
+			Parallel.For( 0, _Z, z => Marshal.Copy( slice + z * width, sliceY, z * _X, _X ) );
 		}
 
 		private void WriteZSlice( IntPtr slice, ushort width, ushort z )
@@ -208,11 +183,11 @@ namespace Zeiss.IMT.PiWeb.Volume
 				return;
 
 			if( _SlicesZ.TryGetValue( z, out var sliceZ ) )
-				Parallel.For( 0, _Y, y => Marshal.Copy( slice + y * width, sliceZ.Data, y * _X, _X ) );
+				Parallel.For( 0, _Y, y => Marshal.Copy( slice + y * width, sliceZ, y * _X, _X ) );
 
 			foreach( var (y, value) in _SlicesY )
 			{
-				Marshal.Copy( slice + y * width, value.Data, z * _X, _X );
+				Marshal.Copy( slice + y * width, value, z * _X, _X );
 			}
 
 			if( !_SlicesX.Any() )
@@ -220,10 +195,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			foreach( var (x, value) in _SlicesX )
 			{
-				Parallel.For( 0, _Y, y => 
-				{
-					value.Data[ y + z * _Y ] = Marshal.ReadByte( slice, x + width * y ); 
-				} );
+				Parallel.For( 0, _Y, y => { value[ y + z * _Y ] = Marshal.ReadByte( slice, x + width * y ); } );
 			}
 		}
 

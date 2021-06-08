@@ -25,7 +25,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 	/// <summary>
 	/// This class is responsible for creating previews. Previews are smaller versions of a volume where every
-	/// n'th voxel is sampled. 
+	/// n'th voxel is sampled.
 	/// </summary>
 	internal class PreviewCreator
 	{
@@ -48,17 +48,17 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		internal PreviewCreator( VolumeMetadata metadata, ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
 		{
-			_Metadata = metadata ?? throw new ArgumentNullException( nameof(metadata) );
+			_Metadata = metadata ?? throw new ArgumentNullException( nameof( metadata ) );
 			_Minification = minification;
 			_Progress = progress;
 			_Ct = ct;
 
-			_PreviewSizeX = ( ushort ) ( ( metadata.SizeX - 1 ) / minification + 1 );
-			_PreviewSizeY = ( ushort ) ( ( metadata.SizeY - 1 ) / minification + 1 );
-			_PreviewSizeZ = ( ushort ) ( ( metadata.SizeZ - 1 ) / minification + 1 );
+			_PreviewSizeX = (ushort)( ( metadata.SizeX - 1 ) / minification + 1 );
+			_PreviewSizeY = (ushort)( ( metadata.SizeY - 1 ) / minification + 1 );
+			_PreviewSizeZ = (ushort)( ( metadata.SizeZ - 1 ) / minification + 1 );
 
 			if( _PreviewSizeX < 2 || _PreviewSizeY < 2 || _PreviewSizeZ < 2 )
-				throw new ArgumentOutOfRangeException( nameof(minification) );
+				throw new ArgumentOutOfRangeException( nameof( minification ) );
 
 			_PreviewData = new List<Task<VolumeSlice>>( _PreviewSizeZ );
 
@@ -82,35 +82,30 @@ namespace Zeiss.IMT.PiWeb.Volume
 		{
 			var sizeX = metadata.SizeX;
 			var sizeZ = metadata.SizeZ;
-			
-			var previewSizeX = ( ushort ) ( ( metadata.SizeX - 1 ) / minification + 1 );
-			var previewSizeY = ( ushort ) ( ( metadata.SizeY - 1 ) / minification + 1 );
-			var previewSizeZ = ( ushort ) ( ( metadata.SizeZ - 1 ) / minification + 1 );
+
+			var previewSizeX = (ushort)( ( metadata.SizeX - 1 ) / minification + 1 );
+			var previewSizeY = (ushort)( ( metadata.SizeY - 1 ) / minification + 1 );
+			var previewSizeZ = (ushort)( ( metadata.SizeZ - 1 ) / minification + 1 );
 
 			if( previewSizeX < 2 || previewSizeY < 2 || previewSizeZ < 2 )
-				throw new ArgumentOutOfRangeException( nameof(minification) );
+				throw new ArgumentOutOfRangeException( nameof( minification ) );
 
 			var result = new List<Task<VolumeSlice>>( previewSizeZ );
 
- 			for( ushort z = 0, oz = 0; z < previewSizeZ && oz < sizeZ; z++, oz += minification )
+			for( ushort z = 0, oz = 0; z < previewSizeZ && oz < sizeZ; z++, oz += minification )
 			{
 				var slice = slices[ oz ];
 				var previewSlizeIndex = z;
-				
-				result.Add( Task.Run( () =>
-				{
-					using var sourceData = slice.Decompress();
-				
-					return CreateMinifiedSlice( previewSlizeIndex, minification, previewSizeX, previewSizeY, sizeX, sourceData.Data );
-				} ) );
+
+				result.Add( Task.Run( () => CreateMinifiedSlice( previewSlizeIndex, minification, previewSizeX, previewSizeY, sizeX, slice.Data ) ) );
 			}
 
-			var volumeMetadata = new VolumeMetadata( 
-				previewSizeX, 
-				previewSizeY, 
-				previewSizeZ, 
-				metadata.ResolutionX * minification, 
-				metadata.ResolutionY * minification, 
+			var volumeMetadata = new VolumeMetadata(
+				previewSizeX,
+				previewSizeY,
+				previewSizeZ,
+				metadata.ResolutionX * minification,
+				metadata.ResolutionY * minification,
 				metadata.ResolutionZ * minification );
 
 			return Volume.CreateUncompressed( volumeMetadata, CreateVolumeSlices( result ) );
@@ -120,7 +115,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		{
 			// ReSharper disable once CoVariantArrayConversion
 			Task.WaitAll( result.ToArray() );
-			
+
 			return result
 				.Select( t => t.Result )
 				.ToArray();
@@ -131,12 +126,12 @@ namespace Zeiss.IMT.PiWeb.Volume
 			var sizeX = metadata.SizeX;
 			var sizeY = metadata.SizeY;
 			var sizeZ = metadata.SizeZ;
-			var previewSizeX = ( ushort ) ( ( metadata.SizeX - 1 ) / minification + 1 );
-			var previewSizeY = ( ushort ) ( ( metadata.SizeY - 1 ) / minification + 1 );
-			var previewSizeZ = ( ushort ) ( ( metadata.SizeZ - 1 ) / minification + 1 );
+			var previewSizeX = (ushort)( ( metadata.SizeX - 1 ) / minification + 1 );
+			var previewSizeY = (ushort)( ( metadata.SizeY - 1 ) / minification + 1 );
+			var previewSizeZ = (ushort)( ( metadata.SizeZ - 1 ) / minification + 1 );
 
 			if( previewSizeX < 2 || previewSizeY < 2 || previewSizeZ < 2 )
-				throw new ArgumentOutOfRangeException( nameof(minification) );
+				throw new ArgumentOutOfRangeException( nameof( minification ) );
 
 			var sliceBufferSize = sizeX * sizeY;
 
@@ -149,7 +144,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 				{
 					var sliceBuffer = VolumeArrayPool.Shared.Rent( sliceBufferSize );
 					stream.Read( sliceBuffer, 0, sliceBufferSize );
-					
+
 					var previewSlizeIndex = z;
 					result.Add( Task.Run( () =>
 					{
@@ -167,11 +162,11 @@ namespace Zeiss.IMT.PiWeb.Volume
 				}
 			}
 
-			var volumeMetadata = new VolumeMetadata( 
-				previewSizeX, 
-				previewSizeY, 
-				previewSizeZ, 
-				metadata.ResolutionX * minification, 
+			var volumeMetadata = new VolumeMetadata(
+				previewSizeX,
+				previewSizeY,
+				previewSizeZ,
+				metadata.ResolutionX * minification,
 				metadata.ResolutionY * minification,
 				metadata.ResolutionZ * minification );
 
@@ -180,30 +175,29 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		internal UncompressedVolume GetPreview()
 		{
-			var volumeMetadata = new VolumeMetadata( 
-				_PreviewSizeX, 
-				_PreviewSizeY, 
-				_PreviewSizeZ, 
+			var volumeMetadata = new VolumeMetadata(
+				_PreviewSizeX,
+				_PreviewSizeY,
+				_PreviewSizeZ,
 				_Metadata.ResolutionX * _Minification,
-				_Metadata.ResolutionY * _Minification, 
+				_Metadata.ResolutionY * _Minification,
 				_Metadata.ResolutionZ * _Minification );
-			
+
 			return Volume.CreateUncompressed( volumeMetadata, CreateVolumeSlices( _PreviewData ) );
 		}
-		
+
 		private static VolumeSlice CreateMinifiedSlice( ushort index, ushort minification, ushort previewSizeX, ushort previewSizeY, ushort stride, ArraySegment<byte> srcBuffer )
 		{
 			var position = 0;
 
 			var length = previewSizeX * previewSizeY;
-			var buffer = VolumeArrayPool.Shared.Rent( length ); 
-			
+			var buffer = new byte[ length ];
+
 			for( ushort y = 0, oy = 0; y < previewSizeY; y++, oy += minification )
 			for( ushort x = 0, ox = 0; x < previewSizeX; x++, ox += minification )
 				buffer[ position++ ] = srcBuffer[ oy * stride + ox ];
 
-			var volumeSlice = new VolumeSlice( Direction.Z, index, length, buffer );
-			VolumeArrayPool.Shared.Return( buffer );
+			var volumeSlice = new VolumeSlice( new VolumeSliceDefinition( Direction.Z, index ), buffer );
 
 			return volumeSlice;
 		}

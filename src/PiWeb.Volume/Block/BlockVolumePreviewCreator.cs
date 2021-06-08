@@ -90,7 +90,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 					if( px * _Minification != gx || py * _Minification != gy || pz * _Minification != gz )
 						continue;
 
-					result[ pz ].Data[ py * _PreviewSizeX + px ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
+					result[ pz ][ py * _PreviewSizeX + px ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
 				}
 			}, null, null, progress, ct );
 
@@ -105,9 +105,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			var slices = result
 				.AsParallel()
 				.AsOrdered()
-				.Select( b => b.ToVolumeSlice() )
+				.Select( ( s, i ) => new VolumeSlice( new VolumeSliceDefinition( Direction.Z, (ushort)i ), s ) )
 				.ToArray();
-				
+
 			return new UncompressedVolume( volumeMetadata, slices );
 		}
 

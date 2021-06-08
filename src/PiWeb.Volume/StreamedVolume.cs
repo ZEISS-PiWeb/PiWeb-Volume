@@ -13,20 +13,18 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#region usings
 
 	using System;
-	using System.Buffers;
 	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.IO;
 	using System.Linq;
 	using System.Threading;
-	using Microsoft.CSharp.RuntimeBinder;
 	using Zeiss.IMT.PiWeb.Volume.Block;
 
 	#endregion
 
 	/// <summary>
 	/// This volume class lazily loads the volume data from an
-	/// underlying stream. 
+	/// underlying stream.
 	/// </summary>
 	public sealed class StreamedVolume : Volume, IDisposable
 	{
@@ -48,7 +46,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		public StreamedVolume( VolumeMetadata metadata, Stream stream, bool leaveOpen = false ) : base( metadata )
 		{
 			_LeaveOpen = leaveOpen;
-			_Stream = stream ?? throw new ArgumentNullException( nameof(stream) );
+			_Stream = stream ?? throw new ArgumentNullException( nameof( stream ) );
 			if( !stream.CanSeek )
 				throw new ArgumentException( "The stream must be seekable." );
 		}
@@ -111,9 +109,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
-			
+
 			_Stream.Seek( 0, SeekOrigin.Begin );
-			
+
 			var result = PreviewCreator.CreatePreview( _Stream, Metadata, minification, progress );
 			logger?.Log( LogLevel.Info, $"Created a preview with minification factor {minification} in {sw.ElapsedMilliseconds} ms." );
 
@@ -146,38 +144,48 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		/// <inheritdoc />
 		public override void GetSlice(
-			VolumeSliceBuffer sliceBuffer,
-			VolumeSliceDefinition slice, 
-			IProgress<VolumeSliceDefinition> progress = null, 
-			ILogger logger = null, 
+			VolumeSliceDefinition slice,
+			byte[] buffer,
+			IProgress<VolumeSliceDefinition> progress = null,
+			ILogger logger = null,
 			CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
-			switch(slice.Direction)
+
+			Metadata.GetSliceSize( slice.Direction, out var width, out var height );
+
+			if( buffer.Length < width * height )
+				throw new VolumeException( VolumeError.FrameBufferTooSmall );
+
+			_Stream.Seek( 0, SeekOrigin.Begin );
+
+			switch( slice.Direction )
 			{
-				case Direction.X: 
-					ReadSliceX( sliceBuffer, slice.Index, ct );
+				case Direction.X:
+					ReadSliceX( buffer, slice.Index, ct );
 					break;
 				case Direction.Y:
-					ReadSliceY( sliceBuffer, slice.Index, ct );
+					ReadSliceY( buffer, slice.Index, ct );
 					break;
 				case Direction.Z:
-					ReadSliceZ( sliceBuffer, slice.Index, ct );
+					ReadSliceZ( buffer, slice.Index, ct );
 					break;
 			}
+
+			progress?.Report( slice );
 			logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
 		}
 
-		private void ReadSliceX( VolumeSliceBuffer sliceBuffer, ushort index, CancellationToken ct )
+		private void ReadSliceX( byte[] sliceBuffer, ushort index, CancellationToken ct )
 		{
 			var sx = Metadata.SizeX;
 			var sy = Metadata.SizeY;
 			var sz = Metadata.SizeZ;
 
 			var bufferSize = sx * sy;
-			
+
 			var buffer = VolumeArrayPool.Shared.Rent( bufferSize );
-			
+
 			_Stream.Seek( 0, SeekOrigin.Begin );
 			for( var z = 0; z < sz; z++ )
 			{
@@ -186,42 +194,38 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 				for( var y = 0; y < sy; y++ )
 				{
-					sliceBuffer.Data[ z * sy + y ] = buffer[ y * sx + index ];
+					sliceBuffer[ z * sy + y ] = buffer[ y * sx + index ];
 				}
 			}
 
 			VolumeArrayPool.Shared.Return( buffer );
 		}
 
-		private void ReadSliceY( VolumeSliceBuffer sliceBuffer, ushort index, CancellationToken ct )
+		private void ReadSliceY( byte[] sliceBuffer, ushort index, CancellationToken ct )
 		{
 			var sx = Metadata.SizeX;
 			var sy = Metadata.SizeY;
 			var sz = Metadata.SizeZ;
 
-			var bufferSize = sx * sz;
-			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Y, index ), bufferSize );
-			
 			_Stream.Seek( index * sx, SeekOrigin.Begin );
 			for( var z = 0; z < sz; z++ )
 			{
 				ct.ThrowIfCancellationRequested();
-				_Stream.Read( sliceBuffer.Data, z * sx, sx );
+				_Stream.Read( sliceBuffer, z * sx, sx );
 				_Stream.Seek( sx * ( sy - 1 ), SeekOrigin.Current );
 			}
 		}
 
-		private void ReadSliceZ( VolumeSliceBuffer sliceBuffer, ushort index, CancellationToken ct )
+		private void ReadSliceZ( byte[] sliceBuffer, ushort index, CancellationToken ct )
 		{
 			var sx = Metadata.SizeX;
 			var sy = Metadata.SizeY;
 
 			var bufferSize = sx * sy;
-			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Z, index ), bufferSize );
 
 			ct.ThrowIfCancellationRequested();
-			_Stream.Seek( ( long ) index * sx * sy, SeekOrigin.Begin );
-			_Stream.Read( sliceBuffer.Data, 0, bufferSize );
+			_Stream.Seek( (long)index * sx * sy, SeekOrigin.Begin );
+			_Stream.Read( sliceBuffer, 0, bufferSize );
 		}
 
 		/// <summary>

@@ -34,16 +34,16 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		private readonly ushort _SizeY;
 		private readonly ushort _SizeX;
 
-		private readonly Dictionary<ushort, List<VolumeSliceBuffer>> _SlicesX = new Dictionary<ushort, List<VolumeSliceBuffer>>();
-		private readonly Dictionary<ushort, List<VolumeSliceBuffer>> _SlicesY = new Dictionary<ushort, List<VolumeSliceBuffer>>();
-		private readonly Dictionary<ushort, List<VolumeSliceBuffer>> _SlicesZ = new Dictionary<ushort, List<VolumeSliceBuffer>>();
+		private readonly Dictionary<ushort, List<BlockSliceBuffer>> _SlicesX = new Dictionary<ushort, List<BlockSliceBuffer>>();
+		private readonly Dictionary<ushort, List<BlockSliceBuffer>> _SlicesY = new Dictionary<ushort, List<BlockSliceBuffer>>();
+		private readonly Dictionary<ushort, List<BlockSliceBuffer>> _SlicesZ = new Dictionary<ushort, List<BlockSliceBuffer>>();
 		private readonly VolumeMetadata _Metadata;
 
 		#endregion
 
 		#region constructors
 
-		internal BlockVolumeSliceRangeCollector( BlockVolume volume, VolumeSliceDefinition definition, VolumeSliceBuffer sliceBuffer )
+		internal BlockVolumeSliceRangeCollector( BlockVolume volume, VolumeSliceDefinition definition, byte[] sliceBuffer )
 		{
 			_Volume = volume;
 			_Metadata = _Volume.Metadata;
@@ -53,11 +53,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			_SizeX = _Metadata.SizeX;
 
 			var map = GetSlices( definition.Direction );
-			_Metadata.GetSliceSize( definition.Direction, out var width, out var height );
-			sliceBuffer.Initialize( definition, width * height );
-			
-			var block = ( ushort ) ( definition.Index / BlockVolume.N );
-			map[ block ] = new List<VolumeSliceBuffer> { sliceBuffer }; 
+
+			var block = (ushort)( definition.Index / BlockVolume.N );
+			map[ block ] = new List<BlockSliceBuffer> { new BlockSliceBuffer( definition, sliceBuffer ) };
 		}
 
 		internal BlockVolumeSliceRangeCollector( BlockVolume volume, IReadOnlyCollection<VolumeSliceRangeDefinition> ranges )
@@ -77,12 +75,12 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 				foreach( var definition in range )
 				{
-					var block = ( ushort ) ( definition.Index / BlockVolume.N );
+					var block = (ushort)( definition.Index / BlockVolume.N );
 
 					if( !map.TryGetValue( block, out var list ) )
-						map[ block ] = list = new List<VolumeSliceBuffer>();
+						map[ block ] = list = new List<BlockSliceBuffer>();
 
-					list.Add( new VolumeSliceBuffer( definition, width * height ) );
+					list.Add( new BlockSliceBuffer( definition, new byte[ width * height ] ) );
 				}
 			}
 		}
@@ -92,14 +90,14 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		#region methods
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		private Dictionary<ushort, List<VolumeSliceBuffer>> GetSlices( Direction direction )
+		private Dictionary<ushort, List<BlockSliceBuffer>> GetSlices( Direction direction )
 		{
 			return direction switch
 			{
 				Direction.X => _SlicesX,
 				Direction.Y => _SlicesY,
 				Direction.Z => _SlicesZ,
-				_ => throw new ArgumentOutOfRangeException( nameof(direction), direction, null )
+				_           => throw new ArgumentOutOfRangeException( nameof( direction ), direction, null )
 			};
 		}
 
@@ -125,7 +123,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 				},
 				layerIndex => _SlicesZ.ContainsKey( layerIndex ) || _SlicesX.Count > 0 || _SlicesY.Count > 0,
 				blockIndex => _SlicesZ.ContainsKey( blockIndex.Z ) || _SlicesY.ContainsKey( blockIndex.Y ) ||
-				              _SlicesX.ContainsKey( blockIndex.X ), progress, ct );
+					_SlicesX.ContainsKey( blockIndex.X ), progress, ct );
 
 			return new VolumeSliceCollection(
 				_SlicesX.Values
@@ -146,17 +144,17 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			);
 		}
 
-		private void ReadZSlices( byte[] block, BlockIndex index, List<VolumeSliceBuffer> slices )
+		private void ReadZSlices( byte[] block, BlockIndex index, List<BlockSliceBuffer> slices )
 		{
 			foreach( var slice in slices )
 				ReadZSlice( block, index, slice );
 		}
 
-		private void ReadZSlice( byte[] block, BlockIndex index, VolumeSliceBuffer slice )
+		private void ReadZSlice( byte[] block, BlockIndex index, BlockSliceBuffer slice )
 		{
 			var bz = slice.Definition.Index - index.Z * BlockVolume.N;
 			if( bz < 0 || bz > BlockVolume.N )
-				throw new ArgumentOutOfRangeException( nameof(slice) );
+				throw new ArgumentOutOfRangeException( nameof( slice ) );
 
 			for( var by = 0; by < BlockVolume.N; by++ )
 			for( var bx = 0; bx < BlockVolume.N; bx++ )
@@ -172,17 +170,17 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			}
 		}
 
-		private void ReadYSlices( byte[] block, BlockIndex index, List<VolumeSliceBuffer> slices )
+		private void ReadYSlices( byte[] block, BlockIndex index, List<BlockSliceBuffer> slices )
 		{
 			foreach( var slice in slices )
 				ReadYSlice( block, index, slice );
 		}
 
-		private void ReadYSlice( byte[] block, BlockIndex index, VolumeSliceBuffer slice )
+		private void ReadYSlice( byte[] block, BlockIndex index, BlockSliceBuffer slice )
 		{
 			var by = slice.Definition.Index - index.Y * BlockVolume.N;
 			if( by < 0 || by > BlockVolume.N )
-				throw new ArgumentOutOfRangeException( nameof(slice) );
+				throw new ArgumentOutOfRangeException( nameof( slice ) );
 
 			for( var bz = 0; bz < BlockVolume.N; bz++ )
 			for( var bx = 0; bx < BlockVolume.N; bx++ )
@@ -198,17 +196,17 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			}
 		}
 
-		private void ReadXSlices( byte[] block, BlockIndex index, List<VolumeSliceBuffer> slices )
+		private void ReadXSlices( byte[] block, BlockIndex index, List<BlockSliceBuffer> slices )
 		{
 			foreach( var slice in slices )
 				ReadXSlice( block, index, slice );
 		}
 
-		private void ReadXSlice( byte[] block, BlockIndex index, VolumeSliceBuffer slice )
+		private void ReadXSlice( byte[] block, BlockIndex index, BlockSliceBuffer slice )
 		{
 			var bx = slice.Definition.Index - index.X * BlockVolume.N;
 			if( bx < 0 || bx > BlockVolume.N )
-				throw new ArgumentOutOfRangeException( nameof(slice) );
+				throw new ArgumentOutOfRangeException( nameof( slice ) );
 
 			for( var bz = 0; bz < BlockVolume.N; bz++ )
 			for( var by = 0; by < BlockVolume.N; by++ )
@@ -222,6 +220,49 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 				slice.Data[ gz * _SizeY + gy ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
 			}
+		}
+
+		#endregion
+
+		#region struct VolumeSliceBuffer
+
+		private readonly struct BlockSliceBuffer
+		{
+			#region constructors
+
+			public BlockSliceBuffer( VolumeSliceDefinition definition, byte[] data )
+			{
+				Definition = definition;
+				Data = data;
+			}
+
+			#endregion
+
+			#region properties
+
+			/// <summary>
+			/// The slice definition that is associated with this buffer.
+			/// </summary>
+			public VolumeSliceDefinition Definition { get; }
+
+			/// <summary>
+			/// The buffer that holds the slice data.
+			/// </summary>
+			public byte[] Data { get; }
+
+			#endregion
+
+			#region methods
+
+			/// <summary>
+			/// Converts this buffer to a <see cref="VolumeSlice"/>.
+			/// </summary>
+			public VolumeSlice ToVolumeSlice()
+			{
+				return new VolumeSlice( Definition, Data );
+			}
+
+			#endregion
 		}
 
 		#endregion

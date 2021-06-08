@@ -100,14 +100,14 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			Parallel.For( 0, Math.Min( _SizeZ, height ), z =>
 			{
-				using var input = _Slices[ z ].Decompress();
+				var input = _Slices[ z ].Data;
 				var output = _Buffer;
 				int inputIndex = _CurrentSlice;
 				int outputIndex = z * width;
 
 				for( var y = 0; y < _SizeY; y++ )
 				{
-					output[ outputIndex ] = input.Data[ inputIndex ];
+					output[ outputIndex ] = input[ inputIndex ];
 					outputIndex++;
 					inputIndex += sx;
 				}
@@ -128,8 +128,8 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			Parallel.For( 0, Math.Min( _SizeZ, height ), z =>
 			{
-				using var data = _Slices[ z ].Decompress();
-				Marshal.Copy( data.Data.Array, data.Data.Offset + _CurrentSlice * _SizeX, pv + z * width, _SizeX );
+				var data = _Slices[ z ].Data;
+				Marshal.Copy( data, _CurrentSlice * _SizeX, pv + z * width, _SizeX );
 			} );
 			_CurrentSlice++;
 
@@ -144,10 +144,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			ReportProgress();
 
-			using var data = _Slices[ _CurrentSlice ].Decompress();
+			var data = _Slices[ _CurrentSlice ].Data;
 
 			// ReSharper disable once AccessToDisposedClosure
-			Parallel.For( 0, Math.Min( _SizeY, height ), y => Marshal.Copy( data.Data.Array, data.Data.Offset + y * _SizeX, pv + y * width, _SizeX ) );
+			Parallel.For( 0, Math.Min( _SizeY, height ), y => Marshal.Copy( data, y * _SizeX, pv + y * width, _SizeX ) );
 
 			_CurrentSlice++;
 

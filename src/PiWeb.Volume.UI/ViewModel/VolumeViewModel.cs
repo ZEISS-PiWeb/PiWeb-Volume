@@ -34,7 +34,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
         private readonly ILogger _Logger;
         private readonly Dispatcher _Dispatcher;
 
-        private readonly VolumeSliceBuffer _SliceBuffer = new VolumeSliceBuffer();
+        private byte[] _SliceBuffer;
 
         private int _SelectedLayerIndex;
         private int _MaxLayer;
@@ -181,6 +181,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
             {
                 case Direction.Z:
 
+					_SliceBuffer = new byte[ Volume.Metadata.SizeX * Volume.Metadata.SizeY ];
                     SelectedLayerImage = new WriteableBitmap( Volume.Metadata.SizeX, Volume.Metadata.SizeY, 96, 96,
                         PixelFormats.Gray8, BitmapPalettes.Gray256 );
 
@@ -197,6 +198,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
                     break;
                 case Direction.Y:
+					_SliceBuffer = new byte[ Volume.Metadata.SizeX * Volume.Metadata.SizeZ ];
                     SelectedLayerImage = new WriteableBitmap( Volume.Metadata.SizeX, Volume.Metadata.SizeZ, 96, 96,
                         PixelFormats.Gray8, BitmapPalettes.Gray256 );
 
@@ -213,6 +215,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
                     break;
                 case Direction.X:
+					_SliceBuffer = new byte[ Volume.Metadata.SizeY * Volume.Metadata.SizeZ ];
                     SelectedLayerImage = new WriteableBitmap( Volume.Metadata.SizeY, Volume.Metadata.SizeZ, 96, 96,
                         PixelFormats.Gray8, BitmapPalettes.Gray256 );
 
@@ -272,10 +275,10 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
         private Layer UpdateLayer( Volume volume, ushort sliceIndex )
         {
-            volume.GetSlice( _SliceBuffer, new VolumeSliceDefinition( _Direction, sliceIndex ), logger: _Logger );
+            volume.GetSlice( new VolumeSliceDefinition( _Direction, sliceIndex ), _SliceBuffer, logger: _Logger );
             volume.Metadata.GetSliceSize( _Direction, out var width, out var height );
 
-            return new Layer( _SliceBuffer.Data, width, height, sliceIndex );
+            return new Layer( _SliceBuffer, width, height, sliceIndex );
         }
 
         private static void WriteImage( WriteableBitmap bitmap, Layer layer )
