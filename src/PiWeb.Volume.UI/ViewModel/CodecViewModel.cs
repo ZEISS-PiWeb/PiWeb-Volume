@@ -22,16 +22,16 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 	{
 		#region members
 
-		private static string _Encoder = "zeiss.block"; //"nvenc";
+		private static string _Encoder = "nvenc";
 
 		private static Dictionary<string, string> _EncoderOptions = new Dictionary<string, string>
 		{
-			{ "quality", "90" } //{ "cq", "31" }
+			{ "cq", "31" }
 		};
 
 		private static int _Bitrate = -1;
 
-		private static string _PixelFormat = "gray8"; //"yuv420p";
+		private static string _PixelFormat = "yuv420p";
 
 		private bool _MultiDirection;
 
