@@ -35,8 +35,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		#region constructors
 
 		private VolumeMetadata()
-		{
-		}
+		{ }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="VolumeMetadata" /> class.
@@ -96,7 +95,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// The number of Voxels in Z-Dimension.
 		/// </summary>
 		public ushort PositionZ { get; private set; } = 0;
-		
+
 		/// <summary>
 		/// The number of Voxels in X-Dimension.
 		/// </summary>
@@ -150,7 +149,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 				Direction.X => SizeX,
 				Direction.Y => SizeY,
 				Direction.Z => SizeZ,
-				_ => throw new ArgumentOutOfRangeException( nameof(direction), direction, null )
+				_           => throw new ArgumentOutOfRangeException( nameof( direction ), direction, null )
 			};
 		}
 
@@ -177,7 +176,23 @@ namespace Zeiss.IMT.PiWeb.Volume
 					height = SizeY;
 					break;
 				default:
-					throw new ArgumentOutOfRangeException( nameof(direction), direction, null );
+					throw new ArgumentOutOfRangeException( nameof( direction ), direction, null );
+			}
+		}
+
+		/// <summary>
+		/// Returns the required size of the slice buffer in the specified direction.
+		/// </summary>
+		/// <param name="direction"></param>
+		internal int GetSliceLength( Direction direction )
+		{
+			switch( direction )
+			{
+				case Direction.X: return SizeY * SizeZ;
+				case Direction.Y: return SizeX * SizeZ;
+				case Direction.Z: return SizeX * SizeY;
+				default:
+					throw new ArgumentOutOfRangeException( nameof( direction ), direction, null );
 			}
 		}
 
@@ -215,7 +230,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 				writer.WriteElementString( "ResolutionX", ResolutionX.ToString( CultureInfo.InvariantCulture ) );
 				writer.WriteElementString( "ResolutionY", ResolutionY.ToString( CultureInfo.InvariantCulture ) );
 				writer.WriteElementString( "ResolutionZ", ResolutionZ.ToString( CultureInfo.InvariantCulture ) );
-				
+
 				writer.WriteElementString( "PositionX", PositionX.ToString( CultureInfo.InvariantCulture ) );
 				writer.WriteElementString( "PositionY", PositionY.ToString( CultureInfo.InvariantCulture ) );
 				writer.WriteElementString( "PositionZ", PositionZ.ToString( CultureInfo.InvariantCulture ) );
@@ -247,10 +262,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 			};
 
 			using var reader = XmlReader.Create( stream, settings );
-			
+
 			var result = new VolumeMetadata();
 			reader.MoveToElement();
-			
+
 			while( reader.Read() )
 			{
 				switch( reader.Name )

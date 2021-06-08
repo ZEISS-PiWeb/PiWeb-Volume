@@ -74,7 +74,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		public static UncompressedVolume CreateUncompressed( VolumeMetadata metadata, IReadOnlyList<VolumeSlice> slices, ILogger logger = null )
 		{
 			var sw = Stopwatch.StartNew();
-			
+
 			var result = new UncompressedVolume( metadata, slices );
 			logger?.Log( LogLevel.Info, $"Created uncompressed volume {sw.ElapsedMilliseconds} ms." );
 
@@ -93,17 +93,17 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="ct">The cancellation token to cancel the operation</param>
 		/// <exception cref="IndexOutOfRangeException">The specified data did not match the dimensions of the specified <paramref name="metadata"/>.</exception>
 		/// <exception cref="VolumeException">Error during encoding</exception>
-		public static CompressedVolume CreateCompressed( 
-			VolumeMetadata metadata, 
-			IReadOnlyList<VolumeSlice> slices, 
-			VolumeCompressionOptions options, 
-			bool multiDirection = false, 
-			IProgress<VolumeSliceDefinition> progress = null, 
-			ILogger logger = null, 
+		public static CompressedVolume CreateCompressed(
+			VolumeMetadata metadata,
+			IReadOnlyList<VolumeSlice> slices,
+			VolumeCompressionOptions options,
+			bool multiDirection = false,
+			IProgress<VolumeSliceDefinition> progress = null,
+			ILogger logger = null,
 			CancellationToken ct = default )
 		{
 			var volume = new UncompressedVolume( metadata, slices );
-			return volume.Compress( options, multiDirection, progress,logger, ct );
+			return volume.Compress( options, multiDirection, progress, logger, ct );
 		}
 
 		/// <summary>
@@ -153,9 +153,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <returns>An enumeration of slice ranges or an empty enumeration.</returns>
 		/// <exception cref="VolumeException">Error during decoding</exception>
 		public abstract VolumeSliceCollection GetSliceRanges(
-			IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, 
-			IProgress<VolumeSliceDefinition> progress = null, 
-			ILogger logger = null, 
+			IReadOnlyCollection<VolumeSliceRangeDefinition> ranges,
+			IProgress<VolumeSliceDefinition> progress = null,
+			ILogger logger = null,
 			CancellationToken ct = default );
 
 		/// <summary>
@@ -167,27 +167,48 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="ct">The cancellation token to cancel the operation</param>
 		/// <returns></returns>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract VolumeSliceRange GetSliceRange( 
-			VolumeSliceRangeDefinition range, 
-			IProgress<VolumeSliceDefinition> progress = null, 
-			ILogger logger = null, 
+		public abstract VolumeSliceRange GetSliceRange(
+			VolumeSliceRangeDefinition range,
+			IProgress<VolumeSliceDefinition> progress = null,
+			ILogger logger = null,
 			CancellationToken ct = default );
 
 		/// <summary>
 		/// Gets the specified slice. This is the most memory friendly and usually the fastest approach to get a single slice.
 		/// </summary>
+		/// <param name="slice">The requested slice.</param>
 		/// <param name="sliceBuffer">The slice buffer that will be filled with the slice data.</param>
+		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
+		/// <param name="logger">The logger to use for log messages</param>
+		/// <param name="ct">The cancellation token to cancel the operation</param>
+		/// <exception cref="VolumeException">Error during decoding</exception>
+		public abstract void GetSlice(
+			VolumeSliceDefinition slice,
+			byte[] sliceBuffer,
+			IProgress<VolumeSliceDefinition> progress = null,
+			ILogger logger = null,
+			CancellationToken ct = default );
+
+		/// <summary>
+		/// Gets the specified slice.
+		/// </summary>
 		/// <param name="slice">The requested slice.</param>
 		/// <param name="progress">A progress indicator, which reports the current slice number.</param>
 		/// <param name="logger">The logger to use for log messages</param>
 		/// <param name="ct">The cancellation token to cancel the operation</param>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract void GetSlice( 
-			VolumeSliceBuffer sliceBuffer,
+		public VolumeSlice GetSlice(
 			VolumeSliceDefinition slice,
 			IProgress<VolumeSliceDefinition> progress = null,
-			ILogger logger = null, 
-			CancellationToken ct = default );
+			ILogger logger = null,
+			CancellationToken ct = default )
+		{
+			var sliceBuffer = new byte[ Metadata.GetSliceLength( slice.Direction ) ];
+
+			GetSlice( slice, sliceBuffer, progress, logger, ct );
+
+			return new VolumeSlice( slice, sliceBuffer );
+		}
 
 		/// <summary>
 		/// Creates a smaller volume from the current volume without performing a full decompression.
@@ -197,10 +218,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <param name="logger">The logger to use for log messages</param>
 		/// <param name="ct">The cancellation token to cancel the operation</param>
 		/// <exception cref="VolumeException">Error during decoding</exception>
-		public abstract UncompressedVolume CreatePreview( 
-			ushort minification, 
-			IProgress<VolumeSliceDefinition> progress = null, 
-			ILogger logger = null, 
+		public abstract UncompressedVolume CreatePreview(
+			ushort minification,
+			IProgress<VolumeSliceDefinition> progress = null,
+			ILogger logger = null,
 			CancellationToken ct = default );
 
 		internal static void GetEncodedSliceSize( VolumeMetadata metadata, Direction direction, out ushort x, out ushort y )
@@ -208,22 +229,22 @@ namespace Zeiss.IMT.PiWeb.Volume
 			switch( direction )
 			{
 				case Direction.X:
-					x = ( ushort ) Math.Max( ( metadata.SizeY + Constants.EncodingBlockSize - 1 ) / Constants.EncodingBlockSize * Constants.EncodingBlockSize, Constants.MinimumEncodingSize );
-					y = ( ushort ) Math.Max( ( metadata.SizeZ + Constants.EncodingBlockSize - 1 ) / Constants.EncodingBlockSize * Constants.EncodingBlockSize, Constants.MinimumEncodingSize );
+					x = (ushort)Math.Max( ( metadata.SizeY + Constants.EncodingBlockSize - 1 ) / Constants.EncodingBlockSize * Constants.EncodingBlockSize, Constants.MinimumEncodingSize );
+					y = (ushort)Math.Max( ( metadata.SizeZ + Constants.EncodingBlockSize - 1 ) / Constants.EncodingBlockSize * Constants.EncodingBlockSize, Constants.MinimumEncodingSize );
 					break;
 				case Direction.Y:
-					x = ( ushort ) Math.Max( ( metadata.SizeX + Constants.EncodingBlockSize - 1 ) / Constants.EncodingBlockSize * Constants.EncodingBlockSize, Constants.MinimumEncodingSize );
-					y = ( ushort ) Math.Max( ( metadata.SizeZ + Constants.EncodingBlockSize - 1 ) / Constants.EncodingBlockSize * Constants.EncodingBlockSize, Constants.MinimumEncodingSize );
+					x = (ushort)Math.Max( ( metadata.SizeX + Constants.EncodingBlockSize - 1 ) / Constants.EncodingBlockSize * Constants.EncodingBlockSize, Constants.MinimumEncodingSize );
+					y = (ushort)Math.Max( ( metadata.SizeZ + Constants.EncodingBlockSize - 1 ) / Constants.EncodingBlockSize * Constants.EncodingBlockSize, Constants.MinimumEncodingSize );
 					break;
 				case Direction.Z:
-					x = ( ushort ) Math.Max( ( metadata.SizeX + Constants.EncodingBlockSize - 1 ) / Constants.EncodingBlockSize * Constants.EncodingBlockSize, Constants.MinimumEncodingSize );
-					y = ( ushort ) Math.Max( ( metadata.SizeY + Constants.EncodingBlockSize - 1 ) / Constants.EncodingBlockSize * Constants.EncodingBlockSize, Constants.MinimumEncodingSize );
+					x = (ushort)Math.Max( ( metadata.SizeX + Constants.EncodingBlockSize - 1 ) / Constants.EncodingBlockSize * Constants.EncodingBlockSize, Constants.MinimumEncodingSize );
+					y = (ushort)Math.Max( ( metadata.SizeY + Constants.EncodingBlockSize - 1 ) / Constants.EncodingBlockSize * Constants.EncodingBlockSize, Constants.MinimumEncodingSize );
 					break;
 				default:
-					throw new ArgumentOutOfRangeException( nameof(direction), direction, null );
+					throw new ArgumentOutOfRangeException( nameof( direction ), direction, null );
 			}
 		}
-		
+
 		/// <summary>
 		/// Loads volume data from the specified data stream.
 		/// </summary>
@@ -239,14 +260,14 @@ namespace Zeiss.IMT.PiWeb.Volume
 					stream = new MemoryStream( stream.StreamToArray() );
 
 				using var archive = new ZipArchive( stream );
-			
+
 				var metaData = ReadVolumeMetadata( archive );
 				var compressionOptions = ReadVolumeCompressionOptions( archive );
 				var directionMap = ReadVolumeVoxels( archive );
 
 				if( compressionOptions?.Encoder == BlockVolume.EncoderID )
 					return new BlockVolume( metaData, compressionOptions, directionMap );
-			
+
 				return new CompressedVolume( metaData, compressionOptions, directionMap );
 			}
 			finally
@@ -259,14 +280,14 @@ namespace Zeiss.IMT.PiWeb.Volume
 		{
 			var directionMap = new DirectionMap();
 
-			if( ReadVoxelData( archive.GetEntry( "Voxels.dat" ), Direction.Z, directionMap ) ) 
+			if( ReadVoxelData( archive.GetEntry( "Voxels.dat" ), Direction.Z, directionMap ) )
 				return directionMap;
-			
-			if( !ReadVoxelData( archive.GetEntry( "VoxelsZ.dat" ), Direction.Z, directionMap ) ) 
+
+			if( !ReadVoxelData( archive.GetEntry( "VoxelsZ.dat" ), Direction.Z, directionMap ) )
 				throw new InvalidOperationException( Resources.FormatResource<Volume>( "InvalidFormatMissingFile_ErrorText", "Voxels.dat" ) );
 
 			ReadVoxelData( archive.GetEntry( "VoxelsY.dat" ), Direction.Y, directionMap );
-			ReadVoxelData( archive.GetEntry( "VoxelsX.dat" ), Direction.X, directionMap ); 
+			ReadVoxelData( archive.GetEntry( "VoxelsX.dat" ), Direction.X, directionMap );
 
 			return directionMap;
 		}
@@ -275,9 +296,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 		{
 			if( dataEntry == null )
 				return false;
-			
+
 			using var entryStream = dataEntry.Open();
-			directionMap[ direction ] = entryStream.StreamToArray( ( int ) dataEntry.Length );
+			directionMap[ direction ] = entryStream.StreamToArray( (int)dataEntry.Length );
 
 			return true;
 		}
@@ -303,7 +324,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			if( compressionOptionsEntry == null )
 				return null;
-			
+
 			using var entryStream = compressionOptionsEntry.Open();
 			return VolumeCompressionOptions.Deserialize( entryStream );
 		}

@@ -49,7 +49,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			if( options.EncoderOptions.TryGetValue( "quality", out var qualityString ) && int.TryParse( qualityString, out var quality ) )
 				scale = QualityScaling( quality );
 
-			var values = new double[BlockVolume.N3];
+			var values = new double[ BlockVolume.N3 ];
 
 			var i = 0;
 			for( var z = 0; z < BlockVolume.N; z++ )

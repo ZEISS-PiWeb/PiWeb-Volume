@@ -33,9 +33,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Tests
 			Assert.That( sliceBuffers.Length, Is.EqualTo( 5 ) );
 			for( var i = 0; i < 5; i++ )
 			{
-				Assert.That( sliceBuffers[ i ].Data, Is.EquivalentTo( expectedBuffer ) );
-				Assert.That( sliceBuffers[ i ].Definition.Direction, Is.EqualTo( Direction.Z ) );
-				Assert.That( sliceBuffers[ i ].Definition.Index, Is.EqualTo( i ) );
+				Assert.That( sliceBuffers[ i ], Is.EquivalentTo( expectedBuffer ) );
 			}
 		}
 

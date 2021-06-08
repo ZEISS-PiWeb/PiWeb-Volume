@@ -178,7 +178,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 				if( set.TryGetValue( s, out var data ) )
 					slices.Add( data );
 				else
-					throw new ArgumentOutOfRangeException( nameof(definition) );
+					throw new ArgumentOutOfRangeException( nameof( definition ) );
 			}
 
 			return new VolumeSliceRange( definition, slices );
@@ -197,7 +197,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( set.TryGetValue( index, out var data ) )
 				return data;
 
-			throw new ArgumentOutOfRangeException( nameof(index) );
+			throw new ArgumentOutOfRangeException( nameof( index ) );
 		}
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -208,7 +208,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 				Direction.X => _SlicesX,
 				Direction.Y => _SlicesY,
 				Direction.Z => _SlicesZ,
-				_ => throw new ArgumentOutOfRangeException( nameof(direction), direction, null )
+				_           => throw new ArgumentOutOfRangeException( nameof( direction ), direction, null )
 			};
 		}
 

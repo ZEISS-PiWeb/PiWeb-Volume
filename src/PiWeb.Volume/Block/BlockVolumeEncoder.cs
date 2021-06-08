@@ -45,14 +45,12 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		internal void Encode( IReadOnlyList<VolumeSlice> slices, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition> progress )
 		{
 			var z = 0;
-			var buffer = new byte[BlockVolume.N][];
-			
+			var buffer = new byte[ BlockVolume.N ][];
+
 			Encode( () =>
 			{
-				using var data = slices[ z ].Decompress();
-				
 				for( var bz = 0; bz < BlockVolume.N && z < metadata.SizeZ; bz++, z++ )
-					buffer[ bz ] = data.Data.ToArray();
+					buffer[ bz ] = slices[ z ].Data;
 
 				return buffer;
 			}, output, metadata, progress );
@@ -65,9 +63,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 		{
 			var z = 0;
 
-			var layerBuffer = new byte[BlockVolume.N][];
+			var layerBuffer = new byte[ BlockVolume.N ][];
 			for( var i = 0; i < BlockVolume.N; i++ )
-				layerBuffer[ i ] = new byte[metadata.SizeX * metadata.SizeY];
+				layerBuffer[ i ] = new byte[ metadata.SizeX * metadata.SizeY ];
 
 			Encode( () =>
 			{
@@ -83,14 +81,14 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			var (bcx, bcy, _) = BlockVolume.GetBlockCount( metadata );
 
 			var blockCount = bcx * bcy;
-			var inputBlocks = new double[blockCount][];
-			var resultBlocks = new short[blockCount][];
-			var resultLengths = new ushort[blockCount];
+			var inputBlocks = new double[ blockCount ][];
+			var resultBlocks = new short[ blockCount ][];
+			var resultLengths = new ushort[ blockCount ];
 
 			for( var i = 0; i < blockCount; i++ )
 			{
-				inputBlocks[ i ] = new double[BlockVolume.N3];
-				resultBlocks[ i ] = new short[BlockVolume.N3];
+				inputBlocks[ i ] = new double[ BlockVolume.N3 ];
+				resultBlocks[ i ] = new short[ BlockVolume.N3 ];
 			}
 
 			using var writer = new BinaryWriter( output );
@@ -118,16 +116,16 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 						if( firstLength == 2 )
 							writer.Write( block[ 0 ] );
 						else
-							writer.Write( ( sbyte ) block[ 0 ] );
+							writer.Write( (sbyte)block[ 0 ] );
 
 					for( var i = 1; i < length; i++ )
 						if( otherLength == 2 )
 							writer.Write( block[ i ] );
 						else
-							writer.Write( ( sbyte ) block[ i ] );
+							writer.Write( (sbyte)block[ i ] );
 				}
 
-				progress.Report( new VolumeSliceDefinition( Direction.Z, ( ushort ) ( blockIndexZ * BlockVolume.N ) ) );
+				progress.Report( new VolumeSliceDefinition( Direction.Z, (ushort)( blockIndexZ * BlockVolume.N ) ) );
 			}
 		}
 
@@ -153,7 +151,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 					//4. Discretization
 					for( var i = 0; i < BlockVolume.N3; i++ )
-						resultBlock[ i ] = ( short ) Math.Max( short.MinValue, Math.Min( short.MaxValue, Math.Round( inputBlock[ i ] ) ) );
+						resultBlock[ i ] = (short)Math.Max( short.MinValue, Math.Min( short.MaxValue, Math.Round( inputBlock[ i ] ) ) );
 
 					var count = 0;
 					var isShort = false;
@@ -168,13 +166,13 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 							isShort |= IsShort( value );
 					}
 
-					//resultLength has 16 bits: 
+					//resultLength has 16 bits:
 					//Bit  0 - 11: index of last value that is greater than 0
 					//Bit 12 - 13: number of bytes of the first value of the block
 					//Bit 14 - 15: number of bytes of the other values of the block
-					resultLengths[ blockIndex ] = ( ushort ) ( count & 0x0FFF );
-					resultLengths[ blockIndex ] = ( ushort ) ( resultLengths[ blockIndex ] | ( IsShort( resultBlock[ 0 ] ) ? 2 << 12 : 1 << 12 ) );
-					resultLengths[ blockIndex ] = ( ushort ) ( resultLengths[ blockIndex ] | ( isShort ? 2 << 14 : 1 << 14 ) );
+					resultLengths[ blockIndex ] = (ushort)( count & 0x0FFF );
+					resultLengths[ blockIndex ] = (ushort)( resultLengths[ blockIndex ] | ( IsShort( resultBlock[ 0 ] ) ? 2 << 12 : 1 << 12 ) );
+					resultLengths[ blockIndex ] = (ushort)( resultLengths[ blockIndex ] | ( isShort ? 2 << 14 : 1 << 14 ) );
 
 					return buffer;
 				}, buffer => ArrayPool<double>.Shared.Return( buffer ) );

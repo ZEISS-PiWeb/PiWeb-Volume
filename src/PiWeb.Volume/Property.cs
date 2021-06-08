@@ -38,7 +38,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		private Property( string name, DataTypeId datatype, object value, string description )
 		{
 			if( string.IsNullOrWhiteSpace( name ) )
-				throw new ArgumentException( "name must not be null or empty", nameof(name) );
+				throw new ArgumentException( "name must not be null or empty", nameof( name ) );
 
 
 			Name = name;
@@ -184,12 +184,12 @@ namespace Zeiss.IMT.PiWeb.Volume
 		{
 			return DataType switch
 			{
-				DataTypeId.Integer => XmlConvert.ToString( ( long ) Value ),
-				DataTypeId.Double => XmlConvert.ToString( ( double ) Value ),
-				DataTypeId.String => ( string ) Value,
-				DataTypeId.DateTime => XmlConvert.ToString( ( DateTime ) Value, XmlDateTimeSerializationMode.RoundtripKind ),
-				DataTypeId.TimeSpan => XmlConvert.ToString( ( TimeSpan ) Value ),
-				_ => throw new NotSupportedException( $"type \"{DataType}\" is not supported" )
+				DataTypeId.Integer  => XmlConvert.ToString( (long)Value ),
+				DataTypeId.Double   => XmlConvert.ToString( (double)Value ),
+				DataTypeId.String   => (string)Value,
+				DataTypeId.DateTime => XmlConvert.ToString( (DateTime)Value, XmlDateTimeSerializationMode.RoundtripKind ),
+				DataTypeId.TimeSpan => XmlConvert.ToString( (TimeSpan)Value ),
+				_                   => throw new NotSupportedException( $"type \"{DataType}\" is not supported" )
 			};
 		}
 
@@ -201,7 +201,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		internal void Serialize( XmlWriter writer )
 		{
 			if( writer == null )
-				throw new ArgumentNullException( nameof(writer) );
+				throw new ArgumentNullException( nameof( writer ) );
 
 			var value = GetStringValue();
 
@@ -226,21 +226,21 @@ namespace Zeiss.IMT.PiWeb.Volume
 		internal static Property Deserialize( XmlReader reader )
 		{
 			if( reader == null )
-				throw new ArgumentNullException( nameof(reader) );
+				throw new ArgumentNullException( nameof( reader ) );
 
 			var name = reader.GetAttribute( "Name" );
-			var dataType = ( DataTypeId ) Enum.Parse( typeof( DataTypeId ), reader.GetAttribute( "Type" ) );
+			var dataType = (DataTypeId)Enum.Parse( typeof( DataTypeId ), reader.GetAttribute( "Type" ) );
 			var description = reader.GetAttribute( "Description" );
 			var stringValue = reader.ReadString();
 
 			return dataType switch
 			{
 				DataTypeId.DateTime => Create( name, XmlConvert.ToDateTime( stringValue, XmlDateTimeSerializationMode.RoundtripKind ), description ),
-				DataTypeId.Double => Create( name, XmlConvert.ToDouble( stringValue ), description ),
-				DataTypeId.Integer => Create( name, XmlConvert.ToInt64( stringValue ), description ),
-				DataTypeId.String => Create( name, stringValue, description ),
+				DataTypeId.Double   => Create( name, XmlConvert.ToDouble( stringValue ), description ),
+				DataTypeId.Integer  => Create( name, XmlConvert.ToInt64( stringValue ), description ),
+				DataTypeId.String   => Create( name, stringValue, description ),
 				DataTypeId.TimeSpan => Create( name, XmlConvert.ToTimeSpan( stringValue ), description ),
-				_ => throw new NotSupportedException( $"DataTypeId \"{dataType}\" is not supported" )
+				_                   => throw new NotSupportedException( $"DataTypeId \"{dataType}\" is not supported" )
 			};
 		}
 
@@ -257,8 +257,8 @@ namespace Zeiss.IMT.PiWeb.Volume
 			if( m1 != null && m2 != null )
 			{
 				return m1.Name == m2.Name &&
-				       m1.DataType == m2.DataType &&
-				       Equals( m1.Value, m2.Value );
+					m1.DataType == m2.DataType &&
+					Equals( m1.Value, m2.Value );
 			}
 
 			return false;
@@ -305,17 +305,17 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		private static DateTime? ObjectToNullableDateTime( string stringValue, IFormatProvider provider = null, DateTimeStyles style = DateTimeStyles.RoundtripKind )
 		{
-			return DateTime.TryParse( stringValue, provider ?? CultureInfo.CurrentCulture, style, out var result ) ? ( DateTime? ) result : null;
+			return DateTime.TryParse( stringValue, provider ?? CultureInfo.CurrentCulture, style, out var result ) ? (DateTime?)result : null;
 		}
 
 		private static long? ObjectToNullableInt64( string stringValue, IFormatProvider provider = null, NumberStyles style = NumberStyles.Integer )
 		{
-			return long.TryParse( stringValue, style, provider, out var result ) ? ( long? ) result : null;
+			return long.TryParse( stringValue, style, provider, out var result ) ? (long?)result : null;
 		}
 
 		internal static double? ObjectToNullableDouble( string stringValue, IFormatProvider provider = null, NumberStyles style = NumberStyles.Float | NumberStyles.AllowThousands )
 		{
-			return double.TryParse( stringValue, style, provider, out var result ) ? ( double? ) result : null;
+			return double.TryParse( stringValue, style, provider, out var result ) ? (double?)result : null;
 		}
 
 		private static TimeSpan? ObjectToNullableTimeSpan( string stringValue, IFormatProvider provider = null )

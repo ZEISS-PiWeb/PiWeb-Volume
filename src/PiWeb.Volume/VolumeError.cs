@@ -146,6 +146,11 @@ namespace Zeiss.IMT.PiWeb.Volume
 		FrameNotWritable = -0x00050003,
 
 		/// <summary>
+		/// The frame buffer is too small to store the frame.
+		/// </summary>
+		FrameBufferTooSmall = -0x00050004,
+
+		/// <summary>
 		/// The scale context allocation failed
 		/// </summary>
 		ScaleContextAllocationFailed = -0x00060001,

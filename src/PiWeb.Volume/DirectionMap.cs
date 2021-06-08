@@ -37,7 +37,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 					Direction.Z => _Z,
 					Direction.Y => _Y,
 					Direction.X => _X,
-					_ => throw new ArgumentOutOfRangeException( nameof(direction) )
+					_           => throw new ArgumentOutOfRangeException( nameof( direction ) )
 				};
 			}
 			set
@@ -49,12 +49,12 @@ namespace Zeiss.IMT.PiWeb.Volume
 				else if( direction == Direction.X )
 					_X = value;
 				else
-					throw new ArgumentOutOfRangeException( nameof(direction) );
+					throw new ArgumentOutOfRangeException( nameof( direction ) );
 			}
 		}
 
 		#endregion
-		
+
 		#region methods
 
 		/// <inheritdoc />

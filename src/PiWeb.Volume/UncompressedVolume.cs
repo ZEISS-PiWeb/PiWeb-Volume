@@ -25,7 +25,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 	/// <summary>
 	/// An uncompressed volume. This volume is optimized for speed to make the access
-	/// to slices as fast as possible. The tradeoff for speed is memory.  
+	/// to slices as fast as possible. The tradeoff for speed is memory.
 	/// </summary>
 	/// <seealso cref="CompressedVolume"/>
 	public sealed class UncompressedVolume : Volume
@@ -42,8 +42,26 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// Initializes a new instance of the <see cref="UncompressedVolume" /> class.
 		/// </summary>
 		/// <param name="metadata">The metadata.</param>
+		/// <param name="data">The grayscale slice data.</param>
+		public UncompressedVolume( VolumeMetadata metadata, byte[][] data )
+			: base( metadata )
+		{
+			var slices = new VolumeSlice[ data.Length ];
+
+			for( ushort z = 0; z < data.Length; z++ )
+				slices[ z ] = new VolumeSlice( new VolumeSliceDefinition( Direction.Z, z ), data[ z ] );
+
+			_Slices = slices;
+
+			CheckForIntegrity();
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="UncompressedVolume" /> class.
+		/// </summary>
+		/// <param name="metadata">The metadata.</param>
 		/// <param name="slices">The grayscale slice data.</param>
-		public UncompressedVolume( VolumeMetadata metadata, IReadOnlyList<VolumeSlice> slices ) 
+		internal UncompressedVolume( VolumeMetadata metadata, IReadOnlyList<VolumeSlice> slices )
 			: base( metadata )
 		{
 			_Slices = slices;
@@ -60,15 +78,15 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <exception cref="IndexOutOfRangeException"></exception>
 		private void CheckForIntegrity()
 		{
-			if( _Slices.Count != Metadata.SizeZ  )
+			if( _Slices.Count != Metadata.SizeZ )
 				throw new VolumeIntegrityException( $"Invalid number of slices (expected: {Metadata.SizeZ}, but was {_Slices.Count})." );
 
 			var expectedSliceSize = Metadata.SizeX * Metadata.SizeY;
 			var index = 0;
 			foreach( var slice in _Slices )
 			{
-				if( slice.Length != expectedSliceSize )
-					throw new VolumeIntegrityException( $"Invalid dimension of slice {index} (expected: {expectedSliceSize}, but was {slice.Length})." );
+				if( slice.Data.Length != expectedSliceSize )
+					throw new VolumeIntegrityException( $"Invalid dimension of slice {index} (expected: {expectedSliceSize}, but was {slice.Data.Length})." );
 				if( slice.Direction != Direction.Z )
 					throw new VolumeIntegrityException( $"Invalid slice direction for slice {index} (expected: {Direction.Z}, but was {slice.Direction})." );
 				index++;
@@ -110,7 +128,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		private byte[] CompressDirection( Direction direction, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
-			
+
 			using var outputStream = new MemoryStream();
 			GetEncodedSliceSize( Metadata, direction, out var encodingSizeX, out var encodingSizeY );
 
@@ -123,7 +141,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			var result = outputStream.ToArray();
 			logger?.Log( LogLevel.Debug, $"Compressed direction {direction} with encoder {options.Encoder} in {sw.ElapsedMilliseconds} ms." );
-			
+
 			return result;
 		}
 
@@ -137,7 +155,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
-			
+
 			var result = PreviewCreator.CreatePreview( _Slices, Metadata, minification );
 			logger?.Log( LogLevel.Info, $"Created a preview with minification factor {minification} in {sw.ElapsedMilliseconds} ms." );
 
@@ -148,7 +166,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
 			if( ranges == null )
-				throw new ArgumentNullException( nameof(ranges) );
+				throw new ArgumentNullException( nameof( ranges ) );
 
 			var sw = Stopwatch.StartNew();
 
@@ -163,33 +181,34 @@ namespace Zeiss.IMT.PiWeb.Volume
 		{
 			var sw = Stopwatch.StartNew();
 
-			var sliceRange = new List<VolumeSliceBuffer>( range.Length );
-			foreach( var definition in range )
-			{
-				var buffer = new VolumeSliceBuffer( definition, 0 );
-				GetSlice( buffer, definition, progress, logger, ct );
+			var sliceRange = new List<VolumeSlice>( range.Length );
 
-				sliceRange.Add( buffer );
-			}
+			foreach( var definition in range )
+				sliceRange.Add( GetSlice( definition, progress, logger, ct ) );
 
 			var result = new VolumeSliceRange( range, sliceRange );
+
 			logger?.Log( LogLevel.Info, $"Extracted '{range}' in {sw.ElapsedMilliseconds} ms." );
-	
+
 			return result;
 		}
 
 		/// <inheritdoc />
-		public override void GetSlice( 
-			VolumeSliceBuffer sliceBuffer,
-			VolumeSliceDefinition slice, 
-			IProgress<VolumeSliceDefinition> progress = null, 
-			ILogger logger = null, 
+		public override void GetSlice(
+			VolumeSliceDefinition slice,
+			byte[] sliceBuffer,
+			IProgress<VolumeSliceDefinition> progress = null,
+			ILogger logger = null,
 			CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
-			switch(slice.Direction)
+
+			if( sliceBuffer.Length < Metadata.GetSliceLength( slice.Direction ) )
+				throw new VolumeException( VolumeError.FrameBufferTooSmall );
+
+			switch( slice.Direction )
 			{
-				case Direction.X: 
+				case Direction.X:
 					ReadSliceX( sliceBuffer, slice.Index );
 					break;
 				case Direction.Y:
@@ -199,49 +218,42 @@ namespace Zeiss.IMT.PiWeb.Volume
 					ReadSliceZ( sliceBuffer, slice.Index );
 					break;
 			}
+
+			progress?.Report( slice );
 			logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
 		}
 
-		private void ReadSliceX( VolumeSliceBuffer sliceBuffer, ushort index )
+		private void ReadSliceX( byte[] sliceBuffer, ushort index )
 		{
 			var sx = Metadata.SizeX;
 			var sy = Metadata.SizeY;
 			var sz = Metadata.SizeZ;
 
-			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.X, index ), sy * sz );
-
 			Parallel.For( 0, sz, z =>
 			{
-				var targetArray = sliceBuffer.Data;
 				for( var y = 0; y < sy; y++ )
 				{
-					targetArray[ z * sy + y ] = _Slices[ z ][ y * sx + index ];
+					sliceBuffer[ z * sy + y ] = _Slices[ z ].Data[ y * sx + index ];
 				}
 			} );
 		}
 
-		private void ReadSliceY( VolumeSliceBuffer sliceBuffer, ushort index )
+		private void ReadSliceY( byte[] sliceBuffer, ushort index )
 		{
 			var sx = Metadata.SizeX;
 			var sz = Metadata.SizeZ;
 
-			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Y, index ), sx * sz );
-
-			Parallel.For( 0, sz, z =>
-			{
-				_Slices[ z ].CopyDataTo( sliceBuffer.Data, z * sx, index * sx, sx );
-			} );
+			Parallel.For( 0, sz, z => { Array.Copy( _Slices[ z ].Data, index * sx, sliceBuffer, z * sx, sx ); } );
 		}
 
-		private void ReadSliceZ( VolumeSliceBuffer sliceBuffer, ushort index )
+		private void ReadSliceZ( byte[] sliceBuffer, ushort index )
 		{
 			var sx = Metadata.SizeX;
 			var sy = Metadata.SizeY;
 
 			var bufferSize = sx * sy;
-			sliceBuffer.Initialize( new VolumeSliceDefinition( Direction.Z, index ), bufferSize );
 
-			_Slices[ index ].CopyDataTo( sliceBuffer.Data );
+			Array.Copy( _Slices[ index ].Data, sliceBuffer, bufferSize );
 		}
 
 		/// <summary>
@@ -264,10 +276,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <inheritdoc />
 		public override string ToString()
 		{
-			var compressedSize = _Slices.Sum( s => s.CompressedLength );
-			var uncompressedSize = _Slices.Sum( s => s.Length );
-			
-			return $"Uncompressed volume {Metadata} [Slice size compressed {compressedSize}, uncompressed {uncompressedSize} bytes]";
+			return $"Uncompressed volume {Metadata}";
 		}
 
 		#endregion

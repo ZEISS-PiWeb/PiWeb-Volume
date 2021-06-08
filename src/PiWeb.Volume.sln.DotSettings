@@ -1,13 +1,13 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:Boolean x:Key="/Default/CodeInspection/CssSpecification/CssVersions/=0/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/CssSpecification/CssVersions/=2_002E1/@EntryIndexedValue">True</s:Boolean>
-	
-	
+
+
 	<s:Boolean x:Key="/Default/CodeInspection/CssSpecification/CssVersions/=3_002E0/@EntryIndexRemoved">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=buffer_002Ejs/@EntryIndexedValue">True</s:Boolean>
-	
+
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=log4MaX_002Econfig/@EntryIndexedValue">True</s:Boolean>
-	
+
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=log4MaX_005FTests_002Econfig/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=piweb_002D1_002D0_002Ed_002Ets/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=piweb_002Ed_002Ets/@EntryIndexedValue">True</s:Boolean>
@@ -15,7 +15,7 @@
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=PiWeb_005FKeyVault_002Ejson/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=PiWeb_005FMain_002Ejson/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=PiWeb_005FStorage_002Ejson/@EntryIndexedValue">True</s:Boolean>
-	
+
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=Statistics_002Esettings/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=TestDeploy_002Ejson/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=webjob_002Dpublish_002Dsettings_002Ejson/@EntryIndexedValue">True</s:Boolean>
@@ -23,7 +23,7 @@
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=_002A_002Ecss/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=_002A_002Ed_002Ets/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=_002A_002Emin_002Ejs/@EntryIndexedValue">True</s:Boolean>
-	
+
 	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=jquery_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=0C0BB88C_002D9637_002D4AB0_002DA398_002D9C2D3B914A61_002Fd_003APlotExtensionRuntime_002Fd_003AApi_002Fd_003AResources_002Fd_003AGenerated_005FModules/@EntryIndexedValue">ExplicitlyExcluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=0C0BB88C_002D9637_002D4AB0_002DA398_002D9C2D3B914A61_002Fd_003APlotExtensionRuntime_002Fd_003AApi_002Fd_003ASources_002Fd_003Ats_002Fd_003Anode_005Fmodules/@EntryIndexedValue">ExplicitlyExcluded</s:String>
@@ -45,6 +45,8 @@
 	<s:String x:Key="/Default/CodeStyle/CodeCleanup/Profiles/=PiWeb_0020Complete/@EntryIndexedValue">&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;Profile name="PiWeb Complete"&gt;&lt;CSUseAutoProperty&gt;True&lt;/CSUseAutoProperty&gt;&lt;CSUseVar&gt;&lt;BehavourStyle&gt;CAN_CHANGE_BOTH&lt;/BehavourStyle&gt;&lt;LocalVariableStyle&gt;ALWAYS_IMPLICIT&lt;/LocalVariableStyle&gt;&lt;ForeachVariableStyle&gt;ALWAYS_IMPLICIT&lt;/ForeachVariableStyle&gt;&lt;/CSUseVar&gt;&lt;CSOptimizeUsings&gt;&lt;OptimizeUsings&gt;True&lt;/OptimizeUsings&gt;&lt;EmbraceInRegion&gt;True&lt;/EmbraceInRegion&gt;&lt;RegionName&gt;usings&lt;/RegionName&gt;&lt;/CSOptimizeUsings&gt;&lt;CSShortenReferences&gt;True&lt;/CSShortenReferences&gt;&lt;CSReformatCode&gt;True&lt;/CSReformatCode&gt;&lt;CSReorderTypeMembers&gt;True&lt;/CSReorderTypeMembers&gt;&lt;CSArrangeThisQualifier&gt;True&lt;/CSArrangeThisQualifier&gt;&lt;CSRemoveCodeRedundancies&gt;True&lt;/CSRemoveCodeRedundancies&gt;&lt;XMLReformatCode&gt;True&lt;/XMLReformatCode&gt;&lt;/Profile&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeCleanup/RecentlyUsedProfile/@EntryValue">PiWeb Complete</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeCleanup/SilentCleanupProfile/@EntryValue">PiWeb Complete</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGN_MULTILINE_BINARY_EXPRESSIONS_CHAIN/@EntryValue">False</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpCodeStyle/OBJECT_CREATION_WHEN_TYPE_EVIDENT/@EntryValue">ExplicitlyTyped</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_ACCESSORHOLDER_ATTRIBUTE_ON_SAME_LINE_EX/@EntryValue">NEVER</s:String>
 
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_AROUND_MULTIPLICATIVE_OP/@EntryValue">True</s:Boolean>
@@ -78,173 +80,188 @@
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_WITHIN_USING_PARENTHESES/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_WITHIN_WHILE_PARENTHESES/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_LINES/@EntryValue">False</s:Boolean>
-	<s:String x:Key="/Default/CodeStyle/CSharpFileLayoutPatterns/Pattern/@EntryValue">&lt;?xml version="1.0" encoding="utf-16"?&gt;&#xD;
-&lt;Patterns xmlns="urn:schemas-jetbrains-com:member-reordering-patterns"&gt;&#xD;
-  &lt;TypePattern DisplayName="COM interfaces or structs"&gt;&#xD;
-    &lt;TypePattern.Match&gt;&#xD;
-      &lt;Or&gt;&#xD;
-        &lt;And&gt;&#xD;
-          &lt;Kind Is="Interface" /&gt;&#xD;
-          &lt;Or&gt;&#xD;
-            &lt;HasAttribute Name="System.Runtime.InteropServices.InterfaceTypeAttribute" /&gt;&#xD;
-            &lt;HasAttribute Name="System.Runtime.InteropServices.ComImport" /&gt;&#xD;
-          &lt;/Or&gt;&#xD;
-        &lt;/And&gt;&#xD;
-        &lt;Kind Is="Struct" /&gt;&#xD;
-      &lt;/Or&gt;&#xD;
-    &lt;/TypePattern.Match&gt;&#xD;
-  &lt;/TypePattern&gt;&#xD;
-  &lt;TypePattern DisplayName="NUnit Test Fixtures" RemoveRegions="All"&gt;&#xD;
-    &lt;TypePattern.Match&gt;&#xD;
-      &lt;And&gt;&#xD;
-        &lt;Kind Is="Class" /&gt;&#xD;
-        &lt;HasAttribute Name="NUnit.Framework.TestFixtureAttribute" Inherited="True" /&gt;&#xD;
-        &lt;HasAttribute Name="NUnit.Framework.TestCaseFixtureAttribute" Inherited="True" /&gt;&#xD;
-      &lt;/And&gt;&#xD;
-    &lt;/TypePattern.Match&gt;&#xD;
-    &lt;Region Name="Setup/Teardown"&gt;&#xD;
-      &lt;Entry DisplayName="Setup/Teardown Methods"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;And&gt;&#xD;
-            &lt;Kind Is="Method" /&gt;&#xD;
-            &lt;Or&gt;&#xD;
-              &lt;HasAttribute Name="NUnit.Framework.SetUpAttribute" Inherited="True" /&gt;&#xD;
-              &lt;HasAttribute Name="NUnit.Framework.TearDownAttribute" Inherited="True" /&gt;&#xD;
-              &lt;HasAttribute Name="NUnit.Framework.FixtureSetUpAttribute" Inherited="True" /&gt;&#xD;
-              &lt;HasAttribute Name="NUnit.Framework.FixtureTearDownAttribute" Inherited="True" /&gt;&#xD;
-            &lt;/Or&gt;&#xD;
-          &lt;/And&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-    &lt;/Region&gt;&#xD;
-    &lt;Entry DisplayName="All other members" /&gt;&#xD;
-    &lt;Entry DisplayName="Test Methods" Priority="100"&gt;&#xD;
-      &lt;Entry.Match&gt;&#xD;
-        &lt;And&gt;&#xD;
-          &lt;Kind Is="Method" /&gt;&#xD;
-          &lt;HasAttribute Name="NUnit.Framework.TestAttribute" /&gt;&#xD;
-        &lt;/And&gt;&#xD;
-      &lt;/Entry.Match&gt;&#xD;
-      &lt;Entry.SortBy&gt;&#xD;
-        &lt;Name /&gt;&#xD;
-      &lt;/Entry.SortBy&gt;&#xD;
-    &lt;/Entry&gt;&#xD;
-  &lt;/TypePattern&gt;&#xD;
-  &lt;TypePattern DisplayName="Default Pattern" RemoveRegions="All"&gt;&#xD;
-    &lt;Region Name="constants"&gt;&#xD;
-      &lt;Entry DisplayName="Constants"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;Kind Is="Constant" /&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-    &lt;/Region&gt;&#xD;
-    &lt;Region Name="members"&gt;&#xD;
-      &lt;Entry DisplayName="Fields"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;Kind Is="Field" /&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-        &lt;Entry.SortBy&gt;&#xD;
-          &lt;Static /&gt;&#xD;
-          &lt;Readonly /&gt;&#xD;
-        &lt;/Entry.SortBy&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-      &lt;Entry DisplayName="Public Delegates" Priority="100"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;And&gt;&#xD;
-            &lt;Access Is="Public" /&gt;&#xD;
-            &lt;Kind Is="Delegate" /&gt;&#xD;
-          &lt;/And&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-    &lt;/Region&gt;&#xD;
-    &lt;Region Name="constructors"&gt;&#xD;
-      &lt;Entry DisplayName="Constructors"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;Kind Is="Constructor" /&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-        &lt;Entry.SortBy&gt;&#xD;
-          &lt;Static /&gt;&#xD;
-        &lt;/Entry.SortBy&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-    &lt;/Region&gt;&#xD;
-    &lt;Region Name="events"&gt;&#xD;
-      &lt;Entry DisplayName="Events"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;Kind Is="Event" /&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-    &lt;/Region&gt;&#xD;
-    &lt;Region Name="commands" Priority="100"&gt;&#xD;
-      &lt;Entry DisplayName="Commands" Priority="100"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;And&gt;&#xD;
-            &lt;Kind Is="Property" /&gt;&#xD;
-            &lt;Name Is=".*Command" /&gt;&#xD;
-          &lt;/And&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-    &lt;/Region&gt;&#xD;
-    &lt;Region Name="properties"&gt;&#xD;
-      &lt;Entry DisplayName="Properties, Indexers"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;Or&gt;&#xD;
-            &lt;Kind Is="Property" /&gt;&#xD;
-            &lt;Kind Is="Indexer" /&gt;&#xD;
-          &lt;/Or&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-    &lt;/Region&gt;&#xD;
-    &lt;Region Name="methods"&gt;&#xD;
-      &lt;Entry DisplayName="Methods"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;Kind Is="Method" /&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-    &lt;/Region&gt;&#xD;
-    &lt;Entry DisplayName="All Other Members" /&gt;&#xD;
-    &lt;Region Name="interface ${0}" Priority="100"&gt;&#xD;
-      &lt;Region.GroupBy&gt;&#xD;
-        &lt;ImplementsInterface Immediate="True" /&gt;&#xD;
-      &lt;/Region.GroupBy&gt;&#xD;
-      &lt;Entry DisplayName="Interface Members"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;And&gt;&#xD;
-            &lt;Kind Is="Member" /&gt;&#xD;
-            &lt;ImplementsInterface /&gt;&#xD;
-          &lt;/And&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-        &lt;Entry.SortBy&gt;&#xD;
-          &lt;ImplementsInterface Immediate="True" /&gt;&#xD;
-        &lt;/Entry.SortBy&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-    &lt;/Region&gt;&#xD;
-    &lt;Region Name="class ${0}"&gt;&#xD;
-      &lt;Region.GroupBy&gt;&#xD;
-        &lt;Name /&gt;&#xD;
-      &lt;/Region.GroupBy&gt;&#xD;
-      &lt;Entry DisplayName="Nested Types"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;Kind Is="Type" /&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-    &lt;/Region&gt;&#xD;
-    &lt;Region Name="${0} enum" Priority="100"&gt;&#xD;
-      &lt;Region.GroupBy&gt;&#xD;
-        &lt;Name /&gt;&#xD;
-      &lt;/Region.GroupBy&gt;&#xD;
-      &lt;Entry DisplayName="Public Enums"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;And&gt;&#xD;
-            &lt;Access Is="Public" /&gt;&#xD;
-            &lt;Kind Is="Enum" /&gt;&#xD;
-          &lt;/And&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-        &lt;Entry.SortBy&gt;&#xD;
-          &lt;Name /&gt;&#xD;
-        &lt;/Entry.SortBy&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-    &lt;/Region&gt;&#xD;
-  &lt;/TypePattern&gt;&#xD;
+	<s:String x:Key="/Default/CodeStyle/CSharpFileLayoutPatterns/Pattern/@EntryValue">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;Patterns xmlns="urn:schemas-jetbrains-com:member-reordering-patterns"&gt;
+  &lt;TypePattern DisplayName="COM interfaces or structs"&gt;
+    &lt;TypePattern.Match&gt;
+      &lt;Or&gt;
+        &lt;And&gt;
+          &lt;Kind Is="Interface" /&gt;
+          &lt;Or&gt;
+            &lt;HasAttribute Name="System.Runtime.InteropServices.InterfaceTypeAttribute" /&gt;
+            &lt;HasAttribute Name="System.Runtime.InteropServices.ComImport" /&gt;
+          &lt;/Or&gt;
+        &lt;/And&gt;
+        &lt;And&gt;
+            &lt;Kind Is="Struct" /&gt;
+            &lt;Or&gt;
+                &lt;HasAttribute Name="System.Runtime.InteropServices.StructLayoutAttribute" /&gt;
+            &lt;/Or&gt;
+        &lt;/And&gt;
+      &lt;/Or&gt;
+    &lt;/TypePattern.Match&gt;
+  &lt;/TypePattern&gt;
+  &lt;TypePattern DisplayName="NUnit Test Fixtures" RemoveRegions="All"&gt;
+    &lt;TypePattern.Match&gt;
+      &lt;And&gt;
+        &lt;Kind Is="Class" /&gt;
+        &lt;HasAttribute Name="NUnit.Framework.TestFixtureAttribute" Inherited="True" /&gt;
+        &lt;HasAttribute Name="NUnit.Framework.TestCaseFixtureAttribute" Inherited="True" /&gt;
+      &lt;/And&gt;
+    &lt;/TypePattern.Match&gt;
+    &lt;Region Name="Setup/Teardown"&gt;
+      &lt;Entry DisplayName="Setup/Teardown Methods"&gt;
+        &lt;Entry.Match&gt;
+          &lt;And&gt;
+            &lt;Kind Is="Method" /&gt;
+            &lt;Or&gt;
+              &lt;HasAttribute Name="NUnit.Framework.SetUpAttribute" Inherited="True" /&gt;
+              &lt;HasAttribute Name="NUnit.Framework.TearDownAttribute" Inherited="True" /&gt;
+              &lt;HasAttribute Name="NUnit.Framework.FixtureSetUpAttribute" Inherited="True" /&gt;
+              &lt;HasAttribute Name="NUnit.Framework.FixtureTearDownAttribute" Inherited="True" /&gt;
+            &lt;/Or&gt;
+          &lt;/And&gt;
+        &lt;/Entry.Match&gt;
+      &lt;/Entry&gt;
+    &lt;/Region&gt;
+    &lt;Entry DisplayName="All other members" /&gt;
+    &lt;Entry DisplayName="Test Methods" Priority="100"&gt;
+      &lt;Entry.Match&gt;
+        &lt;And&gt;
+          &lt;Kind Is="Method" /&gt;
+          &lt;HasAttribute Name="NUnit.Framework.TestAttribute" /&gt;
+        &lt;/And&gt;
+      &lt;/Entry.Match&gt;
+      &lt;Entry.SortBy&gt;
+        &lt;Name /&gt;
+      &lt;/Entry.SortBy&gt;
+    &lt;/Entry&gt;
+  &lt;/TypePattern&gt;
+  &lt;TypePattern DisplayName="Default Pattern" RemoveRegions="All"&gt;
+    &lt;Region Name="constants"&gt;
+      &lt;Entry DisplayName="Constants"&gt;
+        &lt;Entry.Match&gt;
+          &lt;Kind Is="Constant" /&gt;
+        &lt;/Entry.Match&gt;
+      &lt;/Entry&gt;
+    &lt;/Region&gt;
+    &lt;Region Name="members"&gt;
+      &lt;Entry DisplayName="Fields"&gt;
+        &lt;Entry.Match&gt;
+          &lt;Kind Is="Field" /&gt;
+        &lt;/Entry.Match&gt;
+        &lt;Entry.SortBy&gt;
+          &lt;Static /&gt;
+          &lt;Readonly /&gt;
+        &lt;/Entry.SortBy&gt;
+      &lt;/Entry&gt;
+      &lt;Entry DisplayName="Public Delegates" Priority="100"&gt;
+        &lt;Entry.Match&gt;
+          &lt;And&gt;
+            &lt;Access Is="Public" /&gt;
+            &lt;Kind Is="Delegate" /&gt;
+          &lt;/And&gt;
+        &lt;/Entry.Match&gt;
+      &lt;/Entry&gt;
+    &lt;/Region&gt;
+    &lt;Region Name="constructors"&gt;
+      &lt;Entry DisplayName="Constructors"&gt;
+        &lt;Entry.Match&gt;
+          &lt;Kind Is="Constructor" /&gt;
+        &lt;/Entry.Match&gt;
+        &lt;Entry.SortBy&gt;
+          &lt;Static /&gt;
+        &lt;/Entry.SortBy&gt;
+      &lt;/Entry&gt;
+    &lt;/Region&gt;
+    &lt;Region Name="events"&gt;
+      &lt;Entry DisplayName="Events"&gt;
+        &lt;Entry.Match&gt;
+          &lt;Kind Is="Event" /&gt;
+        &lt;/Entry.Match&gt;
+      &lt;/Entry&gt;
+    &lt;/Region&gt;
+    &lt;Region Name="commands" Priority="100"&gt;
+      &lt;Entry DisplayName="Commands" Priority="100"&gt;
+        &lt;Entry.Match&gt;
+          &lt;And&gt;
+            &lt;Kind Is="Property" /&gt;
+            &lt;Name Is=".*Command" /&gt;
+          &lt;/And&gt;
+        &lt;/Entry.Match&gt;
+      &lt;/Entry&gt;
+    &lt;/Region&gt;
+    &lt;Region Name="properties"&gt;
+      &lt;Entry DisplayName="Properties, Indexers"&gt;
+        &lt;Entry.Match&gt;
+          &lt;Or&gt;
+            &lt;Kind Is="Property" /&gt;
+            &lt;Kind Is="Indexer" /&gt;
+          &lt;/Or&gt;
+        &lt;/Entry.Match&gt;
+      &lt;/Entry&gt;
+    &lt;/Region&gt;
+    &lt;Region Name="methods"&gt;
+      &lt;Entry DisplayName="Methods"&gt;
+        &lt;Entry.Match&gt;
+          &lt;Kind Is="Method" /&gt;
+        &lt;/Entry.Match&gt;
+      &lt;/Entry&gt;
+    &lt;/Region&gt;
+    &lt;Entry DisplayName="All Other Members" /&gt;
+    &lt;Region Name="interface ${0}" Priority="100"&gt;
+      &lt;Region.GroupBy&gt;
+        &lt;ImplementsInterface Immediate="True" /&gt;
+      &lt;/Region.GroupBy&gt;
+      &lt;Entry DisplayName="Interface Members"&gt;
+        &lt;Entry.Match&gt;
+          &lt;And&gt;
+            &lt;Kind Is="Member" /&gt;
+            &lt;ImplementsInterface /&gt;
+          &lt;/And&gt;
+        &lt;/Entry.Match&gt;
+        &lt;Entry.SortBy&gt;
+          &lt;ImplementsInterface Immediate="True" /&gt;
+        &lt;/Entry.SortBy&gt;
+      &lt;/Entry&gt;
+    &lt;/Region&gt;
+    &lt;Region Name="class ${0}"&gt;
+      &lt;Region.GroupBy&gt;
+        &lt;Name /&gt;
+      &lt;/Region.GroupBy&gt;
+      &lt;Entry DisplayName="Nested Classes"&gt;
+        &lt;Entry.Match&gt;
+          &lt;Kind Is="Class" /&gt;
+        &lt;/Entry.Match&gt;
+      &lt;/Entry&gt;
+    &lt;/Region&gt;
+    &lt;Region Name="struct ${0}"&gt;
+      &lt;Region.GroupBy&gt;
+        &lt;Name /&gt;
+      &lt;/Region.GroupBy&gt;
+      &lt;Entry DisplayName="Nested Structs"&gt;
+        &lt;Entry.Match&gt;
+          &lt;Kind Is="Struct" /&gt;
+        &lt;/Entry.Match&gt;
+      &lt;/Entry&gt;
+    &lt;/Region&gt;
+    &lt;Region Name="${0} enum" Priority="100"&gt;
+      &lt;Region.GroupBy&gt;
+        &lt;Name /&gt;
+      &lt;/Region.GroupBy&gt;
+      &lt;Entry DisplayName="Public Enums"&gt;
+        &lt;Entry.Match&gt;
+          &lt;And&gt;
+            &lt;Access Is="Public" /&gt;
+            &lt;Kind Is="Enum" /&gt;
+          &lt;/And&gt;
+        &lt;/Entry.Match&gt;
+        &lt;Entry.SortBy&gt;
+          &lt;Name /&gt;
+        &lt;/Entry.SortBy&gt;
+      &lt;/Entry&gt;
+    &lt;/Region&gt;
+  &lt;/TypePattern&gt;
 &lt;/Patterns&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/CSharpMemberOrderPattern/CustomPattern/@EntryValue">&lt;?xml version="1.0" encoding="utf-8" ?&gt;&#xD;
 &#xD;
@@ -558,7 +575,11 @@ II.2.12 &lt;HandlesEvent /&gt;&#xD;
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=TS_005FPUBLIC_005FTYPE_005FFIELD/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=TS_005FPUBLIC_005FTYPE_005FMETHOD/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=TS_005FTYPE_005FPARAMETER/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="T" Suffix="" Style="AaBb" /&gt;</s:String>
+	<s:String x:Key="/Default/CustomTools/CustomToolsData/@EntryValue"></s:String>
+	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=Cloud_002EData_003B_002A_003BZeiss_002EIMT_002EPiWeb_002ECloud_002EData_002EMigrations_002E_002A_003B_002A/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/Environment/Hierarchy/NuGetOptions/IntegratedRestoreEngine/@EntryValue">MsBuild</s:String>
 	<s:String x:Key="/Default/Environment/Hierarchy/PsiConfigurationSettingsKey/CustomLocation/@EntryValue">C:\Users\ddpat\AppData\Local\JetBrains\Transient\ReSharperPlatformVs15\v11_b7484275\SolutionCaches</s:String>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EdotCover_002EIde_002ECore_002EFilterManagement_002EModel_002ESolutionFilterSettingsManagerMigrateSettings/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpAttributeForSingleLineMethodUpgrade/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpFileLayoutPatternsUpgrade/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpKeepExistingMigration/@EntryIndexedValue">True</s:Boolean>
@@ -572,12 +593,31 @@ II.2.12 &lt;HandlesEvent /&gt;&#xD;
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EMigrateThisQualifierSettings/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EUnitTestFramework_002ESettings_002EMigrations_002ERemoveBuildPolicyAlwaysMigration/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/UnitTesting/NUnitProvider/CustomNUnitFolder/@EntryValue">.\packages\NUnit.ConsoleRunner.3.7.0\tools</s:String>
-	
+
 	<s:Boolean x:Key="/Default/Environment/UnitTesting/SaveSessionState/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/UnitTesting/ShadowCopy/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/UnitTesting/WrapLongLinesInUnitTestSessionOutput/@EntryValue">False</s:Boolean>
 	<s:String x:Key="/Default/FilterSettingsManager/CoverageFilterXml/@EntryValue">&lt;data&gt;&lt;IncludeFilters /&gt;&lt;ExcludeFilters&gt;&lt;Filter ModuleMask="Cloud.Data" ModuleVersionMask="*" ClassMask="Zeiss.IMT.PiWeb.Cloud.Data.Migrations.*" FunctionMask="*" IsEnabled="True" /&gt;&lt;/ExcludeFilters&gt;&lt;/data&gt;</s:String>
 	<s:String x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestSessionDefault/LogSeverity/@EntryValue">WARN</s:String>
+	
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=2CAB0A567F30704CA99AA3EC249E3153/Position/@EntryValue">4</s:Int64>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=40C163D436D8ED48A6D01A0AFEFC5556/EntryName/@EntryValue">Test Fixture</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=40C163D436D8ED48A6D01A0AFEFC5556/Position/@EntryValue">8</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=567DCF4B487C244A9F6BB46E4E9F3B84/Position/@EntryValue">9</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=6FAA6736247D464489DF536819A6D103/Position/@EntryValue">5</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=7B10AC30B0320A4F95A3763001E1DBF6/Position/@EntryValue">7</s:Int64>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=9BB83ED0FF792E47BAAB217C25589C77/Position/@EntryValue">6</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=9F59750904F2F540BF5B49C608789778/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=9F59750904F2F540BF5B49C608789778/EntryName/@EntryValue">PiWeb Class</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=A50310A202DAFF44A24F747485F0A22D/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=A50310A202DAFF44A24F747485F0A22D/EntryName/@EntryValue">PiWeb Enumeration</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=A50310A202DAFF44A24F747485F0A22D/Position/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=B98A2E155B32314FB5ABF0F39C488269/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=B98A2E155B32314FB5ABF0F39C488269/EntryName/@EntryValue">PiWeb Interface</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=B98A2E155B32314FB5ABF0F39C488269/Position/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=D1E448D397A6DE4287CBF99980A95346/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=D1E448D397A6DE4287CBF99980A95346/EntryName/@EntryValue">PiWeb Unit Test</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=F0CA621CDF5AB24282D8CDC11C520997/Entry/=D1E448D397A6DE4287CBF99980A95346/Position/@EntryValue">3</s:Int64>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=09E4F4E5087A274CA23DEAE7CEB064BC/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=09E4F4E5087A274CA23DEAE7CEB064BC/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=09E4F4E5087A274CA23DEAE7CEB064BC/Categories/=Imported_002004_002E04_002E2019/@EntryIndexedValue">Imported 04.04.2019</s:String>
@@ -594,20 +634,20 @@ II.2.12 &lt;HandlesEvent /&gt;&#xD;
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=09E4F4E5087A274CA23DEAE7CEB064BC/Shortcut/@EntryValue">docCtor</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=09E4F4E5087A274CA23DEAE7CEB064BC/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=09E4F4E5087A274CA23DEAE7CEB064BC/Text/@EntryValue">/// Initializes a new instance of the &lt;see cref="$CLASS$"/&gt; class.</s:String>
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=1F79B62111BB2940BE60E4541B66B58A/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=1F79B62111BB2940BE60E4541B66B58A/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=1F79B62111BB2940BE60E4541B66B58A/Categories/=Imported_002013_002E06_002E2019/@EntryIndexedValue">Imported 13.06.2019</s:String>
@@ -693,7 +733,7 @@ II.2.12 &lt;HandlesEvent /&gt;&#xD;
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=4D281E5CEAC94D439E0C8233E6C04F36/Text/@EntryValue">#region copyright&#xD;
 &#xD;
 /* * * * * * * * * * * * * * * * * * * * * * * * * */&#xD;
-/* Carl Zeiss IMT (IZfM Dresden)                   */&#xD;
+/* Carl Zeiss Industrielle Messtechnik GmbH        */&#xD;
 /* Softwaresystem PiWeb                            */&#xD;
 /* (c) Carl Zeiss $YEAR$                             */&#xD;
 /* * * * * * * * * * * * * * * * * * * * * * * * * */&#xD;
@@ -840,7 +880,7 @@ public $TYPE$ $PROPERTY$&#xD;
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=9F59750904F2F540BF5B49C608789778/Text/@EntryValue">#region copyright&#xD;
 &#xD;
 /* * * * * * * * * * * * * * * * * * * * * * * * * */&#xD;
-/* Carl Zeiss IMT (IZfM Dresden)                   */&#xD;
+/* Carl Zeiss Industrielle Messtechnik GmbH        */&#xD;
 /* Softwaresystem PiWeb                            */&#xD;
 /* (c) Carl Zeiss $YEAR$                             */&#xD;
 /* * * * * * * * * * * * * * * * * * * * * * * * * */&#xD;
@@ -881,7 +921,7 @@ namespace $NAMESPACE$&#xD;
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A50310A202DAFF44A24F747485F0A22D/Text/@EntryValue">#region copyright&#xD;
 &#xD;
 /* * * * * * * * * * * * * * * * * * * * * * * * * */&#xD;
-/* Carl Zeiss IMT (IZfM Dresden)                   */&#xD;
+/* Carl Zeiss Industrielle Messtechnik GmbH        */&#xD;
 /* Softwaresystem PiWeb                            */&#xD;
 /* (c) Carl Zeiss $YEAR$                             */&#xD;
 /* * * * * * * * * * * * * * * * * * * * * * * * * */&#xD;
@@ -897,53 +937,53 @@ namespace $NAMESPACE$&#xD;
 	{&#xD;
 	}&#xD;
 }</s:String>
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AEC355A851D4D149BB54FAC53B50CD89/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AEC355A851D4D149BB54FAC53B50CD89/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AEC355A851D4D149BB54FAC53B50CD89/Categories/=Imported_002013_002E06_002E2019/@EntryIndexedValue">Imported 13.06.2019</s:String>
@@ -994,7 +1034,7 @@ namespace $NAMESPACE$&#xD;
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B98A2E155B32314FB5ABF0F39C488269/Text/@EntryValue">#region copyright&#xD;
 &#xD;
 /* * * * * * * * * * * * * * * * * * * * * * * * * */&#xD;
-/* Carl Zeiss IMT (IZfM Dresden)                   */&#xD;
+/* Carl Zeiss Industrielle Messtechnik GmbH        */&#xD;
 /* Softwaresystem PiWeb                            */&#xD;
 /* (c) Carl Zeiss $YEAR$                             */&#xD;
 /* * * * * * * * * * * * * * * * * * * * * * * * * */&#xD;
@@ -1030,103 +1070,103 @@ namespace $NAMESPACE$&#xD;
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D1E448D397A6DE4287CBF99980A95346/Scope/=E8F0594528C33E45BBFEC6CFE851095D/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D1E448D397A6DE4287CBF99980A95346/Scope/=E8F0594528C33E45BBFEC6CFE851095D/Type/@EntryValue">InCSharpProjectFile</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D1E448D397A6DE4287CBF99980A95346/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
-	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D1E448D397A6DE4287CBF99980A95346/Text/@EntryValue">#region copyright&#xD;
-&#xD;
-/* * * * * * * * * * * * * * * * * * * * * * * * * */&#xD;
-/* Carl Zeiss IMT (IZfM Dresden)                   */&#xD;
-/* Softwaresystem PiWeb                            */&#xD;
-/* (c) Carl Zeiss $YEAR$                             */&#xD;
-/* * * * * * * * * * * * * * * * * * * * * * * * * */&#xD;
-&#xD;
-#endregion&#xD;
-&#xD;
-namespace $NAMESPACE$&#xD;
-{&#xD;
-	#region usings&#xD;
-&#xD;
-	using NUnit.Framework;&#xD;
-	using Zeiss.IMT.PiWeb.Common.Testing;&#xD;
-&#xD;
-	#endregion&#xD;
-&#xD;
-	[TestFixture]&#xD;
-	[Category(WellKnownTestCategories.Instant)]&#xD;
-	public class $CLASS$&#xD;
-	{&#xD;
-		#region methods&#xD;
-&#xD;
-		[OneTimeSetUp]&#xD;
-		public void SetUpTests()&#xD;
-		{&#xD;
-		}&#xD;
-&#xD;
-		[SetUp]&#xD;
-		public void SetUpTest()&#xD;
-		{&#xD;
-		}&#xD;
-&#xD;
-		[TearDown]&#xD;
-		public void TearDownTest()&#xD;
-		{&#xD;
-		}&#xD;
-&#xD;
-		[OneTimeTearDown]&#xD;
-		public void TearDownTests()&#xD;
-		{&#xD;
-		}&#xD;
-&#xD;
-		[Test]&#xD;
-		public void Test1()&#xD;
-		{&#xD;
-		}&#xD;
-&#xD;
-		#endregion&#xD;
-	}&#xD;
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D1E448D397A6DE4287CBF99980A95346/Text/@EntryValue">#region copyright
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
+/* Softwaresystem PiWeb                            */
+/* (c) Carl Zeiss $YEAR$                             */
+/* * * * * * * * * * * * * * * * * * * * * * * * * */
+
+#endregion
+
+namespace $NAMESPACE$
+{
+	#region usings
+
+	using NUnit.Framework;
+	using Zeiss.PiWeb.Testing;
+
+	#endregion
+
+	[TestFixture]
+	[Category(WellKnownTestCategories.Instant)]
+	public class $CLASS$
+	{
+		#region methods
+
+		[OneTimeSetUp]
+		public void SetUpTests()
+		{
+		}
+
+		[SetUp]
+		public void SetUpTest()
+		{
+		}
+
+		[TearDown]
+		public void TearDownTest()
+		{
+		}
+
+		[OneTimeTearDown]
+		public void TearDownTests()
+		{
+		}
+
+		[Test]
+		public void Test1()
+		{
+		}
+
+		#endregion
+	}
 }</s:String>
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D7BF1812C8E2A3439F3ADC9D39686782/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D7BF1812C8E2A3439F3ADC9D39686782/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D7BF1812C8E2A3439F3ADC9D39686782/Categories/=Imported_002004_002E04_002E2019/@EntryIndexedValue">Imported 04.04.2019</s:String>
@@ -1155,18 +1195,18 @@ namespace $NAMESPACE$&#xD;
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D8B9CE7EB5B62A4495730C3CE99D5C73/Shortcut/@EntryValue">docAsyncMethod</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D8B9CE7EB5B62A4495730C3CE99D5C73/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D8B9CE7EB5B62A4495730C3CE99D5C73/Text/@EntryValue">/// Creates the operation that $DETAILS$.</s:String>
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D9D6B693FD28834C8D7419661B3035E7/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D9D6B693FD28834C8D7419661B3035E7/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D9D6B693FD28834C8D7419661B3035E7/Categories/=Imported_002004_002E04_002E2019/@EntryIndexedValue">Imported 04.04.2019</s:String>
@@ -1311,7 +1351,7 @@ public void Dispose()&#xD;
 	}&#xD;
 }</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=2ACF20850D5DD4489D1A65DE5961A57A/Severity/@EntryValue">WARNING</s:String>
-	
+
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=2ACF20850D5DD4489D1A65DE5961A57A/ShortenReferences/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=80A8AC73AF18DB42AE02136E7562D61D/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=80A8AC73AF18DB42AE02136E7562D61D/Comment/@EntryValue">Use MVVM Light style property instead</s:String>
@@ -1349,7 +1389,7 @@ public void Dispose()&#xD;
 	}&#xD;
 }</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=80A8AC73AF18DB42AE02136E7562D61D/Severity/@EntryValue">WARNING</s:String>
-	
+
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=80A8AC73AF18DB42AE02136E7562D61D/ShortenReferences/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=FC6B288D114AE0429B363AA453A94032/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=FC6B288D114AE0429B363AA453A94032/Comment/@EntryValue">Use MVVM Light style property instead</s:String>
@@ -1465,6 +1505,11 @@ public void Dispose()&#xD;
 		RaisePropertyChanged();&#xD;
 	}&#xD;
 }</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Industrielle/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Messtechnik/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Miba/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Ntlm/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Versioning/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Softwaresystem/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=upsert/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Versioning/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Zeiss/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

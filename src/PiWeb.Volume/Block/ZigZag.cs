@@ -43,7 +43,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 		#endregion
 
-		#region class ZigZagEntry
+		#region struct ZigZagEntry
 
 		private readonly struct ZigZagEntry
 		{

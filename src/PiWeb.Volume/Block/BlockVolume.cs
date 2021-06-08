@@ -49,6 +49,10 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			: base( metadata, options, CreateDirectionMap( slices, metadata, options, progress ) )
 		{ }
 
+		#endregion
+
+		#region methods
+
 		private static DirectionMap CreateDirectionMap( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
 		{
 			var encoder = new BlockVolumeEncoder( options );
@@ -65,13 +69,9 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			var output = new MemoryStream();
 
 			encoder.Encode( input, output, metadata, progress );
-			
+
 			return new DirectionMap { [ Direction.Z ] = output.ToArray() };
 		}
-
-		#endregion
-
-		#region methods
 
 		/// <inheritdoc />
 		public override UncompressedVolume Decompress( IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
@@ -104,7 +104,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			if( bcx * N < metadata.SizeX )
 				bcx++;
 
-			return ( ( ushort ) bcx, ( ushort ) bcy, ( ushort ) bcz );
+			return ( (ushort)bcx, (ushort)bcy, (ushort)bcz );
 		}
 
 		/// <inheritdoc />
@@ -123,7 +123,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
 			var sw = Stopwatch.StartNew();
-			
+
 			var previewCreator = new BlockVolumePreviewCreator( this, minification );
 			var result = previewCreator.CreatePreview( progress, ct );
 			logger?.Log( LogLevel.Info, $"Created a preview with minification factor {minification} in {sw.ElapsedMilliseconds} ms." );
@@ -133,17 +133,18 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 		/// <inheritdoc />
 		public override void GetSlice(
-			VolumeSliceBuffer sliceBuffer,
-			VolumeSliceDefinition slice, 
+			VolumeSliceDefinition slice,
+			byte[] buffer,
 			IProgress<VolumeSliceDefinition> progress = null,
-			ILogger logger = null, 
+			ILogger logger = null,
 			CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
-			
+
+			var sliceBuffer = new byte[ Metadata.GetSliceLength( slice.Direction ) ];
 			var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, slice, sliceBuffer );
 			sliceRangeCollector.CollectSliceRanges( progress, ct );
-			
+
 			logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
 		}
 
