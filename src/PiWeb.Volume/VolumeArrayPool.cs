@@ -16,7 +16,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 	#endregion
 
-	public static class VolumeArrayPool
+	internal static class VolumeArrayPool
 	{
 		#region constants
 
@@ -27,7 +27,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		#region members
 
-		public static ArrayPool<byte> Shared = ArrayPool<byte>.Create( MaxWidth * MaxHeight, 10 );
+		public static readonly ArrayPool<byte> Shared = ArrayPool<byte>.Create( MaxWidth * MaxHeight, 10 );
 
 		#endregion
 	}

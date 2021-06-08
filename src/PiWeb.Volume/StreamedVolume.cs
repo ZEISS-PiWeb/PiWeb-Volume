@@ -133,13 +133,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
 		{
 			throw new NotImplementedException();
-			//var sw = Stopwatch.StartNew();
 
-			//Stream.Seek( 0, SeekOrigin.Begin );
-			//var result = VolumeSliceRange.Extract( range, Metadata, Data );
-			//logger?.Log( LogLevel.Info, $"Extracted '{range}' in {sw.ElapsedMilliseconds} ms." );
-
-			//return result;
 		}
 
 		/// <inheritdoc />

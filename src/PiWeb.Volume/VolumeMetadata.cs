@@ -84,17 +84,17 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// <summary>
 		/// The number of Voxels in X-Dimension.
 		/// </summary>
-		public ushort PositionX { get; private set; } = 0;
+		public ushort PositionX { get; private set; }
 
 		/// <summary>
 		/// The number of Voxels in Y-Dimension.
 		/// </summary>
-		public ushort PositionY { get; private set; } = 0;
+		public ushort PositionY { get; private set; }
 
 		/// <summary>
 		/// The number of Voxels in Z-Dimension.
 		/// </summary>
-		public ushort PositionZ { get; private set; } = 0;
+		public ushort PositionZ { get; private set; }
 
 		/// <summary>
 		/// The number of Voxels in X-Dimension.
