@@ -66,8 +66,18 @@ namespace Zeiss.IMT.PiWeb.Volume
 		public ushort Length => (ushort)( Last - First + 1 );
 
 		#endregion
-		
+
 		#region methods
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"Slice range {First}-{Last}, direction {Direction}";
+		}
+
+		#endregion
+
+		#region interface IEnumerable<VolumeSliceDefinition>
 
 		/// <inheritdoc />
 		public IEnumerator<VolumeSliceDefinition> GetEnumerator()
@@ -82,12 +92,6 @@ namespace Zeiss.IMT.PiWeb.Volume
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
-		}
-
-		/// <inheritdoc />
-		public override string ToString()
-		{
-			return $"Slice range {First}-{Last}, direction {Direction}";
 		}
 
 		#endregion

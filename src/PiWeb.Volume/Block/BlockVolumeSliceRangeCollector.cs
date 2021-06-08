@@ -224,7 +224,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 		#endregion
 
-		#region struct VolumeSliceBuffer
+		#region struct BlockSliceBuffer
 
 		private readonly struct BlockSliceBuffer
 		{

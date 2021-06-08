@@ -13,9 +13,6 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#region usings
 
 	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Runtime.CompilerServices;
 	using System.Runtime.InteropServices;
 	using System.Threading;
 	using System.Threading.Tasks;
@@ -76,11 +73,11 @@ namespace Zeiss.IMT.PiWeb.Volume
 			{
 				case Direction.X:
 
-					if (index == _Slice.Index)
+					if( index == _Slice.Index )
 						WriteXSlice( slice, width, index );
 					break;
 				case Direction.Y:
-					if (index == _Slice.Index)
+					if( index == _Slice.Index )
 						WriteYSlice( slice, width, index );
 					break;
 				case Direction.Z:
@@ -130,7 +127,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 					Marshal.Copy( slice + index * width, _SliceBuffer, z * _X, _X );
 					break;
 				case Direction.Z:
-					if (index == z)
+					if( index == z )
 						Parallel.For( 0, _Y, y => Marshal.Copy( slice + y * width, _SliceBuffer, y * _X, _X ) );
 					break;
 				default:

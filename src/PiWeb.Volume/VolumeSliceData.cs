@@ -13,18 +13,17 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#region usings
 
 	using System;
-	using System.Buffers;
 
 	#endregion
 
 	public readonly struct VolumeSliceData : IDisposable
 	{
 		#region members
-		
+
 		private readonly bool _ReturnToPool;
 
 		#endregion
-		
+
 		#region constructors
 
 		public VolumeSliceData( byte[] data, int length, bool returnToPool )

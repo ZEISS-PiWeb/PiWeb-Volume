@@ -55,21 +55,21 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			var quantization = Quantization.Calculate( _Options, true );
 			var zigzag = ZigZag.Calculate();
 
-			var result = new byte[sz][];
+			var result = new byte[ sz ][];
 
 			for( var z = 0; z < sz; z++ )
-				result[ z ] = new byte[sx * sy];
+				result[ z ] = new byte[ sx * sy ];
 
 			var (bcx, bcy, bcz) = BlockVolume.GetBlockCount( metadata );
 			var blockCount = bcx * bcy;
-			var encodedBlockLengths = new ushort[blockCount];
-			var encodedBlocks = new short[blockCount][];
-			var decodedBlocks = new double[blockCount][];
+			var encodedBlockLengths = new ushort[ blockCount ];
+			var encodedBlocks = new short[ blockCount ][];
+			var decodedBlocks = new double[ blockCount ][];
 
 			for( var i = 0; i < blockCount; i++ )
 			{
-				encodedBlocks[ i ] = new short[BlockVolume.N3];
-				decodedBlocks[ i ] = new double[BlockVolume.N3];
+				encodedBlocks[ i ] = new short[ BlockVolume.N3 ];
+				decodedBlocks[ i ] = new double[ BlockVolume.N3 ];
 			}
 
 			using var reader = new BinaryReader( input );
@@ -87,7 +87,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 					DecodeLayer( encodedBlocks, encodedBlockLengths, bcx, biz, quantization, zigzag, blockPredicate, blockAction );
 				}
 
-				progress?.Report( new VolumeSliceDefinition( Direction.Z, ( ushort ) ( biz * BlockVolume.N ) ) );
+				progress?.Report( new VolumeSliceDefinition( Direction.Z, (ushort)( biz * BlockVolume.N ) ) );
 			}
 		}
 
@@ -121,7 +121,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 				var firstLength = ( resultLength & 0b0011000000000000 ) >> 12;
 				var otherLength = ( resultLength & 0b1100000000000000 ) >> 14;
 
-				encodedBlockLengths[ i ] = ( ushort ) length;
+				encodedBlockLengths[ i ] = (ushort)length;
 				if( length > 0 )
 					encodedBlocks[ i ][ 0 ] = firstLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
 
@@ -148,7 +148,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 				{
 					var blockIndexX = index % blockCountX;
 					var blockIndexY = index / blockCountX;
-					var blockIndex = new BlockIndex( ( ushort ) blockIndexX, ( ushort ) blockIndexY, blockIndexZ );
+					var blockIndex = new BlockIndex( (ushort)blockIndexX, (ushort)blockIndexY, blockIndexZ );
 
 					if( blockPredicate?.Invoke( blockIndex ) == false )
 						return buffers;
@@ -177,7 +177,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 					//5. Discretization
 					for( var i = 0; i < BlockVolume.N3; i++ )
-						byteBuffer[ i ] = ( byte ) Math.Max( byte.MinValue, Math.Min( byte.MaxValue, Math.Round( doubleBuffer1[ i ] + 128.0 ) ) );
+						byteBuffer[ i ] = (byte)Math.Max( byte.MinValue, Math.Min( byte.MaxValue, Math.Round( doubleBuffer1[ i ] + 128.0 ) ) );
 
 					blockAction( byteBuffer, blockIndex );
 
@@ -193,22 +193,10 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 		#endregion
 
-		#region class BlockAction
-
 		internal delegate void BlockAction( byte[] data, BlockIndex index );
-
-		#endregion
-
-		#region class BlockPredicate
 
 		internal delegate bool BlockPredicate( BlockIndex index );
 
-		#endregion
-
-		#region class LayerPredicate
-
 		internal delegate bool LayerPredicate( ushort index );
-
-		#endregion
 	}
 }

@@ -47,12 +47,12 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			_SizeY = _Metadata.SizeY;
 			_SizeX = _Metadata.SizeX;
 
-			_PreviewSizeX = ( ushort ) ( ( _SizeX - 1 ) / _Minification + 1 );
-			_PreviewSizeY = ( ushort ) ( ( _SizeY - 1 ) / _Minification + 1 );
-			_PreviewSizeZ = ( ushort ) ( ( _SizeZ - 1 ) / _Minification + 1 );
+			_PreviewSizeX = (ushort)( ( _SizeX - 1 ) / _Minification + 1 );
+			_PreviewSizeY = (ushort)( ( _SizeY - 1 ) / _Minification + 1 );
+			_PreviewSizeZ = (ushort)( ( _SizeZ - 1 ) / _Minification + 1 );
 
 			if( _PreviewSizeX < 2 || _PreviewSizeY < 2 || _PreviewSizeZ < 2 )
-				throw new ArgumentOutOfRangeException( nameof(minification) );
+				throw new ArgumentOutOfRangeException( nameof( minification ) );
 		}
 
 		#endregion
@@ -68,7 +68,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			var data = _Volume.CompressedData[ Direction.Z ];
 			var input = new MemoryStream( data );
 
-			var result = VolumeSliceHelper.CreateSliceBuffer( _PreviewSizeX,_PreviewSizeY, _PreviewSizeZ );
+			var result = VolumeSliceHelper.CreateSliceBuffer( _PreviewSizeX, _PreviewSizeY, _PreviewSizeZ );
 
 			decoder.Decode( input, _Metadata, ( block, index ) =>
 			{

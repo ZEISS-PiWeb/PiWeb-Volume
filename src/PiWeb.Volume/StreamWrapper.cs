@@ -51,7 +51,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		private int Read( IntPtr pv, int cb )
 		{
 			if( cb > _Buffer.Length )
-				_Buffer = new byte[cb];
+				_Buffer = new byte[ cb ];
 
 			var result = _Stream.Read( _Buffer, 0, cb );
 			Marshal.Copy( _Buffer, 0, pv, result );
@@ -62,7 +62,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		private int Write( IntPtr pv, int cb )
 		{
 			if( cb > _Buffer.Length )
-				_Buffer = new byte[cb];
+				_Buffer = new byte[ cb ];
 
 			Marshal.Copy( pv, _Buffer, 0, cb );
 			_Stream.Write( _Buffer, 0, cb );

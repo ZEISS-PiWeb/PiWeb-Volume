@@ -32,7 +32,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 		private static double[] CalculateCoefficients( bool invert )
 		{
-			var result = new double[BlockVolume.N2];
+			var result = new double[ BlockVolume.N2 ];
 
 			for( var y = 0; y < BlockVolume.N; y++ )
 			{

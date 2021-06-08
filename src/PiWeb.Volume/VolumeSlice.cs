@@ -13,7 +13,6 @@ namespace Zeiss.IMT.PiWeb.Volume
 	#region usings
 
 	using System;
-	using System.Runtime.CompilerServices;
 
 	#endregion
 
@@ -33,7 +32,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		{
 			Direction = definition.Direction;
 			Index = definition.Index;
-			Data = data ?? throw new ArgumentNullException( nameof(data) );
+			Data = data ?? throw new ArgumentNullException( nameof( data ) );
 		}
 
 		#endregion

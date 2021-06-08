@@ -12,7 +12,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 	/// <summary>
 	/// This class is responsible for storing a byte array very efficently optimized for memory usage.
 	/// This is achieved by slicing the data into smaller blocks (for random access) and storing each
-	/// slice as a LZ4 compressed byte array.  
+	/// slice as a LZ4 compressed byte array.
 	/// </summary>
 	public readonly struct CompressedBytes
 	{
@@ -46,15 +46,15 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		#region properties
 
-		private static byte[] Buffer => _Buffer ??= new byte[2 * BucketSize];
+		private static byte[] Buffer => _Buffer ??= new byte[ 2 * BucketSize ];
 
 		/// <summary>
-		/// Returns the uncompressed length. 
+		/// Returns the uncompressed length.
 		/// </summary>
 		public int Length { get; }
 
 		/// <summary>
-		/// Returns the compressed length. 
+		/// Returns the compressed length.
 		/// </summary>
 		public int CompressedLength => _Data.Length;
 
@@ -89,7 +89,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			var stream = new MemoryStream();
 
 			var numberOfBuckets = ( data.Count + BucketSize ) / BucketSize;
-			var buckets = new int[numberOfBuckets];
+			var buckets = new int[ numberOfBuckets ];
 
 			var sourceIndex = 0;
 			var destinationIndex = 0;
@@ -110,6 +110,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 				sourceIndex += BucketSize;
 				destinationIndex += bytesCompressed;
 			}
+
 			if( stream.Length < data.Count )
 				return new CompressedBytes( stream.ToArray(), buckets, data.Count, true );
 
@@ -117,7 +118,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		}
 
 		/// <summary>
-		/// Decompresses all bytes into <paramref name="destination"/> 
+		/// Decompresses all bytes into <paramref name="destination"/>
 		/// </summary>
 		/// <param name="destination">The destination buffer.</param>
 		public void DecompressTo( byte[] destination )
@@ -162,7 +163,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		{
 			var (sourceOffset, sourceLength) = GetCompressedByteCountInBucket( bucketIndex );
 			LZ4Codec.Decode( _Data, sourceOffset, sourceLength, Buffer, 0, Buffer.Length );
-			
+
 			Array.Copy( Buffer, srcIndex, destination, destinationIndex, count );
 		}
 
@@ -170,8 +171,8 @@ namespace Zeiss.IMT.PiWeb.Volume
 		{
 			var currentBucketStartIndex = _Buckets[ bucketIndex ];
 			if( bucketIndex < _Buckets.Length - 1 )
-				return (currentBucketStartIndex, _Buckets[ bucketIndex + 1 ] - currentBucketStartIndex);
-			return (currentBucketStartIndex, CompressedLength - currentBucketStartIndex);
+				return ( currentBucketStartIndex, _Buckets[ bucketIndex + 1 ] - currentBucketStartIndex );
+			return ( currentBucketStartIndex, CompressedLength - currentBucketStartIndex );
 		}
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]

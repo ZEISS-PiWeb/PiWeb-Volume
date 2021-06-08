@@ -51,7 +51,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			_SizeY = metadata.SizeY;
 			_SizeZ = metadata.SizeZ;
 
-			_Buffer = new byte[0];
+			_Buffer = new byte[ 0 ];
 
 			Interop = new InteropSliceReader
 			{
@@ -79,7 +79,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 			_ProgressNotifier?.Report( new VolumeSliceDefinition( Direction.Z, _CurrentSlice ) );
 
 			if( _Buffer.Length < width * height )
-				_Buffer = new byte[width * height];
+				_Buffer = new byte[ width * height ];
 
 			for( var y = 0; y < _SizeY; y++ )
 				_Stream.Read( _Buffer, width * y, _SizeX );

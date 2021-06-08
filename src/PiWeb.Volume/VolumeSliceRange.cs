@@ -15,7 +15,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 	using System.Collections;
 	using System.Collections.Generic;
-	
+
 	#endregion
 
 	/// <summary>
@@ -40,7 +40,6 @@ namespace Zeiss.IMT.PiWeb.Volume
 		{
 			Definition = definition;
 			_Slices = slices;
-
 		}
 
 		#endregion

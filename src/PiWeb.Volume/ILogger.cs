@@ -15,11 +15,15 @@ namespace Zeiss.IMT.PiWeb.Volume
 	/// </summary>
 	public interface ILogger
 	{
+		#region methods
+
 		/// <summary>
 		/// Logs a message with the givel <paramref name="level"/>.
 		/// </summary>
 		/// <param name="level">The log level of the message.</param>
 		/// <param name="message">The log message.</param>
 		void Log( LogLevel level, string message );
+
+		#endregion
 	}
 }

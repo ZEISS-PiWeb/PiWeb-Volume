@@ -24,6 +24,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		/// Floating point number
 		/// </summary>
 		Double = 2,
+
 		/// <summary>
 		/// String
 		/// </summary>

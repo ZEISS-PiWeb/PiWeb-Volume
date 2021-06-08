@@ -81,7 +81,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 				Direction.X => ReadInXDirection( pv, width, height ),
 				Direction.Y => ReadInYDirection( pv, width, height ),
 				Direction.Z => ReadInZDirection( pv, width, height ),
-				_ => throw new ArgumentOutOfRangeException()
+				_           => throw new ArgumentOutOfRangeException()
 			};
 		}
 
@@ -94,7 +94,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 			var bufferSize = width * height;
 			if( _Buffer.Length < bufferSize )
-				_Buffer = new byte[bufferSize];
+				_Buffer = new byte[ bufferSize ];
 
 			var sx = _SizeX;
 

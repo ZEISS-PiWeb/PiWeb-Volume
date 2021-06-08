@@ -35,8 +35,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 		#region constructors
 
 		private VolumeCompressionOptions()
-		{
-		}
+		{ }
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="VolumeCompressionOptions" /> class.

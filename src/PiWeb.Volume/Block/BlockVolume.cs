@@ -49,6 +49,10 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			: base( metadata, options, CreateDirectionMap( slices, metadata, options, progress ) )
 		{ }
 
+		#endregion
+
+		#region methods
+
 		private static DirectionMap CreateDirectionMap( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
 		{
 			var encoder = new BlockVolumeEncoder( options );
@@ -68,10 +72,6 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 
 			return new DirectionMap { [ Direction.Z ] = output.ToArray() };
 		}
-
-		#endregion
-
-		#region methods
 
 		/// <inheritdoc />
 		public override UncompressedVolume Decompress( IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
@@ -104,7 +104,7 @@ namespace Zeiss.IMT.PiWeb.Volume.Block
 			if( bcx * N < metadata.SizeX )
 				bcx++;
 
-			return ( ( ushort ) bcx, ( ushort ) bcy, ( ushort ) bcz );
+			return ( (ushort)bcx, (ushort)bcy, (ushort)bcz );
 		}
 
 		/// <inheritdoc />
