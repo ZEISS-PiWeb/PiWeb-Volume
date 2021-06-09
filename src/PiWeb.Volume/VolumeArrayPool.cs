@@ -16,7 +16,11 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 	#endregion
 
-	internal static class VolumeArrayPool
+	/// <summary>
+	/// An array pool that will reuse arrays up to a size of 2^24 bytes which is enough to store
+	/// a slice of 4096 * 4096 voxels.
+	/// </summary>
+	public static class VolumeArrayPool
 	{
 		#region constants
 
@@ -27,6 +31,9 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		#region members
 
+		/// <summary>
+		/// The static array pool used for volume slices.
+		/// </summary>
 		public static readonly ArrayPool<byte> Shared = ArrayPool<byte>.Create( MaxWidth * MaxHeight, 10 );
 
 		#endregion
