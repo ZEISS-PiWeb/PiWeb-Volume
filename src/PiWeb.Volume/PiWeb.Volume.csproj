@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Platforms>x64</Platforms>    
+    <Platforms>x64</Platforms>
     <RootNamespace>Zeiss.IMT.PiWeb.Volume</RootNamespace>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -13,16 +13,16 @@
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <PackageVersion>1.4.0</PackageVersion>
+    <PackageVersion>1.5.0</PackageVersion>
     <LangVersion>8</LangVersion>
-    <AssemblyVersion>1.4.0</AssemblyVersion>
-    <FileVersion>1.4.0</FileVersion>    
+    <AssemblyVersion>1.5.0</AssemblyVersion>
+    <FileVersion>1.5.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DocumentationFile>$(SolutionDir)\..\bin\$(Configuration)\PiWeb.Volume.xml</DocumentationFile>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -34,16 +34,16 @@
     <PackageLicenseUrl>https://github.com/ZEISS-PiWeb/PiWeb-Volume/blob/master/LICENSE.md</PackageLicenseUrl>
     <PackageIconUrl>https://github.com/ZEISS-PiWeb/PiWeb-Volume/raw/master/logo6464.png</PackageIconUrl>
     <PackageTags>Carl Zeiss PiWeb Volume</PackageTags>
-    <PackageReleaseNotes>Reintroduced Volume.GetSlice with return value.</PackageReleaseNotes>
+    <PackageReleaseNotes>Made the volume array pool public.</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Copyright>© Carl Zeiss IZfM Dresden</Copyright>
-    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionPrefix>1.5.0</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PiWeb.Volume.Core\PiWeb.Volume.Core.vcxproj" PrivateAssets="all" />
   </ItemGroup>
-  
+
   <ItemGroup>
 
     <EmbeddedResource Include="Volume.de.resx">
@@ -58,5 +58,5 @@
     <None Include="$(SolutionDir)\PiWeb.Volume.Core\lib\*.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
     <None Include="$(SolutionDir)\..\bin\$(Configuration)\PiWeb.Volume.Core.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
   </ItemGroup>
-  
+
 </Project>
