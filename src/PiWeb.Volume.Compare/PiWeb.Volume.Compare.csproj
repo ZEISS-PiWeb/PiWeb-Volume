@@ -4,7 +4,7 @@
         <Platforms>x64</Platforms>
         <OutputType>WinExe</OutputType>
         <RootNamespace>Zeiss.PiWeb.Volume.Compare</RootNamespace>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net6.0-windows</TargetFramework>
         <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>

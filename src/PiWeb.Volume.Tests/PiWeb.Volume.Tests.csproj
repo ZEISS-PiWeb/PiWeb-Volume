@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Platforms>x64</Platforms>
         <RootNamespace>Zeiss.PiWeb.Volume.Tests</RootNamespace>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>

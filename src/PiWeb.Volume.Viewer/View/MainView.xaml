@@ -4,8 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:view1="clr-namespace:Zeiss.PiWeb.Volume.UI.View;assembly=PiWeb.Volume.UI"
     xmlns:viewModel="clr-namespace:Zeiss.PiWeb.Volume.Viewer.ViewModel"
+    xmlns:view="clr-namespace:Zeiss.PiWeb.Volume.UI.View;assembly=PiWeb.Volume.UI"
     Title="PiWeb Volume Viewer"
     Width="1440"
     Height="900"
@@ -24,11 +24,11 @@
             Background="{StaticResource LightGrayBrush}"
             BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
             BorderThickness="0,0,0,1">
-            <view1:VolumeManagementView Margin="8" />
+            <view:VolumeManagementView Margin="8" />
         </Border>
 
         <!--  Main area  -->
-        <view1:VolumeView
+        <view:VolumeView
             Grid.Row="1"
             DataContext="{Binding VolumeViewModel}"
             IsEnabled="{Binding Converter={StaticResource IsNotNullConverter}}" />
