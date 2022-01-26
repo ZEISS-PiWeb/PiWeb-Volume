@@ -2,23 +2,23 @@
 
     <PropertyGroup>
         <Platforms>x64</Platforms>
-        <RootNamespace>Zeiss.IMT.PiWeb.Volume.Convert</RootNamespace>
+        <RootNamespace>Zeiss.PiWeb.Volume.Convert</RootNamespace>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-        <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>        
+        <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
         <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
         <PackageVersion>1.0.0</PackageVersion>
         <LangVersion>8</LangVersion>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>        
-        <FileVersion>1.0.0.0</FileVersion>     
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <FileVersion>1.0.0.0</FileVersion>
     </PropertyGroup>
 
-    <ItemGroup>       
+    <ItemGroup>
         <ProjectReference Include="..\PiWeb.Volume\PiWeb.Volume.csproj" />
     </ItemGroup>
 

@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <Platforms>x64</Platforms>        
-        <RootNamespace>Zeiss.IMT.PiWeb.Volume.UI</RootNamespace>       
+        <Platforms>x64</Platforms>
+        <RootNamespace>Zeiss.PiWeb.Volume.UI</RootNamespace>
         <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>

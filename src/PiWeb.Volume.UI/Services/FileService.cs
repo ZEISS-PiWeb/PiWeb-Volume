@@ -8,12 +8,12 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.UI.Services
+namespace Zeiss.PiWeb.Volume.UI.Services
 {
     #region usings
 
     using Microsoft.Win32;
-    using Zeiss.IMT.PiWeb.Volume.UI.Interfaces;
+    using Zeiss.PiWeb.Volume.UI.Interfaces;
 
     #endregion
 

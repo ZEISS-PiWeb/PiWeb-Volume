@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume
+namespace Zeiss.PiWeb.Volume
 {
 	#region usings
 
@@ -26,7 +26,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		/// <inheritdoc />
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException" /> class.
+		/// Initializes a new instance of the <see cref="T:Zeiss.PiWeb.Volume.VolumeException" /> class.
 		/// </summary>
 		/// <param name="error">The error.</param>
 		internal VolumeException( VolumeError error )
@@ -36,7 +36,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		/// <inheritdoc />
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException" /> class.
+		/// Initializes a new instance of the <see cref="T:Zeiss.PiWeb.Volume.VolumeException" /> class.
 		/// </summary>
 		/// <param name="error">The error.</param>
 		/// <param name="message">The message.</param>
@@ -47,7 +47,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		/// <inheritdoc />
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeException" /> class.
+		/// Initializes a new instance of the <see cref="T:Zeiss.PiWeb.Volume.VolumeException" /> class.
 		/// </summary>
 		/// <param name="error">The error.</param>
 		/// <param name="message">The message.</param>

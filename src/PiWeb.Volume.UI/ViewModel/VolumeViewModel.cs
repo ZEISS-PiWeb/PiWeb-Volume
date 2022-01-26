@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
+namespace Zeiss.PiWeb.Volume.UI.ViewModel
 {
     #region usings
 
@@ -22,7 +22,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
     using System.Windows.Threading;
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.CommandWpf;
-    using Zeiss.IMT.PiWeb.Volume.UI.Model;
+    using Zeiss.PiWeb.Volume.UI.Model;
 
     #endregion
 

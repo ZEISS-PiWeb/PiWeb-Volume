@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
+namespace Zeiss.PiWeb.Volume.UI.ViewModel
 {
     #region usings
 
@@ -19,9 +19,9 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
     using System.Windows.Input;
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.CommandWpf;
-    using Zeiss.IMT.PiWeb.Volume.Convert;
-    using Zeiss.IMT.PiWeb.Volume.UI.Interfaces;
-    using Zeiss.IMT.PiWeb.Volume.UI.Model;
+    using Zeiss.PiWeb.Volume.Convert;
+    using Zeiss.PiWeb.Volume.UI.Interfaces;
+    using Zeiss.PiWeb.Volume.UI.Model;
 
     #endregion
 
@@ -189,7 +189,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
 
         private bool CanExecuteCreatePreview()
         {
-            return VolumeViewModel?.Volume is CompressedVolume || 
+            return VolumeViewModel?.Volume is CompressedVolume ||
                    VolumeViewModel?.Volume is StreamedVolume;
         }
 
@@ -326,7 +326,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ViewModel
             var progress = new VolumeProgress( volume );
 
             IsLoading = true;
-            
+
             progress.ProgressChanged += OnProgressChanged;
 
             var preview = await Task.Run( () => volume.CreatePreview( 4, progress, _Logger ) );

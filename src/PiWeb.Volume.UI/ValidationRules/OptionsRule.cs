@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.UI.ValidationRules
+namespace Zeiss.PiWeb.Volume.UI.ValidationRules
 {
 	#region usings
 
@@ -30,7 +30,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.ValidationRules
 				return ValidationResult.ValidResult;
 
 			var options = str.Split( new[] { ';' } );
-			
+
 			foreach( var option in options )
 			{
 				var keyvalue = option.Split( new[] { '=' }, StringSplitOptions.RemoveEmptyEntries );

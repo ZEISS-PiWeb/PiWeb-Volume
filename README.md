@@ -37,10 +37,10 @@ It's also possible to store multiple directions in one volume file, which triple
 
 ## Installation
 
-The PiWeb Volume Library is available via [NuGet](https://www.nuget.org/packages/Zeiss.IMT.PiWeb.Volume/):
+The PiWeb Volume Library is available via [NuGet](https://www.nuget.org/packages/Zeiss.PiWeb.Volume/):
 
 ```Batchfile
-PM> Install-Package Zeiss.IMT.PiWeb.Volume
+PM> Install-Package Zeiss.PiWeb.Volume
 ```
 
 Or compile the library by yourself. Requirements:

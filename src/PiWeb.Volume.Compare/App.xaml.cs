@@ -1,11 +1,11 @@
-﻿namespace Zeiss.IMT.PiWeb.Volume.Compare
+﻿namespace Zeiss.PiWeb.Volume.Compare
 {
 	using System.Windows;
 	using Unity;
-	using Zeiss.IMT.PiWeb.Volume.Compare.View;
-	using Zeiss.IMT.PiWeb.Volume.Compare.ViewModel;
-	using Zeiss.IMT.PiWeb.Volume.UI.Interfaces;
-	using Zeiss.IMT.PiWeb.Volume.UI.Services;
+	using Zeiss.PiWeb.Volume.Compare.View;
+	using Zeiss.PiWeb.Volume.Compare.ViewModel;
+	using Zeiss.PiWeb.Volume.UI.Interfaces;
+	using Zeiss.PiWeb.Volume.UI.Services;
 
 	/// <summary>
 	/// Interaction logic for App.xaml

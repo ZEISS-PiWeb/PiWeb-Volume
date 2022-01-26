@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Platforms>x64</Platforms>
         <OutputType>WinExe</OutputType>
-        <RootNamespace>Zeiss.IMT.PiWeb.Volume.Compare</RootNamespace>
+        <RootNamespace>Zeiss.PiWeb.Volume.Compare</RootNamespace>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -23,8 +23,8 @@
       <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
-    <ItemGroup>      
-      <ProjectReference Include="..\PiWeb.Volume.Convert\PiWeb.Volume.Convert.csproj" />      
+    <ItemGroup>
+      <ProjectReference Include="..\PiWeb.Volume.Convert\PiWeb.Volume.Convert.csproj" />
       <ProjectReference Include="..\PiWeb.Volume.UI\PiWeb.Volume.UI.csproj" />
       <ProjectReference Include="..\PiWeb.Volume\PiWeb.Volume.csproj" />
     </ItemGroup>

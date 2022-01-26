@@ -8,12 +8,12 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume
+namespace Zeiss.PiWeb.Volume
 {
 	#region usings
 
 	using System.Runtime.InteropServices;
-	using Zeiss.IMT.PiWeb.Volume.Interop;
+	using Zeiss.PiWeb.Volume.Interop;
 
 	#endregion
 

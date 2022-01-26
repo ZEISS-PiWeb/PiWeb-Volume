@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.Compare.ViewModel
+namespace Zeiss.PiWeb.Volume.Compare.ViewModel
 {
 	#region usings
 
@@ -20,10 +20,10 @@ namespace Zeiss.IMT.PiWeb.Volume.Compare.ViewModel
 	using System.Threading.Tasks;
 	using System.Windows.Media;
 	using GalaSoft.MvvmLight;
-	using Zeiss.IMT.PiWeb.Volume.UI.Components;
-	using Zeiss.IMT.PiWeb.Volume.UI.Interfaces;
-	using Zeiss.IMT.PiWeb.Volume.UI.Model;
-	using Zeiss.IMT.PiWeb.Volume.UI.ViewModel;
+	using Zeiss.PiWeb.Volume.UI.Components;
+	using Zeiss.PiWeb.Volume.UI.Interfaces;
+	using Zeiss.PiWeb.Volume.UI.Model;
+	using Zeiss.PiWeb.Volume.UI.ViewModel;
 
 	#endregion
 

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Platforms>x64</Platforms>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Zeiss.IMT.PiWeb.Volume.Viewer</RootNamespace>
+    <RootNamespace>Zeiss.PiWeb.Volume.Viewer</RootNamespace>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

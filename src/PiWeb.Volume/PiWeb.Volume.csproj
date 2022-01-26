@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Platforms>x64</Platforms>
-    <RootNamespace>Zeiss.IMT.PiWeb.Volume</RootNamespace>
+    <RootNamespace>Zeiss.PiWeb.Volume</RootNamespace>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -26,7 +26,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>Zeiss.IMT.PiWeb.Volume</PackageId>
+    <PackageId>Zeiss.PiWeb.Volume</PackageId>
     <Title>Carl Zeiss PiWeb Volume API</Title>
     <Authors>Carl Zeiss IZfM Dresden</Authors>
     <Description>The Carl Zeiss PiWeb-Volume API allows to compress and store volumemetric data for visualization in PiWeb.</Description>
