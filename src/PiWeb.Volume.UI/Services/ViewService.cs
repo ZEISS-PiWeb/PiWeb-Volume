@@ -8,14 +8,14 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.UI.Services
+namespace Zeiss.PiWeb.Volume.UI.Services
 {
 	#region usings
 
 	using GalaSoft.MvvmLight;
-	using Zeiss.IMT.PiWeb.Volume.UI.Interfaces;
-	using Zeiss.IMT.PiWeb.Volume.UI.View;
-	using Zeiss.IMT.PiWeb.Volume.UI.ViewModel;
+	using Zeiss.PiWeb.Volume.UI.Interfaces;
+	using Zeiss.PiWeb.Volume.UI.View;
+	using Zeiss.PiWeb.Volume.UI.ViewModel;
 
 	#endregion
 

@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.UI.Converters
+namespace Zeiss.PiWeb.Volume.UI.Converters
 {
 	#region usings
 
@@ -30,7 +30,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Converters
 				return null;
 
 			var reference = values.FirstOrDefault( v => v != null && v != DependencyProperty.UnsetValue );
-			
+
 			if( values.Any( v => !Equals( v, reference ) ) )
 				return reference is IConvertible convertibleReference
 					? SafeChangeType( convertibleReference, targetType, culture )

@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.UI.Interfaces
+namespace Zeiss.PiWeb.Volume.UI.Interfaces
 {
 	public interface IFileService
 	{

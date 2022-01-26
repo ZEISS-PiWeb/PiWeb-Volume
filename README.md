@@ -1,13 +1,18 @@
-[logo]: docs/gfx/logo.png "PiWeb Logo"
+[logo]: gfx/logo_128x128.png "Zeiss IQS Logo"
 [classes]: docs/gfx/classdiagram.png "Class diagram"
 [multi]: docs/gfx/multi.png "multi"
 [previewExtraction]: docs/gfx/previewExtraction.png "PreviewExtraction"
 [sliceExtraction]: docs/gfx/sliceExtraction.png "SliceExtraction"
 [testingUI]: docs/gfx/testing_ui.jpg "TestingUI"
 
+[![main](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/dotnet.yml/badge.svg?branch=main)](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/dotnet.yml)
+[![NuGet](https://img.shields.io/nuget/v/Zeiss.PiWeb.Volume?logo=nuget)](https://www.nuget.org/packages/Zeiss.PiWeb.Volume/)
+
 # PiWeb Volume Library
 
-![PiWeb Logo][logo]
+| ![Zeiss IQS Logo][logo]| The **PiWeb Volume Library** provides an easy to use interface for reading and especially writing PiWeb volume data. |
+|-|:-|
+
 
 ## Overview
 
@@ -37,16 +42,20 @@ It's also possible to store multiple directions in one volume file, which triple
 
 ## Installation
 
-The PiWeb Volume Library is available via [NuGet](https://www.nuget.org/packages/Zeiss.IMT.PiWeb.Volume/):
+The PiWeb Volume Library is available via [NuGet](https://www.nuget.org/packages/Zeiss.PiWeb.Volume/):
 
-```Batchfile
+```ps
+# Version 2.0.0 and newer
+PM> Install-Package Zeiss.PiWeb.Volume
+
+# Older versions
 PM> Install-Package Zeiss.IMT.PiWeb.Volume
 ```
 
 Or compile the library by yourself. Requirements:
 
-- Microsoft Visual Studio 2015
-- Microsoft .NET Framework v4.5
+- Microsoft Visual Studio 2022
+- Microsoft .NET 6.0
 
 ## Usage
 

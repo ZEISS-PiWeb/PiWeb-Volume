@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume
+namespace Zeiss.PiWeb.Volume
 {
 	#region usings
 
@@ -19,7 +19,7 @@ namespace Zeiss.IMT.PiWeb.Volume
 	using System.Linq;
 	using System.Threading;
 	using System.Threading.Tasks;
-	using Zeiss.IMT.PiWeb.Volume.Block;
+	using Zeiss.PiWeb.Volume.Block;
 
 	#endregion
 

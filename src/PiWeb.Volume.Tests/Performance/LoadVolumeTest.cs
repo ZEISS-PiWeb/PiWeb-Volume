@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.Tests.Performance
+namespace Zeiss.PiWeb.Volume.Tests.Performance
 {
 	#region usings
 
@@ -27,17 +27,17 @@ namespace Zeiss.IMT.PiWeb.Volume.Tests.Performance
 
 		private static readonly string SamplePath = Path.Combine( Paths.TestData, "testcube_singledirection.volx" );
 		private byte[] _VolumeData;
-		
+
 		#endregion
 
 		#region methods
-		
+
 		[GlobalSetup]
 		public void Setup()
 		{
 			_VolumeData = File.ReadAllBytes( SamplePath );
 		}
-		
+
 		[Benchmark]
 		public Volume LoadVolume()
 		{

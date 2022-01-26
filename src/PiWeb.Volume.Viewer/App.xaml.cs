@@ -8,16 +8,16 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.Viewer
+namespace Zeiss.PiWeb.Volume.Viewer
 {
 	#region usings
 
 	using System.Windows;
 	using Unity;
-	using Zeiss.IMT.PiWeb.Volume.UI.Interfaces;
-	using Zeiss.IMT.PiWeb.Volume.UI.Services;
-	using Zeiss.IMT.PiWeb.Volume.Viewer.View;
-	using Zeiss.IMT.PiWeb.Volume.Viewer.ViewModel;
+	using Zeiss.PiWeb.Volume.UI.Interfaces;
+	using Zeiss.PiWeb.Volume.UI.Services;
+	using Zeiss.PiWeb.Volume.Viewer.View;
+	using Zeiss.PiWeb.Volume.Viewer.ViewModel;
 
 	#endregion
 

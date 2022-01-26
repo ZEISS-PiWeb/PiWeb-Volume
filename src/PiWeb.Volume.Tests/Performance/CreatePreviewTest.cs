@@ -1,4 +1,4 @@
-namespace Zeiss.IMT.PiWeb.Volume.Tests.Performance
+namespace Zeiss.PiWeb.Volume.Tests.Performance
 {
 	using System.IO;
 	using BenchmarkDotNet.Attributes;
@@ -12,14 +12,14 @@ namespace Zeiss.IMT.PiWeb.Volume.Tests.Performance
 		#region members
 
 		private static readonly string SamplePath = Path.Combine( Paths.TestData, "testcube_singledirection.volx" );
-		
+
 		private CompressedVolume _SampleCompressedVolume;
 		private UncompressedVolume _SampleDecompressedVolume;
 
 		#endregion
 
 		#region methods
-		
+
 		[GlobalSetup]
 		public void Setup()
 		{

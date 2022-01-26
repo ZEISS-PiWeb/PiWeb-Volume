@@ -1,10 +1,10 @@
 <UserControl
-    x:Class="Zeiss.IMT.PiWeb.Volume.UI.View.VolumeManagementView"
+    x:Class="Zeiss.PiWeb.Volume.UI.View.VolumeManagementView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:viewModel="clr-namespace:Zeiss.IMT.PiWeb.Volume.UI.ViewModel"
+    xmlns:viewModel="clr-namespace:Zeiss.PiWeb.Volume.UI.ViewModel"
     d:DataContext="{d:DesignInstance viewModel:VolumeManagementViewModel}"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -20,7 +20,7 @@
     <HeaderedContentControl Header="File:">
         <Grid Height="22">
             <DockPanel>
-                
+
                 <Button
                     HorizontalAlignment="Right"
                     Command="{Binding SaveVolumeCommand}"
@@ -30,7 +30,7 @@
                     DockPanel.Dock="Right">
                     <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/save.png" Style="{StaticResource Icon}" />
                 </Button>
-                
+
                 <Button
                     HorizontalAlignment="Right"
                     Command="{Binding OpenVolumeCommand}"
@@ -39,7 +39,7 @@
                     DockPanel.Dock="Right">
                     <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/folder_open.png" Style="{StaticResource Icon}" />
                 </Button>
-                
+
                 <Button
                     HorizontalAlignment="Right"
                     Command="{Binding CreatePreviewCommand}"
@@ -49,7 +49,7 @@
                     DockPanel.Dock="Right">
                     <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/assembly.png" Style="{StaticResource Icon}" />
                 </Button>
-                
+
                 <Button
                     HorizontalAlignment="Right"
                     Command="{Binding DecompressCommand}"
@@ -59,7 +59,7 @@
                     DockPanel.Dock="Right">
                     <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/compress_table.png" Style="{StaticResource Icon}" />
                 </Button>
-                
+
                 <TextBox
                     Margin="8,0"
                     VerticalContentAlignment="Center"

@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.UI.Components
+namespace Zeiss.PiWeb.Volume.UI.Components
 {
 	#region usings
 
@@ -113,10 +113,10 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
 
 			for( var i = 1; i < 16; i++ )
 				drawingContext.DrawLine( pen, new Point( width * i * 16 + 0.5, 0 ), new Point( width * i * 16 + 0.5, ActualHeight ) );
-			
+
 			if( Data is null || Data.Count == 0 )
 				return;
-			
+
 			var max = Data.SelectMany( d => d.Values ).Max();
 			if( LogarithmicScale )
 				max = max > 0 ? Math.Log10( max ) : 0;
@@ -131,7 +131,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
 
 					if( count < 1e-6 )
 						continue;
-					
+
 					var height = count / max * ( ActualHeight - 24 - 1 ) + 1;
 					var brush = new SolidColorBrush( i == _HighlightedIndex
 						? new Color
@@ -157,7 +157,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
 
 				drawingContext.DrawText( ftext, new Point( ActualWidth * 0.5, 4 ) );
 			}
-			
+
 			drawingContext.DrawLine( pen, new Point( 0, ActualHeight ), new Point( ActualWidth, ActualHeight ) );
 		}
 

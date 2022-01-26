@@ -9,7 +9,7 @@
 #endregion
 
 // ReSharper disable SuggestBaseTypeForParameter
-namespace Zeiss.IMT.PiWeb.Volume.Block
+namespace Zeiss.PiWeb.Volume.Block
 {
 	#region usings
 

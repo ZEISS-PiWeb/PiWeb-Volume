@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.Block
+namespace Zeiss.PiWeb.Volume.Block
 {
 	#region usings
 
