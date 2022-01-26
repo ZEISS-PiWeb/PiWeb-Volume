@@ -30,9 +30,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Extended.Wpf.Toolkit" Version="4.0.1" NoWarn="NU1701" />
+      <PackageReference Include="Extended.Wpf.Toolkit" Version="4.2.0" NoWarn="NU1701" />
       <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" NoWarn="NU1701" />
-      <PackageReference Include="Unity" Version="5.11.1" />
+      <PackageReference Include="Unity" Version="5.11.10" />
     </ItemGroup>
 
 </Project>
