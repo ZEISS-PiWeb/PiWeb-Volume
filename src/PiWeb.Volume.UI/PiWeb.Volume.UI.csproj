@@ -1,36 +1,43 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net6.0-windows</TargetFramework>
-        <Platforms>x64</Platforms>
-        <RootNamespace>Zeiss.PiWeb.Volume.UI</RootNamespace>
-        <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-        <AssemblyTitle>PiWeb.Volume.UI</AssemblyTitle>
-        <Product>PiWeb.Volume.UI</Product>
-        <UseWPF>true</UseWPF>
-        <IsPackable>false</IsPackable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Platforms>x64</Platforms>
+    <LangVersion>9</LangVersion>
+    <AssemblyName>PiWeb.Volume.UI</AssemblyName>
+    <RootNamespace>Zeiss.PiWeb.Volume.UI</RootNamespace>
+    <Copyright>Copyright © 2020 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>
+    <Company>Carl Zeiss Industrielle Messtechnik GmbH</Company>
+    <Authors>$(Company)</Authors>
+    <UseWPF>true</UseWPF>
+    <IsPackable>false</IsPackable>
+    <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+  </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    </PropertyGroup>
-    <ItemGroup>
-        <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" NoWarn="NU1701" />
-        <PackageReference Include="System.Reactive" Version="4.4.1" NoWarn="NU1701" />
-        <PackageReference Include="Extended.Wpf.Toolkit" Version="4.2.0" NoWarn="NU1701" />
-    </ItemGroup>
-    <ItemGroup>
-        <Resource Include="Effects\*.ps" />
-        <Resource Include="Resources\**\*.png" />
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="$(SolutionDir)\PiWeb.Volume\PiWeb.Volume.csproj" />
-        <ProjectReference Include="$(SolutionDir)\PiWeb.Volume.Convert\PiWeb.Volume.Convert.csproj" />
-    </ItemGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" NoWarn="NU1701" />
+    <PackageReference Include="System.Reactive" Version="4.4.1" NoWarn="NU1701" />
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.2.0" NoWarn="NU1701" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Resource Include="Effects\*.ps" />
+    <Resource Include="Resources\**\*.png" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)\PiWeb.Volume\PiWeb.Volume.csproj" />
+    <ProjectReference Include="$(SolutionDir)\PiWeb.Volume.Convert\PiWeb.Volume.Convert.csproj" />
+  </ItemGroup>
 
 </Project>
