@@ -18,9 +18,14 @@
     <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <Configurations>Debug;Release;Test;Pack</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DocumentationFile>bin\$(Configuration)\PiWeb.Volume.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Pack'">
     <DocumentationFile>bin\$(Configuration)\PiWeb.Volume.xml</DocumentationFile>
   </PropertyGroup>
 
@@ -58,9 +63,9 @@
   <ItemGroup>
     <None Include="$(SolutionDir)\PiWeb.Volume.Core\lib\*.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
     <None Include="$(SolutionDir)\PiWeb.Volume.Core\bin\$(Configuration)\PiWeb.Volume.Core.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
-    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt"/>
-    <None Include="..\..\gfx\logo_128x128.png" Pack="true" PackagePath="logo_128x128.png"/>
-    <None Include="..\..\third_party_notices\third_party_notices.txt"/>
+    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
+    <None Include="..\..\gfx\logo_128x128.png" Pack="true" PackagePath="logo_128x128.png" />
+    <None Include="..\..\third_party_notices\third_party_notices.txt" />
   </ItemGroup>
 
 </Project>
