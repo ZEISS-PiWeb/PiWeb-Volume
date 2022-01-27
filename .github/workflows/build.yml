@@ -19,6 +19,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Check path
+      run: echo ${{ github.workspace }} 
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -31,4 +33,4 @@ jobs:
     - name: Build and restore
       run: msbuild -restore -p:Configuration=Release
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal ${{ github.workspace }}\bin\Release\PiWeb.Volume.Tests.dll
