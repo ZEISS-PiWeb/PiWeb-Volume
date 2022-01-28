@@ -5,7 +5,7 @@
     <OutputType>WinExe</OutputType>
     <AssemblyName>PiWeb.Volume.Viewer</AssemblyName>
     <RootNamespace>Zeiss.PiWeb.Volume.Viewer</RootNamespace>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <IsPackable>false</IsPackable>
     <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
