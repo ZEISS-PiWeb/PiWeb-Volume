@@ -13,6 +13,10 @@ rm ./build.sh
 cp ../build.sh ./build.sh
 echo "Done."
 
+echo "Disabling LAME..."
+mv ./FFmpeg-Builds/scripts.d/50-libmp3lame.sh ./FFmpeg-Builds/scripts.d/50-libmp3lame.sh.disabled
+echo "Done."
+
 echo "Creating docker container..."
 ./makeimage.sh win64 lgpl-shared 4.4
 
