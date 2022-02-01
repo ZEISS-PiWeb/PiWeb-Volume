@@ -1,5 +1,19 @@
 # Build FFmpeg
 
+## Prerequisites
+
++ WSL or linux installation (tested with Ubuntu 20.04)
++ Docker
++ `zip` and `unzip`
+
+```sh
+# in Ubuntu/Debian
+sudo apt install zip unzip
+```
+
+## Build script
+
+
 This script is derived from [Btbn/FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds).
 See `build.sh.patch` for the actual changes made.
 
