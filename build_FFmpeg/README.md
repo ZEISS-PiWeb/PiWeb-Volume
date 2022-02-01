@@ -25,4 +25,8 @@ After building, the included `.dll`s, `.lib`s and the content of `./src/PiWeb.Vo
 can be dynamically replaced with the ones you built yourself.
 
 
+# License
+
+The attached MIT license applies to `build_FFmpeg/build.sh` and `build_FFmpeg/build_ffmpeg.sh`.
+Everything in `build_FFmpeg/third_party/` remains under their respective licenses.
 
