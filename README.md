@@ -5,7 +5,7 @@
 [sliceExtraction]: docs/gfx/sliceExtraction.png "SliceExtraction"
 [testingUI]: docs/gfx/testing_ui.jpg "TestingUI"
 
-[![main](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/build.yml)
+[![Build](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/build.yml)
 [![NuGet](https://img.shields.io/nuget/v/Zeiss.PiWeb.Volume?logo=nuget)](https://www.nuget.org/packages/Zeiss.PiWeb.Volume/)
 
 # PiWeb Volume Library
