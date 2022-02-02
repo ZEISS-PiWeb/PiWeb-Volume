@@ -1,9 +1,9 @@
-[logo]: gfx/logo_128x128.png "Zeiss IQS Logo"
-[classes]: docs/gfx/classdiagram.png "Class diagram"
-[multi]: docs/gfx/multi.png "multi"
-[previewExtraction]: docs/gfx/previewExtraction.png "PreviewExtraction"
-[sliceExtraction]: docs/gfx/sliceExtraction.png "SliceExtraction"
-[testingUI]: docs/gfx/testing_ui.jpg "TestingUI"
+[logo]: docs/img/logo_128x128.png "Zeiss IQS Logo"
+[classes]: docs/img/classdiagram.png "Class diagram"
+[multi]: docs/img/multi.png "multi"
+[previewExtraction]: docs/img/previewExtraction.png "PreviewExtraction"
+[sliceExtraction]: docs/img/sliceExtraction.png "SliceExtraction"
+[testingUI]: docs/img/testing_ui.jpg "TestingUI"
 
 [![Build](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/build.yml)
 [![NuGet](https://img.shields.io/nuget/v/Zeiss.PiWeb.Volume?logo=nuget)](https://www.nuget.org/packages/Zeiss.PiWeb.Volume/)

@@ -64,7 +64,7 @@
     <None Include="..\PiWeb.Volume.Core\lib\*.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
     <None Include="..\..\bin\$(Configuration)\PiWeb.Volume.Core.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
     <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
-    <None Include="..\..\gfx\logo_128x128.png" Pack="true" PackagePath="logo_128x128.png" />
+    <None Include="..\..\docs\img\logo_128x128.png" Pack="true" PackagePath="logo_128x128.png" />
     <None Include="..\..\third_party\third_party_notices.txt" Pack="true" PackagePath="third_party_notices.txt" />
   </ItemGroup>
 
