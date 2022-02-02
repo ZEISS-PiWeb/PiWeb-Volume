@@ -15,7 +15,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
-    <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
+    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Configurations>Debug;Release;Test;Pack</Configurations>
@@ -61,11 +61,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="$(SolutionDir)\PiWeb.Volume.Core\lib\*.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
-    <None Include="$(SolutionDir)\PiWeb.Volume.Core\bin\$(Configuration)\PiWeb.Volume.Core.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
+    <None Include="..\PiWeb.Volume.Core\lib\*.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
+    <None Include="..\..\bin\$(Configuration)\PiWeb.Volume.Core.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
     <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
     <None Include="..\..\gfx\logo_128x128.png" Pack="true" PackagePath="logo_128x128.png" />
-    <None Include="..\..\third_party_notices\third_party_notices.txt" />
+    <None Include="..\..\third_party\third_party_notices.txt" Pack="true" PackagePath="third_party_notices.txt" />
   </ItemGroup>
 
 </Project>
