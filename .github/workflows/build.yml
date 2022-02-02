@@ -31,6 +31,6 @@ jobs:
         # The preferred processor architecture of MSBuild. Can be either "x86" or "x64". "x64" is only available from Visual Studio version 17.0 and later.
         msbuild-architecture: x64
     - name: Build and restore
-      run: msbuild -restore -p:Configuration=Test
+      run: msbuild -restore -p:Configuration=Test ${{ github.workspace }}\src\PiWeb.Volume.sln
     - name: Test
       run: dotnet test --no-build --verbosity normal ${{ github.workspace }}\bin\Test\PiWeb.Volume.Tests.dll
