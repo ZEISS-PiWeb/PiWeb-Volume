@@ -12,6 +12,7 @@ defaults:
 
 jobs:
   nuget-publish:
+
     runs-on: windows-latest
 
     steps:
@@ -30,7 +31,7 @@ jobs:
         # The preferred processor architecture of MSBuild. Can be either "x86" or "x64". "x64" is only available from Visual Studio version 17.0 and later.
         msbuild-architecture: x64
     - name: Build and restore
-      run: msbuild -restore -p:Configuration=Pack
+      run: msbuild -restore -p:Configuration=Pack ${{ github.workspace }}\src\PiWeb.Volume.sln
     - name: Publish
       run: |
         mkdir __out
