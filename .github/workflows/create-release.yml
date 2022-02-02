@@ -37,8 +37,8 @@ jobs:
       - name: commit
         run: |
           # Change version number, commit and push
-          sed -i 's#<Version>[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]#<Version>${{ github.event.inputs.version }}#g' ./src/PiWeb.Volume\PiWeb.Volume.csproj
-          git add ./src/PiWeb.Volume\PiWeb.Volume.csproj
+          sed -i 's#<Version>[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]#<Version>${{ github.event.inputs.version }}#g' ./src/PiWeb.Volume/PiWeb.Volume.csproj
+          git add ./src/PiWeb.Volume/PiWeb.Volume.csproj
           git commit -m "feat: Raises version number"
           
       - name: checkout main

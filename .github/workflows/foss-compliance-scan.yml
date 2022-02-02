@@ -3,10 +3,13 @@ name: FOSS Compliance
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
+
     runs-on: windows-latest
+
     steps:
     - uses: actions/checkout@v2
     - name: Check path
@@ -18,9 +21,10 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1.1
       with:
+        # The preferred processor architecture of MSBuild. Can be either "x86" or "x64". "x64" is only available from Visual Studio version 17.0 and later.
         msbuild-architecture: x64
     - name: Build and restore
-      run: msbuild -restore -p:Configuration=Pack
+      run: msbuild -restore -p:Configuration=Pack ${{ github.workspace }}\src\PiWeb.Volume.sln
     - name: SCA scan
       run: |
         # Extract version number.
