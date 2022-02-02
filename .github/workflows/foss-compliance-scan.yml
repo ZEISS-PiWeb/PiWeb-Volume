@@ -1,0 +1,32 @@
+name: FOSS Compliance
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check path
+      run: echo ${{ github.workspace }} 
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+      with:
+        msbuild-architecture: x64
+    - name: Build and restore
+      run: msbuild -restore -p:Configuration=Pack
+    - name: SCA scan
+      run: |
+        # Extract version number.
+        [xml]$xml = Get-Content ${{ github.workspace }}\src\PiWeb.Volume\PiWeb.Volume.csproj
+        $version = $xml.SelectNodes('//Version') | Select-Object -Expand '#text'
+        # Run scan and upload binaries.
+        cd .\software_composition_analysis
+        powershell "[Net.ServicePointManager]::SecurityProtocol = 'tls12'; irm https://detect.synopsys.com/detect7.ps1?$(Get-Random) | iex; detect" --blackduck.api.token=${{ secrets.BLACKDUCK_TOKEN }} --detect.project.version.name=$version --detect.source.path=${{ github.workspace }}\bin\Pack
+        
