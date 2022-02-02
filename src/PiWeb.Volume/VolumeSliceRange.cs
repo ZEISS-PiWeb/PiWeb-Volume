@@ -9,7 +9,7 @@
 #endregion
 
 
-namespace Zeiss.IMT.PiWeb.Volume
+namespace Zeiss.PiWeb.Volume
 {
 	#region usings
 
@@ -83,10 +83,10 @@ namespace Zeiss.IMT.PiWeb.Volume
 
 		/// <inheritdoc />
 		/// <summary>
-		/// Gets the <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeSlice" /> at the specified index.
+		/// Gets the <see cref="T:Zeiss.PiWeb.Volume.VolumeSlice" /> at the specified index.
 		/// </summary>
 		/// <value>
-		/// The <see cref="T:Zeiss.IMT.PiWeb.Volume.VolumeSlice" />.
+		/// The <see cref="T:Zeiss.PiWeb.Volume.VolumeSlice" />.
 		/// </value>
 		/// <param name="index">The index.</param>
 		/// <returns></returns>

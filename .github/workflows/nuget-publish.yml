@@ -1,0 +1,39 @@
+name: NuGet Packaging and Pushing to NuGet.org
+
+# See https://tehgm.net/blog/nuget-github-actions/ for explanations
+
+on:
+  push:
+    branches: [ main ]
+    
+defaults:
+  run:
+    working-directory: src
+
+jobs:
+  nuget-publish:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check path
+      run: echo ${{ github.workspace }} 
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+      env: 
+        NUGET_AUTH_TOKEN: ${{secrets.NUGET_TOKEN}}
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+      with:
+        # The preferred processor architecture of MSBuild. Can be either "x86" or "x64". "x64" is only available from Visual Studio version 17.0 and later.
+        msbuild-architecture: x64
+    - name: Build and restore
+      run: msbuild -restore -p:Configuration=Pack
+    - name: Publish
+      run: |
+        mkdir __out
+        dotnet  pack -c Pack -o __out --no-restore
+        dotnet nuget push "./__out/*.nupkg" --skip-duplicate --no-symbols true --api-key ${{secrets.NUGET_TOKEN}}
+        rm -rf __out

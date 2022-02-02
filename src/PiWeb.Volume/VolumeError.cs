@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume
+namespace Zeiss.PiWeb.Volume
 {
 	/// <summary>
 	/// Errors returned by the volume compressor

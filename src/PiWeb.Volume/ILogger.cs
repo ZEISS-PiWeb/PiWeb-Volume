@@ -8,10 +8,10 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume
+namespace Zeiss.PiWeb.Volume
 {
 	/// <summary>
-	/// This interface is responsible for log handling in the PiWeb volume library. 
+	/// This interface is responsible for log handling in the PiWeb volume library.
 	/// </summary>
 	public interface ILogger
 	{

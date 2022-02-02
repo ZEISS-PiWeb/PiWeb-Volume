@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.UI.Components
+namespace Zeiss.PiWeb.Volume.UI.Components
 {
     #region usings
 
@@ -18,7 +18,7 @@ namespace Zeiss.IMT.PiWeb.Volume.UI.Components
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media;
-    using Zeiss.IMT.PiWeb.Volume.UI.Model;
+    using Zeiss.PiWeb.Volume.UI.Model;
 
     #endregion
 

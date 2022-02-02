@@ -9,7 +9,7 @@
 #endregion
 
 
-namespace Zeiss.IMT.PiWeb.Volume
+namespace Zeiss.PiWeb.Volume
 {
 	/// <summary>
 	/// Describes the compression state of a the volume in a specific direction

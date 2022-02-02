@@ -1,59 +1,79 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29209.62
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PiWeb.Volume.Core", "PiWeb.Volume.Core\PiWeb.Volume.Core.vcxproj", "{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume", "PiWeb.Volume\PiWeb.Volume.csproj", "{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiWeb.Volume", "PiWeb.Volume\PiWeb.Volume.csproj", "{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3} = {7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume.Viewer", "PiWeb.Volume.Viewer\PiWeb.Volume.Viewer.csproj", "{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiWeb.Volume.Viewer", "PiWeb.Volume.Viewer\PiWeb.Volume.Viewer.csproj", "{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume.Convert", "PiWeb.Volume.Convert\PiWeb.Volume.Convert.csproj", "{EE2E6934-C175-4029-9761-57E6A2806831}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiWeb.Volume.Convert", "PiWeb.Volume.Convert\PiWeb.Volume.Convert.csproj", "{EE2E6934-C175-4029-9761-57E6A2806831}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume.Compare", "PiWeb.Volume.Compare\PiWeb.Volume.Compare.csproj", "{B20ABEBF-7831-4FF1-9515-4C3C839A1038}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiWeb.Volume.Compare", "PiWeb.Volume.Compare\PiWeb.Volume.Compare.csproj", "{B20ABEBF-7831-4FF1-9515-4C3C839A1038}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume.UI", "PiWeb.Volume.UI\PiWeb.Volume.UI.csproj", "{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiWeb.Volume.UI", "PiWeb.Volume.UI\PiWeb.Volume.UI.csproj", "{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiWeb.Volume.Tests", "PiWeb.Volume.Tests\PiWeb.Volume.Tests.csproj", "{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiWeb.Volume.Tests", "PiWeb.Volume.Tests\PiWeb.Volume.Tests.csproj", "{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Release|x64 = Release|x64
 		Debug|x64 = Debug|x64
+		Pack|x64 = Pack|x64
+		Release|x64 = Release|x64
+		Test|x64 = Test|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Release|x64.ActiveCfg = Release|x64
-		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Release|x64.Build.0 = Release|x64
-		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Debug|x64.ActiveCfg = Debug|x64
-		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Debug|x64.Build.0 = Debug|x64
-		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}.Release|x64.ActiveCfg = Release|x64
-		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}.Release|x64.Build.0 = Release|x64
 		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}.Debug|x64.ActiveCfg = Debug|x64
 		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}.Debug|x64.Build.0 = Debug|x64
-		{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}.Release|x64.ActiveCfg = Release|x64
-		{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}.Release|x64.Build.0 = Release|x64
+		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}.Pack|x64.ActiveCfg = Pack|x64
+		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}.Pack|x64.Build.0 = Pack|x64
+		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}.Release|x64.ActiveCfg = Release|x64
+		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}.Release|x64.Build.0 = Release|x64
+		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}.Test|x64.ActiveCfg = Test|x64
+		{7BC35A03-B0E0-4182-80E1-A50A2CB5A5E3}.Test|x64.Build.0 = Test|x64
+		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Debug|x64.ActiveCfg = Debug|x64
+		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Debug|x64.Build.0 = Debug|x64
+		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Pack|x64.ActiveCfg = Pack|x64
+		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Pack|x64.Build.0 = Pack|x64
+		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Release|x64.ActiveCfg = Release|x64
+		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Release|x64.Build.0 = Release|x64
+		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Test|x64.ActiveCfg = Test|x64
+		{EE00A737-6B2B-4EE2-800F-21C8E7CB30E5}.Test|x64.Build.0 = Test|x64
 		{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}.Debug|x64.ActiveCfg = Debug|x64
 		{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}.Debug|x64.Build.0 = Debug|x64
+		{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}.Pack|x64.ActiveCfg = Pack|x64
+		{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}.Release|x64.ActiveCfg = Release|x64
+		{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}.Release|x64.Build.0 = Release|x64
+		{990AFF9C-CA6F-4E61-8A67-C5C29184A0AC}.Test|x64.ActiveCfg = Test|x64
 		{EE2E6934-C175-4029-9761-57E6A2806831}.Debug|x64.ActiveCfg = Debug|x64
 		{EE2E6934-C175-4029-9761-57E6A2806831}.Debug|x64.Build.0 = Debug|x64
+		{EE2E6934-C175-4029-9761-57E6A2806831}.Pack|x64.ActiveCfg = Pack|x64
 		{EE2E6934-C175-4029-9761-57E6A2806831}.Release|x64.ActiveCfg = Release|x64
 		{EE2E6934-C175-4029-9761-57E6A2806831}.Release|x64.Build.0 = Release|x64
-		{B20ABEBF-7831-4FF1-9515-4C3C839A1038}.Release|x64.ActiveCfg = Release|Any CPU
-		{B20ABEBF-7831-4FF1-9515-4C3C839A1038}.Release|x64.Build.0 = Release|Any CPU
-		{B20ABEBF-7831-4FF1-9515-4C3C839A1038}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{B20ABEBF-7831-4FF1-9515-4C3C839A1038}.Debug|x64.Build.0 = Debug|Any CPU
-		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Release|x64.ActiveCfg = Release|Any CPU
-		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Release|x64.Build.0 = Release|Any CPU
-		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Debug|x64.Build.0 = Debug|Any CPU
-		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Release|x64.ActiveCfg = Release|Any CPU
-		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Release|x64.Build.0 = Release|Any CPU
-		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Debug|x64.Build.0 = Debug|Any CPU
+		{EE2E6934-C175-4029-9761-57E6A2806831}.Test|x64.ActiveCfg = Test|x64
+		{B20ABEBF-7831-4FF1-9515-4C3C839A1038}.Debug|x64.ActiveCfg = Debug|x64
+		{B20ABEBF-7831-4FF1-9515-4C3C839A1038}.Debug|x64.Build.0 = Debug|x64
+		{B20ABEBF-7831-4FF1-9515-4C3C839A1038}.Pack|x64.ActiveCfg = Pack|x64
+		{B20ABEBF-7831-4FF1-9515-4C3C839A1038}.Release|x64.ActiveCfg = Release|x64
+		{B20ABEBF-7831-4FF1-9515-4C3C839A1038}.Release|x64.Build.0 = Release|x64
+		{B20ABEBF-7831-4FF1-9515-4C3C839A1038}.Test|x64.ActiveCfg = Test|x64
+		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Debug|x64.ActiveCfg = Debug|x64
+		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Debug|x64.Build.0 = Debug|x64
+		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Pack|x64.ActiveCfg = Pack|x64
+		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Release|x64.ActiveCfg = Release|x64
+		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Release|x64.Build.0 = Release|x64
+		{BA7C8459-5BB8-4758-AA00-535DD6EBEBC5}.Test|x64.ActiveCfg = Test|x64
+		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Debug|x64.ActiveCfg = Debug|x64
+		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Debug|x64.Build.0 = Debug|x64
+		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Pack|x64.ActiveCfg = Pack|x64
+		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Release|x64.ActiveCfg = Release|x64
+		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Test|x64.ActiveCfg = Test|x64
+		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Test|x64.Build.0 = Test|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

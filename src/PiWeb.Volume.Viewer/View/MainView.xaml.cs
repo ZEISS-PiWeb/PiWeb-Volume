@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.Viewer.View
+namespace Zeiss.PiWeb.Volume.Viewer.View
 {
     /// <summary>
     /// Interaction logic for MainView.xaml

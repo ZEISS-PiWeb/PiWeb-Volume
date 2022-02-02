@@ -8,12 +8,12 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.Viewer.ViewModel
+namespace Zeiss.PiWeb.Volume.Viewer.ViewModel
 {
 	#region usings
 
-	using Zeiss.IMT.PiWeb.Volume.UI.Interfaces;
-	using Zeiss.IMT.PiWeb.Volume.UI.ViewModel;
+	using Zeiss.PiWeb.Volume.UI.Interfaces;
+	using Zeiss.PiWeb.Volume.UI.ViewModel;
 
 	#endregion
 

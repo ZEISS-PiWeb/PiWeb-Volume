@@ -1,43 +1,50 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Platforms>x64</Platforms>
-    <RootNamespace>Zeiss.IMT.PiWeb.Volume</RootNamespace>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Platforms>x64</Platforms>
+    <LangVersion>9</LangVersion>
+    <AssemblyName>PiWeb.Volume</AssemblyName>
+    <RootNamespace>Zeiss.PiWeb.Volume</RootNamespace>
+    <Copyright>Copyright © 2020 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>
+    <Company>Carl Zeiss Industrielle Messtechnik GmbH</Company>
+    <Authors>$(Company)</Authors>
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <PackageVersion>1.5.0</PackageVersion>
-    <LangVersion>8</LangVersion>
-    <AssemblyVersion>1.5.0</AssemblyVersion>
-    <FileVersion>1.5.0</FileVersion>
+    <Configurations>Debug;Release;Test;Pack</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DocumentationFile>$(SolutionDir)\..\bin\$(Configuration)\PiWeb.Volume.xml</DocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\PiWeb.Volume.xml</DocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Pack'">
+    <DocumentationFile>bin\$(Configuration)\PiWeb.Volume.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Label="NuGet package specifications">
     <IsPackable>true</IsPackable>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>Zeiss.IMT.PiWeb.Volume</PackageId>
-    <Title>Carl Zeiss PiWeb Volume API</Title>
-    <Authors>Carl Zeiss IZfM Dresden</Authors>
-    <Description>The Carl Zeiss PiWeb-Volume API allows to compress and store volumemetric data for visualization in PiWeb.</Description>
+    <ProductName>PiWeb Volume Library</ProductName>
+    <Description>
+      The Carl Zeiss PiWeb-Volume API allows to compress and store
+      volumemetric data for visualization in PiWeb.
+    </Description>
+    <PackageId>Zeiss.PiWeb.Volume</PackageId>
+    <Version>2.0.1</Version>
+    <PackageIcon>logo_128x128.png</PackageIcon>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/ZEISS-PiWeb/PiWeb-Volume</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/ZEISS-PiWeb/PiWeb-Volume/blob/master/LICENSE.md</PackageLicenseUrl>
-    <PackageIconUrl>https://github.com/ZEISS-PiWeb/PiWeb-Volume/raw/master/logo6464.png</PackageIconUrl>
-    <PackageTags>Carl Zeiss PiWeb Volume</PackageTags>
-    <PackageReleaseNotes>Made the volume array pool public.</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Copyright>© Carl Zeiss IZfM Dresden</Copyright>
-    <VersionPrefix>1.5.0</VersionPrefix>
+    <RepositoryUrl>https://github.com/ZEISS-PiWeb/PiWeb-Volume.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Carl Zeiss PiWeb Volume</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -45,7 +52,6 @@
   </ItemGroup>
 
   <ItemGroup>
-
     <EmbeddedResource Include="Volume.de.resx">
       <DependentUpon>Volume.cs</DependentUpon>
     </EmbeddedResource>
@@ -56,7 +62,10 @@
 
   <ItemGroup>
     <None Include="$(SolutionDir)\PiWeb.Volume.Core\lib\*.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
-    <None Include="$(SolutionDir)\..\bin\$(Configuration)\PiWeb.Volume.Core.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
+    <None Include="$(SolutionDir)\PiWeb.Volume.Core\bin\$(Configuration)\PiWeb.Volume.Core.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
+    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
+    <None Include="..\..\gfx\logo_128x128.png" Pack="true" PackagePath="logo_128x128.png" />
+    <None Include="..\..\third_party_notices\third_party_notices.txt" />
   </ItemGroup>
 
 </Project>

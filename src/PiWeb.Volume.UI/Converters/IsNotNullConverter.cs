@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.UI.Converters
+namespace Zeiss.PiWeb.Volume.UI.Converters
 {
     #region usings
 

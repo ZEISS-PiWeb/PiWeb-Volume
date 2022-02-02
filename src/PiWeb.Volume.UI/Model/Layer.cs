@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.IMT.PiWeb.Volume.UI.Model
+namespace Zeiss.PiWeb.Volume.UI.Model
 {
 	public readonly struct Layer
 	{

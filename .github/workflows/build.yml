@@ -1,0 +1,36 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ develop ]
+
+defaults:
+  run:
+    working-directory: src
+
+
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check path
+      run: echo ${{ github.workspace }} 
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+      with:
+        # The preferred processor architecture of MSBuild. Can be either "x86" or "x64". "x64" is only available from Visual Studio version 17.0 and later.
+        msbuild-architecture: x64
+    - name: Build and restore
+      run: msbuild -restore -p:Configuration=Test
+    - name: Test
+      run: dotnet test --no-build --verbosity normal ${{ github.workspace }}\bin\Test\PiWeb.Volume.Tests.dll
