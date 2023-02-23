@@ -5,8 +5,9 @@
 [sliceExtraction]: docs/img/sliceExtraction.png "SliceExtraction"
 [testingUI]: docs/img/testing_ui.jpg "TestingUI"
 
-[![Build](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/build.yml)
-[![NuGet](https://img.shields.io/nuget/v/Zeiss.PiWeb.Volume?logo=nuget)](https://www.nuget.org/packages/Zeiss.PiWeb.Volume/)
+[![build on develop](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/develop.yml/badge.svg?branch=develop&event=push)](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/develop.yml)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/mit)
+[![NuGet](https://img.shields.io/nuget/v/Zeiss.PiWeb.Formplot?logo=nuget)](https://www.nuget.org/packages/Zeiss.PiWeb.Volume/)
 
 # PiWeb Volume Library
 
@@ -21,6 +22,7 @@
 - [Usage](#usage)
 - [Testing](#testing)
 - [License](#license)
+- [Contributing](#contributing)
 
 ## Introduction
 
@@ -164,3 +166,7 @@ In the solution, you'll find a project named `PiWeb.Volume.UI` which is a small 
 While the PiWeb Volume Library is published under the **BSD 3-Clause "New" or "Revised" License**, it is built on top of [FFmpeg](https://www.ffmpeg.org), which is published under the **LGPL v2.1 License**. While building the FFmpeg binaries, we took care that neither third party libraries with GPL or other copy-left licenses nor commercial libraries were referenced.
 
 Please note, that some famous codecs like `libx264` and `libx265` cannot be used, since they are licensed under GPL.
+
+# Contributing
+
+This repository makes use of resuable workflows from [ZEISS-PiWeb/github-actions](https://github.com/ZEISS-PiWeb/github-actions). Read the documentation (especially about automated semantic versioning) before committing any changes.
