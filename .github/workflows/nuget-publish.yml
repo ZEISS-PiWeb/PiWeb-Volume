@@ -25,7 +25,7 @@ jobs:
         source-url: https://api.nuget.org/v3/index.json
         dotnet-version: 3.1.x
       env: 
-        NUGET_AUTH_TOKEN: ${{secrets.NUGET_TOKEN}}
+        NUGET_AUTH_TOKEN: ${{secrets.NUGET_FEED_PAT}}
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1.1
       with:
@@ -36,5 +36,5 @@ jobs:
     - name: Publish
       run: |
         msbuild -t:pack -p:Configuration=Pack -p:Platform=x64 ${{ github.workspace }}\src\PiWeb.Volume\PiWeb.Volume.csproj 
-        dotnet nuget push ${{ github.workspace }}\bin\Pack\*.nupkg --skip-duplicate --no-symbols true --api-key ${{secrets.NUGET_TOKEN}}
+        dotnet nuget push ${{ github.workspace }}\bin\Pack\*.nupkg --skip-duplicate --no-symbols true --api-key ${{secrets.NUGET_FEED_PAT}}
         Remove-Item ${{ github.workspace }}\bin\Pack -Recurse
