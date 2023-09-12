@@ -10,7 +10,7 @@
 
 # PiWeb Volume Library
 
-| ![Zeiss IQS Logo][logo]| The **PiWeb Volume Library** provides an easy to use interface for reading and especially writing PiWeb volume data. |
+| ![Zeiss IQS Logo][logo]| The **PiWeb Volume Library** provides an easy to use interface for reading and especially writing volume data for the quality data management system [ZEISS PiWeb](http://www.zeiss.com/industrial-metrology/en_de/products/software/piweb.html). |
 |-|:-|
 
 
