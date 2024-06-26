@@ -140,9 +140,7 @@ namespace Zeiss.PiWeb.Volume.Block
 			CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
-
-			var sliceBuffer = new byte[ Metadata.GetSliceLength( slice.Direction ) ];
-			var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, slice, sliceBuffer );
+			var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, slice, buffer );
 			sliceRangeCollector.CollectSliceRanges( progress, ct );
 
 			logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
