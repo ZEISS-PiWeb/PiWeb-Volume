@@ -42,7 +42,7 @@ namespace Zeiss.PiWeb.Volume.Block
 		/// <summary>
 		/// Encodes the specified input data which is a complete volume in z-slices.
 		/// </summary>
-		internal void Encode( IReadOnlyList<VolumeSlice> slices, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition> progress )
+		internal void Encode( IReadOnlyList<VolumeSlice> slices, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition>? progress )
 		{
 			var z = 0;
 			var buffer = new byte[ BlockVolume.N ][];
@@ -59,7 +59,7 @@ namespace Zeiss.PiWeb.Volume.Block
 		/// <summary>
 		/// Encodes the input data that is coming from the specified input stream.
 		/// </summary>
-		internal void Encode( Stream input, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition> progress )
+		internal void Encode( Stream input, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition>? progress )
 		{
 			var z = 0;
 
@@ -76,7 +76,7 @@ namespace Zeiss.PiWeb.Volume.Block
 			}, output, metadata, progress );
 		}
 
-		private void Encode( Func<byte[][]> getLayerAction, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition> progress )
+		private void Encode( Func<byte[][]> getLayerAction, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition>? progress )
 		{
 			var (bcx, bcy, _) = BlockVolume.GetBlockCount( metadata );
 
@@ -125,7 +125,7 @@ namespace Zeiss.PiWeb.Volume.Block
 							writer.Write( (sbyte)block[ i ] );
 				}
 
-				progress.Report( new VolumeSliceDefinition( Direction.Z, (ushort)( blockIndexZ * BlockVolume.N ) ) );
+				progress?.Report( new VolumeSliceDefinition( Direction.Z, (ushort)( blockIndexZ * BlockVolume.N ) ) );
 			}
 		}
 

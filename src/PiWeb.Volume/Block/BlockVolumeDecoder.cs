@@ -43,9 +43,9 @@ namespace Zeiss.PiWeb.Volume.Block
 		internal void Decode( Stream input,
 			VolumeMetadata metadata,
 			BlockAction blockAction,
-			LayerPredicate layerPredicate = null,
-			BlockPredicate blockPredicate = null,
-			IProgress<VolumeSliceDefinition> progress = null,
+			LayerPredicate? layerPredicate = null,
+			BlockPredicate? blockPredicate = null,
+			IProgress<VolumeSliceDefinition>? progress = null,
 			CancellationToken ct = default )
 		{
 			var quantization = Quantization.Calculate( _Options, true );
@@ -96,22 +96,28 @@ namespace Zeiss.PiWeb.Volume.Block
 
 		private static void ReadLayer( BinaryReader reader, int blockCount, short[] encodedBlocks, ushort[] encodedBlockLengths )
 		{
+			var blockBuffer = ArrayPool<short>.Shared.Rent( BlockVolume.N3 );
+
 			for( var i = 0; i < blockCount; i++ )
 			{
 				var resultLength = reader.ReadUInt16();
 
-				var dataIndex = i * BlockVolume.N3;
+				var dataIndex = 0;
 				var length = resultLength & 0x0FFF;
 				var firstLength = ( resultLength & 0b0011000000000000 ) >> 12;
 				var otherLength = ( resultLength & 0b1100000000000000 ) >> 14;
 
 				encodedBlockLengths[ i ] = (ushort)length;
 				if( length > 0 )
-					encodedBlocks[ dataIndex++ ] = firstLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
+					blockBuffer[ dataIndex++ ] = firstLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
 
 				for( var j = 1; j < length; j++ )
-					encodedBlocks[ dataIndex++ ] = otherLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
+					blockBuffer[ dataIndex++ ] = otherLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
+
+				Buffer.BlockCopy( blockBuffer, 0, encodedBlocks, i * BlockVolume.N3 * sizeof(short), BlockVolume.N3 * sizeof(short) );
 			}
+
+			ArrayPool<short>.Shared.Return( blockBuffer );
 		}
 
 		private static void DecodeLayer(
@@ -122,7 +128,7 @@ namespace Zeiss.PiWeb.Volume.Block
 			ushort blockIndexZ,
 			double[] quantization,
 			int[] zigzag,
-			BlockPredicate blockPredicate,
+			BlockPredicate? blockPredicate,
 			BlockAction blockAction )
 		{
 			Parallel.For( 0, blockCountX * blockCountY, () => (

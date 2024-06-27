@@ -44,10 +44,10 @@ namespace Zeiss.PiWeb.Volume
 		/// <param name="encoderOptions">The encoder options.</param>
 		/// <param name="pixelFormat">The pixelformat.</param>
 		/// <param name="bitrate">The bitrate.</param>
-		public VolumeCompressionOptions( string encoder = "libopenh264", string pixelFormat = "yuv420p", Dictionary<string, string> encoderOptions = null, int bitrate = -1 )
+		public VolumeCompressionOptions( string encoder = "libopenh264", string pixelFormat = "yuv420p", Dictionary<string, string>? encoderOptions = null, int bitrate = -1 )
 		{
 			Encoder = encoder;
-			EncoderOptions = encoderOptions;
+			EncoderOptions = encoderOptions ?? new Dictionary<string, string>();
 			PixelFormat = pixelFormat;
 			Bitrate = bitrate;
 		}
@@ -62,7 +62,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <value>
 		/// The codec.
 		/// </value>
-		public string Encoder { get; private set; }
+		public string Encoder { get; private set; } = string.Empty;
 
 		/// <summary>
 		///     Gets the codec options.
@@ -70,12 +70,12 @@ namespace Zeiss.PiWeb.Volume
 		/// <value>
 		///     The codec options.
 		/// </value>
-		public Dictionary<string, string> EncoderOptions { get; private set; }
+		public IReadOnlyDictionary<string, string> EncoderOptions { get; private set; } = new Dictionary<string, string>();
 
 		/// <summary>
 		/// Gets the pixel format
 		/// </summary>
-		public string PixelFormat { get; private set; }
+		public string PixelFormat { get; private set; } = string.Empty;
 
 		/// <summary>
 		/// Gets the bitrate.
@@ -98,19 +98,18 @@ namespace Zeiss.PiWeb.Volume
 				CloseOutput = false
 			};
 
-			using( var writer = XmlWriter.Create( stream, settings ) )
-			{
-				writer.WriteStartDocument( true );
-				writer.WriteStartElement( "VolumeCompressionOptions" );
+			using var writer = XmlWriter.Create( stream, settings );
 
-				writer.WriteElementString( "Encoder", Encoder );
-				writer.WriteElementString( "EncoderOptions", GetOptionsString() );
-				writer.WriteElementString( "PixelFormat", PixelFormat );
-				writer.WriteElementString( "Bitrate", Bitrate.ToString( CultureInfo.InvariantCulture ) );
+			writer.WriteStartDocument( true );
+			writer.WriteStartElement( "VolumeCompressionOptions" );
 
-				writer.WriteEndElement();
-				writer.WriteEndDocument();
-			}
+			writer.WriteElementString( "Encoder", Encoder );
+			writer.WriteElementString( "EncoderOptions", GetOptionsString() );
+			writer.WriteElementString( "PixelFormat", PixelFormat );
+			writer.WriteElementString( "Bitrate", Bitrate.ToString( CultureInfo.InvariantCulture ) );
+
+			writer.WriteEndElement();
+			writer.WriteEndDocument();
 		}
 
 		internal static VolumeCompressionOptions Deserialize( Stream stream )
@@ -124,34 +123,36 @@ namespace Zeiss.PiWeb.Volume
 				NameTable = new NameTable()
 			};
 
-			using( var reader = XmlReader.Create( stream, settings ) )
-			{
-				var result = new VolumeCompressionOptions();
-				reader.MoveToElement();
-				while( reader.Read() )
-					switch( reader.Name )
-					{
-						case "Encoder":
-							result.Encoder = reader.ReadString();
-							break;
-						case "EncoderOptions":
-							result.EncoderOptions = OptionsFromString( reader.ReadString() );
-							break;
-						case "PixelFormat":
-							result.PixelFormat = reader.ReadString();
-							break;
-						case "Bitrate":
-							result.Bitrate = int.Parse( reader.ReadString(), NumberStyles.Integer, CultureInfo.InvariantCulture );
-							break;
-					}
+			using var reader = XmlReader.Create( stream, settings );
 
-				return result;
+			var result = new VolumeCompressionOptions();
+			reader.MoveToElement();
+
+			while( reader.Read() )
+			{
+				switch( reader.Name )
+				{
+					case "Encoder":
+						result.Encoder = reader.ReadString();
+						break;
+					case "EncoderOptions":
+						result.EncoderOptions = OptionsFromString( reader.ReadString() );
+						break;
+					case "PixelFormat":
+						result.PixelFormat = reader.ReadString();
+						break;
+					case "Bitrate":
+						result.Bitrate = int.Parse( reader.ReadString(), NumberStyles.Integer, CultureInfo.InvariantCulture );
+						break;
+				}
 			}
+
+			return result;
 		}
 
 		internal string GetOptionsString()
 		{
-			if( EncoderOptions == null )
+			if( EncoderOptions.Count == 0 )
 				return string.Empty;
 
 			return string.Join( ";", EncoderOptions.Select( o => $"{o.Key}={o.Value}" ) );

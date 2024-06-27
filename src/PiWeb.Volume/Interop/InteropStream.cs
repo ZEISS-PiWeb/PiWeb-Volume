@@ -29,11 +29,11 @@ namespace Zeiss.PiWeb.Volume.Interop
 	{
 		#region members
 
-		public Read Read;
+		public Read? Read;
 
-		public Write Write;
+		public Write? Write;
 
-		public Seek Seek;
+		public Seek? Seek;
 
 		#endregion
 	}

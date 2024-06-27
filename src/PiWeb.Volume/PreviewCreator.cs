@@ -33,7 +33,7 @@ namespace Zeiss.PiWeb.Volume
 
 		private readonly VolumeMetadata _Metadata;
 		private readonly ushort _Minification;
-		private readonly IProgress<VolumeSliceDefinition> _Progress;
+		private readonly IProgress<VolumeSliceDefinition>? _Progress;
 		private readonly CancellationToken _Ct;
 
 		private readonly List<Task<VolumeSlice>> _PreviewData;
@@ -46,7 +46,7 @@ namespace Zeiss.PiWeb.Volume
 
 		#region constructors
 
-		internal PreviewCreator( VolumeMetadata metadata, ushort minification, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		internal PreviewCreator( VolumeMetadata metadata, ushort minification, IProgress<VolumeSliceDefinition>? progress = null, CancellationToken ct = default )
 		{
 			_Metadata = metadata ?? throw new ArgumentNullException( nameof( metadata ) );
 			_Minification = minification;
@@ -121,7 +121,7 @@ namespace Zeiss.PiWeb.Volume
 				.ToArray();
 		}
 
-		internal static UncompressedVolume CreatePreview( Stream stream, VolumeMetadata metadata, ushort minification, IProgress<VolumeSliceDefinition> progress )
+		internal static UncompressedVolume CreatePreview( Stream stream, VolumeMetadata metadata, ushort minification, IProgress<VolumeSliceDefinition>? progress = null )
 		{
 			var sizeX = metadata.SizeX;
 			var sizeY = metadata.SizeY;

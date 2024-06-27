@@ -51,13 +51,12 @@ namespace Zeiss.PiWeb.Volume.Block
 
 		#region methods
 
-		internal VolumeSlice[] Decompress( IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		internal VolumeSlice[] Decompress( IProgress<VolumeSliceDefinition>? progress = null, CancellationToken ct = default )
 		{
-			if( _Volume.CompressedData[ Direction.Z ] == null )
+			if( _Volume.CompressedData[ Direction.Z ] is not {} data )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
 			var decoder = new BlockVolumeDecoder( _Volume.CompressionOptions );
-			var data = _Volume.CompressedData[ Direction.Z ];
 			var input = new MemoryStream( data );
 			var result = VolumeSliceHelper.CreateSliceBuffer( _SizeX, _SizeY, _SizeZ );
 

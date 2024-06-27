@@ -28,7 +28,7 @@ namespace Zeiss.PiWeb.Volume
 
 		private readonly IReadOnlyList<VolumeSlice> _Slices;
 		private readonly Direction _ReadDirection;
-		private readonly IProgress<VolumeSliceDefinition> _ProgressNotifier;
+		private readonly IProgress<VolumeSliceDefinition>? _ProgressNotifier;
 		private readonly CancellationToken _Ct;
 
 		private readonly ushort _SizeX;
@@ -42,7 +42,12 @@ namespace Zeiss.PiWeb.Volume
 
 		#region constructors
 
-		internal SliceReader( VolumeMetadata metadata, IReadOnlyList<VolumeSlice> slices, Direction readDirection = Direction.Z, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default )
+		internal SliceReader(
+			VolumeMetadata metadata,
+			IReadOnlyList<VolumeSlice> slices,
+			Direction readDirection = Direction.Z,
+			IProgress<VolumeSliceDefinition>? progressNotifier = null,
+			CancellationToken ct = default )
 		{
 			_Slices = slices;
 			_ReadDirection = readDirection;

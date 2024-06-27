@@ -24,7 +24,7 @@ namespace Zeiss.PiWeb.Volume.Interop
 	{
 		#region members
 
-		public ReadSliceCallback ReadSlice;
+		public ReadSliceCallback? ReadSlice;
 
 		#endregion
 	}
