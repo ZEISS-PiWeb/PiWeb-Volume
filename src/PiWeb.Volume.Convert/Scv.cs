@@ -143,7 +143,7 @@ namespace Zeiss.PiWeb.Volume.Convert
 
 			result.Properties.Add( Property.Create( "HeaderSize", HeaderLength ) );
 			result.Properties.Add( Property.Create( "MirrorZ", MirrorZ ) );
-			result.Properties.Add( Property.Create( "Bitdepth", BitDepth ) );
+			result.Properties.Add( Property.Create( "BitDepth", BitDepth ) );
 			result.Properties.Add( Property.Create( "MinBitDepth", MinBitDepth ) );
 			result.Properties.Add( Property.Create( "MaxBitDepth", MaxBitDepth ) );
 			result.Properties.Add( Property.Create( "ScannerPositionX", ScannerPositionX ) );
@@ -187,7 +187,7 @@ namespace Zeiss.PiWeb.Volume.Convert
 			return result;
 		}
 
-		public static Scv Parse( Stream stream )
+		public static Scv Parse( Stream stream, int bitDepthFromExtension )
 		{
 			var result = new Scv();
 
@@ -248,6 +248,9 @@ namespace Zeiss.PiWeb.Volume.Convert
 			result.MaxReko = reader.ReadSingle();
 			result.Angle = reader.ReadSingle();
 			result.Merge = reader.ReadByte();
+
+			if( result.BitDepth == 0 )
+				result.BitDepth = bitDepthFromExtension;
 
 			return result;
 		}

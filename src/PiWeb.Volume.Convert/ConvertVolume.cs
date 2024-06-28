@@ -89,6 +89,7 @@ namespace Zeiss.PiWeb.Volume.Convert
 		/// <param name="maxValue"></param>
 		public static Volume FromScv(
 			Stream scvStream,
+			int bitDepthFromExtension,
 			bool extraPolate,
 			byte minValue,
 			byte maxValue,
@@ -99,7 +100,7 @@ namespace Zeiss.PiWeb.Volume.Convert
 			var sw = Stopwatch.StartNew();
 			try
 			{
-				var scv = Scv.Parse( scvStream );
+				var scv = Scv.Parse( scvStream, bitDepthFromExtension );
 
 				scvStream.Seek( scv.HeaderLength, SeekOrigin.Begin );
 
@@ -132,9 +133,8 @@ namespace Zeiss.PiWeb.Volume.Convert
 		/// </summary>
 		/// <param name="uint16Stream">Stream containing the uint16 data.</param>
 		/// <param name="metadata">Metadata</param>
-		/// <param name="streamed"></param>
 		/// <param name="progress">Progress</param>
-		public static Volume FromUint16( Stream uint16Stream, VolumeMetadata metadata, bool streamed, IProgress<double> progress, ILogger logger = null )
+		public static Volume FromUint16( Stream uint16Stream, VolumeMetadata metadata, IProgress<double> progress, ILogger logger = null )
 		{
 			var sw = Stopwatch.StartNew();
 			try

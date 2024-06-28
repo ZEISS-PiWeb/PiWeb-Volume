@@ -287,13 +287,14 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
                 return;
 
             var scv = File.OpenRead( FileName );
-
+			var bitDepthFromExtension = string.Equals( Path.GetExtension( FileName ), ".uint16_scv" ) ? 16 : 8;
             var progress = new DoubleProgress();
 
             progress.ProgressChanged += OnProgressChanged;
 
             var volume = await Task.Run( () => ConvertVolume.FromScv(
                 scv,
+				bitDepthFromExtension,
                 loadOptionsViewModel.Extrapolate,
                 loadOptionsViewModel.Minimum,
                 loadOptionsViewModel.Maximum,
