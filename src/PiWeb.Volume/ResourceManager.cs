@@ -29,7 +29,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <returns></returns>
 		internal static string GetResource<T>( string name )
 		{
-			return new ResourceManager( typeof( T ) ).GetString( name, CultureInfo.CurrentUICulture );
+			return new ResourceManager( typeof( T ) ).GetString( name, CultureInfo.CurrentUICulture ) ?? $"#{name}";
 		}
 
 		/// <summary>
@@ -43,7 +43,7 @@ namespace Zeiss.PiWeb.Volume
 		{
 			var value = new ResourceManager( typeof( T ) ).GetString( name, CultureInfo.CurrentUICulture );
 			if( string.IsNullOrEmpty( value ) )
-				return "";
+				return $"#{name}";
 
 			return string.Format( value, args );
 		}

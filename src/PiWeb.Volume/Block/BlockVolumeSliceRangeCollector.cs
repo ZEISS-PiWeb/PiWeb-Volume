@@ -101,13 +101,12 @@ namespace Zeiss.PiWeb.Volume.Block
 			};
 		}
 
-		internal VolumeSliceCollection CollectSliceRanges( IProgress<VolumeSliceDefinition> progress, CancellationToken ct )
+		internal VolumeSliceCollection CollectSliceRanges( IProgress<VolumeSliceDefinition>? progress, CancellationToken ct )
 		{
-			if( _Volume.CompressedData[ Direction.Z ] == null )
+			if( _Volume.CompressedData[ Direction.Z ] is not {} data )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
 			var decoder = new BlockVolumeDecoder( _Volume.CompressionOptions );
-			var data = _Volume.CompressedData[ Direction.Z ];
 			var input = new MemoryStream( data );
 
 			decoder.Decode( input, _Metadata, ( block, index ) =>

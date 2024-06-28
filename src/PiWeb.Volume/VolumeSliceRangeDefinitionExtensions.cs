@@ -50,7 +50,7 @@ namespace Zeiss.PiWeb.Volume
 					}
 				}
 
-				if( first.HasValue )
+				if( first.HasValue && last.HasValue )
 					yield return new VolumeSliceRangeDefinition( group.Key, first.Value, last.Value );
 			}
 		}

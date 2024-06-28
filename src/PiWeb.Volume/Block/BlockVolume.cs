@@ -41,11 +41,11 @@ namespace Zeiss.PiWeb.Volume.Block
 			: base( metadata, options, compressedData )
 		{ }
 
-		internal BlockVolume( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
+		internal BlockVolume( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress )
 			: base( metadata, options, CreateDirectionMap( input, metadata, options, progress ) )
 		{ }
 
-		internal BlockVolume( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
+		internal BlockVolume( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress )
 			: base( metadata, options, CreateDirectionMap( slices, metadata, options, progress ) )
 		{ }
 
@@ -53,7 +53,7 @@ namespace Zeiss.PiWeb.Volume.Block
 
 		#region methods
 
-		private static DirectionMap CreateDirectionMap( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
+		private static DirectionMap CreateDirectionMap( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress )
 		{
 			var encoder = new BlockVolumeEncoder( options );
 			var output = new MemoryStream();
@@ -63,7 +63,7 @@ namespace Zeiss.PiWeb.Volume.Block
 			return new DirectionMap { [ Direction.Z ] = output.ToArray() };
 		}
 
-		private static DirectionMap CreateDirectionMap( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress )
+		private static DirectionMap CreateDirectionMap( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress )
 		{
 			var encoder = new BlockVolumeEncoder( options );
 			var output = new MemoryStream();
@@ -74,7 +74,7 @@ namespace Zeiss.PiWeb.Volume.Block
 		}
 
 		/// <inheritdoc />
-		public override UncompressedVolume Decompress( IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public override UncompressedVolume Decompress( IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
 			try
@@ -117,7 +117,7 @@ namespace Zeiss.PiWeb.Volume.Block
 		}
 
 		/// <inheritdoc />
-		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
 		{
 			if( CompressedData[ Direction.Z ] == null )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
@@ -135,21 +135,19 @@ namespace Zeiss.PiWeb.Volume.Block
 		public override void GetSlice(
 			VolumeSliceDefinition slice,
 			byte[] buffer,
-			IProgress<VolumeSliceDefinition> progress = null,
-			ILogger logger = null,
+			IProgress<VolumeSliceDefinition>? progress = null,
+			ILogger? logger = null,
 			CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
-
-			var sliceBuffer = new byte[ Metadata.GetSliceLength( slice.Direction ) ];
-			var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, slice, sliceBuffer );
+			var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, slice, buffer );
 			sliceRangeCollector.CollectSliceRanges( progress, ct );
 
 			logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
 		}
 
 		/// <inheritdoc />
-		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
 
@@ -163,7 +161,7 @@ namespace Zeiss.PiWeb.Volume.Block
 		}
 
 		/// <inheritdoc />
-		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
 

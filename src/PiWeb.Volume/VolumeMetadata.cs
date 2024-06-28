@@ -292,7 +292,9 @@ namespace Zeiss.PiWeb.Volume
 						result.ResolutionZ = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 						break;
 					case "Property":
-						result.Properties.Add( Property.Deserialize( reader ) );
+						var property = Property.Deserialize( reader );
+						if( property is not null )
+							result.Properties.Add( property );
 						break;
 					case "PositionX":
 						result.PositionX = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );

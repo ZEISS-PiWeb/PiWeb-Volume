@@ -185,6 +185,8 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
             VolumeViewModel = new VolumeViewModel( decompressedVolume, decompressedVolume, 1, _Logger );
 
             IsLoading = false;
+
+			CommandManager.InvalidateRequerySuggested();
         }
 
         private bool CanExecuteCreatePreview()

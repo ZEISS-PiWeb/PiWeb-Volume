@@ -24,7 +24,7 @@ namespace Zeiss.PiWeb.Volume.Interop
 	{
 		#region members
 
-		public WriteSliceCallback WriteSlice;
+		public WriteSliceCallback? WriteSlice;
 
 		#endregion
 	}

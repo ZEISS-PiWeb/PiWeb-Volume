@@ -25,7 +25,7 @@ namespace Zeiss.PiWeb.Volume
 	{
 		#region members
 
-		private readonly IProgress<VolumeSliceDefinition> _ProgressNotifier;
+		private readonly IProgress<VolumeSliceDefinition>? _ProgressNotifier;
 		private readonly CancellationToken _Ct;
 
 		private readonly ushort _SizeX;
@@ -39,7 +39,7 @@ namespace Zeiss.PiWeb.Volume
 
 		#region constructors
 
-		internal SliceStreamReader( VolumeMetadata metadata, Stream stream, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default )
+		internal SliceStreamReader( VolumeMetadata metadata, Stream stream, IProgress<VolumeSliceDefinition>? progressNotifier = null, CancellationToken ct = default )
 		{
 			_Stream = stream;
 
@@ -51,7 +51,7 @@ namespace Zeiss.PiWeb.Volume
 			_SizeY = metadata.SizeY;
 			_SizeZ = metadata.SizeZ;
 
-			_Buffer = new byte[ 0 ];
+			_Buffer = Array.Empty<byte>();
 
 			Interop = new InteropSliceReader
 			{

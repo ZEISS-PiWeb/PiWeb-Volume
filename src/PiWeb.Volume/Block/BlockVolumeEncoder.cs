@@ -42,7 +42,7 @@ namespace Zeiss.PiWeb.Volume.Block
 		/// <summary>
 		/// Encodes the specified input data which is a complete volume in z-slices.
 		/// </summary>
-		internal void Encode( IReadOnlyList<VolumeSlice> slices, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition> progress )
+		internal void Encode( IReadOnlyList<VolumeSlice> slices, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition>? progress )
 		{
 			var z = 0;
 			var buffer = new byte[ BlockVolume.N ][];
@@ -59,7 +59,7 @@ namespace Zeiss.PiWeb.Volume.Block
 		/// <summary>
 		/// Encodes the input data that is coming from the specified input stream.
 		/// </summary>
-		internal void Encode( Stream input, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition> progress )
+		internal void Encode( Stream input, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition>? progress )
 		{
 			var z = 0;
 
@@ -76,7 +76,7 @@ namespace Zeiss.PiWeb.Volume.Block
 			}, output, metadata, progress );
 		}
 
-		private void Encode( Func<byte[][]> getLayerAction, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition> progress )
+		private void Encode( Func<byte[][]> getLayerAction, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition>? progress )
 		{
 			var (bcx, bcy, _) = BlockVolume.GetBlockCount( metadata );
 
@@ -125,7 +125,7 @@ namespace Zeiss.PiWeb.Volume.Block
 							writer.Write( (sbyte)block[ i ] );
 				}
 
-				progress.Report( new VolumeSliceDefinition( Direction.Z, (ushort)( blockIndexZ * BlockVolume.N ) ) );
+				progress?.Report( new VolumeSliceDefinition( Direction.Z, (ushort)( blockIndexZ * BlockVolume.N ) ) );
 			}
 		}
 
@@ -133,7 +133,7 @@ namespace Zeiss.PiWeb.Volume.Block
 		{
 			Parallel.For( 0, inputBlocks.Length,
 				() => ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
-				( blockIndex, state, buffer ) =>
+				( blockIndex, _, buffer ) =>
 				{
 					var inputBlock = inputBlocks[ blockIndex ];
 					var resultBlock = resultBlocks[ blockIndex ];
@@ -154,7 +154,8 @@ namespace Zeiss.PiWeb.Volume.Block
 						resultBlock[ i ] = (short)Math.Max( short.MinValue, Math.Min( short.MaxValue, Math.Round( inputBlock[ i ] ) ) );
 
 					var count = 0;
-					var isShort = false;
+					var isFirstValueShort = resultBlock[ 0 ] is > sbyte.MaxValue or < sbyte.MinValue;
+					var areOtherValuesShort = false;
 
 					for( var i = 0; i < BlockVolume.N3; i++ )
 					{
@@ -162,8 +163,8 @@ namespace Zeiss.PiWeb.Volume.Block
 						if( value != 0 )
 							count = i + 1;
 
-						if( i > 0 )
-							isShort |= IsShort( value );
+						if( i > 0 && ( value is > sbyte.MaxValue or < sbyte.MinValue ) )
+							areOtherValuesShort = true;
 					}
 
 					//resultLength has 16 bits:
@@ -171,16 +172,11 @@ namespace Zeiss.PiWeb.Volume.Block
 					//Bit 12 - 13: number of bytes of the first value of the block
 					//Bit 14 - 15: number of bytes of the other values of the block
 					resultLengths[ blockIndex ] = (ushort)( count & 0x0FFF );
-					resultLengths[ blockIndex ] = (ushort)( resultLengths[ blockIndex ] | ( IsShort( resultBlock[ 0 ] ) ? 2 << 12 : 1 << 12 ) );
-					resultLengths[ blockIndex ] = (ushort)( resultLengths[ blockIndex ] | ( isShort ? 2 << 14 : 1 << 14 ) );
+					resultLengths[ blockIndex ] = (ushort)( resultLengths[ blockIndex ] | ( isFirstValueShort ? 2 << 12 : 1 << 12 ) );
+					resultLengths[ blockIndex ] = (ushort)( resultLengths[ blockIndex ] | ( areOtherValuesShort ? 2 << 14 : 1 << 14 ) );
 
 					return buffer;
 				}, buffer => ArrayPool<double>.Shared.Return( buffer ) );
-		}
-
-		private static bool IsShort( short value )
-		{
-			return value > byte.MaxValue || value < byte.MinValue;
 		}
 
 		private static void CreateLayer( byte[][] layer, double[][] blocks, ushort blockIndexZ, VolumeMetadata metadata )

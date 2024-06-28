@@ -43,34 +43,17 @@ namespace Zeiss.PiWeb.Volume.Block
 		internal void Decode( Stream input,
 			VolumeMetadata metadata,
 			BlockAction blockAction,
-			LayerPredicate layerPredicate = null,
-			BlockPredicate blockPredicate = null,
-			IProgress<VolumeSliceDefinition> progress = null,
+			LayerPredicate? layerPredicate = null,
+			BlockPredicate? blockPredicate = null,
+			IProgress<VolumeSliceDefinition>? progress = null,
 			CancellationToken ct = default )
 		{
-			var sz = metadata.SizeZ;
-			var sy = metadata.SizeY;
-			var sx = metadata.SizeX;
-
 			var quantization = Quantization.Calculate( _Options, true );
 			var zigzag = ZigZag.Calculate();
-
-			var result = new byte[ sz ][];
-
-			for( var z = 0; z < sz; z++ )
-				result[ z ] = new byte[ sx * sy ];
-
 			var (bcx, bcy, bcz) = BlockVolume.GetBlockCount( metadata );
 			var blockCount = bcx * bcy;
 			var encodedBlockLengths = new ushort[ blockCount ];
-			var encodedBlocks = new short[ blockCount ][];
-			var decodedBlocks = new double[ blockCount ][];
-
-			for( var i = 0; i < blockCount; i++ )
-			{
-				encodedBlocks[ i ] = new short[ BlockVolume.N3 ];
-				decodedBlocks[ i ] = new double[ BlockVolume.N3 ];
-			}
+			var encodedBlocks = new short[ blockCount * BlockVolume.N3 ];
 
 			using var reader = new BinaryReader( input );
 
@@ -83,8 +66,8 @@ namespace Zeiss.PiWeb.Volume.Block
 				}
 				else
 				{
-					ReadLayer( reader, encodedBlocks, encodedBlockLengths );
-					DecodeLayer( encodedBlocks, encodedBlockLengths, bcx, biz, quantization, zigzag, blockPredicate, blockAction );
+					ReadLayer( reader, blockCount, encodedBlocks, encodedBlockLengths );
+					DecodeLayer( encodedBlocks, encodedBlockLengths, bcx, bcy, biz, quantization, zigzag, blockPredicate, blockAction );
 				}
 
 				progress?.Report( new VolumeSliceDefinition( Direction.Z, (ushort)( biz * BlockVolume.N ) ) );
@@ -111,40 +94,48 @@ namespace Zeiss.PiWeb.Volume.Block
 			}
 		}
 
-		private static void ReadLayer( BinaryReader reader, short[][] encodedBlocks, ushort[] encodedBlockLengths )
+		private static void ReadLayer( BinaryReader reader, int blockCount, short[] encodedBlocks, ushort[] encodedBlockLengths )
 		{
-			for( var i = 0; i < encodedBlocks.Length; i++ )
+			var blockBuffer = ArrayPool<short>.Shared.Rent( BlockVolume.N3 );
+
+			for( var i = 0; i < blockCount; i++ )
 			{
 				var resultLength = reader.ReadUInt16();
 
+				var dataIndex = 0;
 				var length = resultLength & 0x0FFF;
 				var firstLength = ( resultLength & 0b0011000000000000 ) >> 12;
 				var otherLength = ( resultLength & 0b1100000000000000 ) >> 14;
 
 				encodedBlockLengths[ i ] = (ushort)length;
 				if( length > 0 )
-					encodedBlocks[ i ][ 0 ] = firstLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
+					blockBuffer[ dataIndex++ ] = firstLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
 
 				for( var j = 1; j < length; j++ )
-					encodedBlocks[ i ][ j ] = otherLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
+					blockBuffer[ dataIndex++ ] = otherLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
+
+				Buffer.BlockCopy( blockBuffer, 0, encodedBlocks, i * BlockVolume.N3 * sizeof(short), BlockVolume.N3 * sizeof(short) );
 			}
+
+			ArrayPool<short>.Shared.Return( blockBuffer );
 		}
 
 		private static void DecodeLayer(
-			short[][] encodedBlocks,
+			short[] encodedBlocks,
 			ushort[] encodedBlockLengths,
 			ushort blockCountX,
+			ushort blockCountY,
 			ushort blockIndexZ,
 			double[] quantization,
 			int[] zigzag,
-			BlockPredicate blockPredicate,
+			BlockPredicate? blockPredicate,
 			BlockAction blockAction )
 		{
-			Parallel.For( 0, encodedBlocks.Length, () => (
+			Parallel.For( 0, blockCountX * blockCountY, () => (
 					ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
 					ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
 					ArrayPool<byte>.Shared.Rent( BlockVolume.N3 )
-				), ( index, state, buffers ) =>
+				), ( index, _, buffers ) =>
 				{
 					var blockIndexX = index % blockCountX;
 					var blockIndexY = index / blockCountX;
@@ -153,7 +144,6 @@ namespace Zeiss.PiWeb.Volume.Block
 					if( blockPredicate?.Invoke( blockIndex ) == false )
 						return buffers;
 
-					var encodedBlock = encodedBlocks[ index ];
 					var encodedLength = encodedBlockLengths[ index ];
 
 					var doubleBuffer1 = buffers.Item1;
@@ -161,8 +151,8 @@ namespace Zeiss.PiWeb.Volume.Block
 					var byteBuffer = buffers.Item3;
 
 					//1. Dediscretization
-					for( var i = 0; i < BlockVolume.N3; i++ )
-						doubleBuffer1[ i ] = i >= encodedLength ? 0 : encodedBlock[ i ];
+					for( int i = 0, di = index * BlockVolume.N3; i < BlockVolume.N3; i++, di++ )
+						doubleBuffer1[ i ] = i >= encodedLength ? 0 : encodedBlocks[ di ];
 
 					//2. ZigZag
 					for( var i = 0; i < BlockVolume.N3; i++ )
