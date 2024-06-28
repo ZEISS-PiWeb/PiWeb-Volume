@@ -246,7 +246,7 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
         {
             _Subcription?.Dispose();
 
-            if( _Preview != null )
+			if( _Preview != null )
             {
                 var previewLayer = UpdateLayer( _Preview, Math.Min( ( ushort ) Math.Round( _SelectedLayerIndex / ( double ) Minification ), ( ushort ) _MaxPreviewLayer ) );
                 WriteImage( PreviewLayerImage, previewLayer );
