@@ -129,11 +129,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <summary>
 		/// Gets or sets the metadata.
 		/// </summary>
-		public ICollection<Property> Properties
-		{
-			get => _Properties;
-			set => _Properties = value ?? Array.Empty<Property>();
-		}
+		public ICollection<Property> Properties { get; } = new List<Property>();
 
 		#endregion
 
@@ -184,7 +180,7 @@ namespace Zeiss.PiWeb.Volume
 		/// Returns the required size of the slice buffer in the specified direction.
 		/// </summary>
 		/// <param name="direction"></param>
-		internal int GetSliceLength( Direction direction )
+		public int GetSliceLength( Direction direction )
 		{
 			switch( direction )
 			{

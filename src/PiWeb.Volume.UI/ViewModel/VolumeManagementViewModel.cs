@@ -10,346 +10,391 @@
 
 namespace Zeiss.PiWeb.Volume.UI.ViewModel
 {
-    #region usings
+	#region usings
 
-    using System;
-    using System.IO;
-    using System.Threading.Tasks;
-    using System.Windows;
-    using System.Windows.Input;
-    using GalaSoft.MvvmLight;
-    using GalaSoft.MvvmLight.CommandWpf;
-    using Zeiss.PiWeb.Volume.Convert;
-    using Zeiss.PiWeb.Volume.UI.Interfaces;
-    using Zeiss.PiWeb.Volume.UI.Model;
+	using System;
+	using System.IO;
+	using System.Threading.Tasks;
+	using System.Windows;
+	using System.Windows.Input;
+	using GalaSoft.MvvmLight;
+	using GalaSoft.MvvmLight.CommandWpf;
+	using Zeiss.PiWeb.Volume.Convert;
+	using Zeiss.PiWeb.Volume.UI.Interfaces;
+	using Zeiss.PiWeb.Volume.UI.Model;
 
-    #endregion
+	#endregion
 
-    public class VolumeManagementViewModel : ViewModelBase
-    {
-        #region members
+	public class VolumeManagementViewModel : ViewModelBase
+	{
+		#region members
 
-        private readonly IFileService _FileService;
-        private readonly IMessageService _MessageService;
-        private readonly IViewService _ViewService;
-        private readonly ILogger _Logger = new ConsoleLogger();
+		private readonly IFileService _FileService;
+		private readonly IMessageService _MessageService;
+		private readonly IViewService _ViewService;
+		private readonly ILogger _Logger = new ConsoleLogger();
 
-        private VolumeViewModel _VolumeViewModel;
-        private string _FileName;
-        private string _ProgressMessage;
-        private double _Progress;
-        private bool _IsLoading;
+		private VolumeViewModel _VolumeViewModel;
+		private string _FileName;
+		private string _ProgressMessage;
+		private double _Progress;
+		private bool _IsLoading;
 
-        #endregion
+		#endregion
 
-        #region constructors
+		#region constructors
 
-        public VolumeManagementViewModel(
-            IFileService fileService,
-            IMessageService messageService,
-            IViewService viewService )
-        {
-            _FileService = fileService;
-            _MessageService = messageService;
-            _ViewService = viewService;
-        }
+		public VolumeManagementViewModel(
+			IFileService fileService,
+			IMessageService messageService,
+			IViewService viewService )
+		{
+			_FileService = fileService;
+			_MessageService = messageService;
+			_ViewService = viewService;
+		}
 
-        #endregion
+		#endregion
 
-        #region events
+		#region events
 
-        public event EventHandler<EventArgs> VolumeChanged;
+		public event EventHandler<EventArgs> VolumeChanged;
 
-        #endregion
+		#endregion
 
-        #region commands
+		#region commands
 
-        public ICommand OpenVolumeCommand => new RelayCommand( ExecuteOpenVolume );
+		public ICommand OpenVolumeCommand => new RelayCommand( ExecuteOpenVolume );
 
-        public ICommand SaveVolumeCommand => new RelayCommand( ExecuteSaveVolume, CanExecuteSaveVolume );
+		public ICommand SaveVolumeCommand => new RelayCommand( ExecuteSaveVolume, CanExecuteSaveVolume );
 
-        public ICommand DecompressCommand => new RelayCommand( ExecuteDecompress, CanExecuteDecompress );
+		public ICommand DecompressCommand => new RelayCommand( ExecuteDecompress, CanExecuteDecompress );
 
-        public ICommand CreatePreviewCommand => new RelayCommand( ExecuteCreatePreview, CanExecuteCreatePreview );
+		public ICommand CreatePreviewCommand => new RelayCommand( ExecuteCreatePreview, CanExecuteCreatePreview );
 
-        #endregion
+		#endregion
 
-        #region properties
+		#region properties
 
-        public VolumeViewModel VolumeViewModel
-        {
-            get => _VolumeViewModel;
-            set
-            {
-                if( _VolumeViewModel?.Volume is IDisposable disposable )
-                    disposable.Dispose();
+		public VolumeViewModel VolumeViewModel
+		{
+			get => _VolumeViewModel;
+			set
+			{
+				if( _VolumeViewModel?.Volume is IDisposable disposable )
+					disposable.Dispose();
 
-                if( Set( ref _VolumeViewModel, value ) )
-                    VolumeChanged?.Invoke( this, EventArgs.Empty );
-            }
-        }
+				if( Set( ref _VolumeViewModel, value ) )
+					VolumeChanged?.Invoke( this, EventArgs.Empty );
+			}
+		}
 
-        public double Progress
-        {
-            get => _Progress;
-            set => Set( ref _Progress, value );
-        }
+		public double Progress
+		{
+			get => _Progress;
+			set => Set( ref _Progress, value );
+		}
 
-        public string ProgressMessage
-        {
-            get => _ProgressMessage;
-            set => Set( ref _ProgressMessage, value );
-        }
+		public string ProgressMessage
+		{
+			get => _ProgressMessage;
+			set => Set( ref _ProgressMessage, value );
+		}
 
-        public string FileName
-        {
-            get => _FileName;
-            set => Set( ref _FileName, value );
-        }
+		public string FileName
+		{
+			get => _FileName;
+			set => Set( ref _FileName, value );
+		}
 
-        public bool IsLoading
-        {
-            get => _IsLoading;
-            set => Set( ref _IsLoading, value );
-        }
+		public bool IsLoading
+		{
+			get => _IsLoading;
+			set => Set( ref _IsLoading, value );
+		}
 
-        #endregion
+		#endregion
 
-        #region methods
+		#region methods
 
-        private async void ExecuteSaveVolume()
-        {
-            if( !_FileService.SelectSaveFileName( out var fileName ) )
-                return;
+		private async void ExecuteSaveVolume()
+		{
+			if( !_FileService.SelectSaveFileName( out var fileName ) )
+				return;
 
-            await using var stream = File.Create( fileName );
+			await using var stream = File.Create( fileName );
 
-            var codecViewModel = new CodecViewModel();
+			switch( Path.GetExtension( fileName ).ToLower() )
+			{
+				case ".volx":
+					await SavePiWebVolume( stream );
+					break;
+				case ".uint8_scv":
+					await SaveCalypsoVolume( stream );
+					break;
+			}
+		}
 
-            if( _ViewService.RequestView( codecViewModel ) != true )
-                return;
+		private async Task SavePiWebVolume( Stream stream )
+		{
+			var codecViewModel = new CodecViewModel();
 
-            var options = codecViewModel.GetOptions();
-            var multiDirection = codecViewModel.MultiDirection;
+			if( _ViewService.RequestView( codecViewModel ) != true )
+				return;
 
-            IsLoading = true;
+			var options = codecViewModel.GetOptions();
+			var multiDirection = codecViewModel.MultiDirection;
 
-            var volume = VolumeViewModel.Volume;
-            var progress = new VolumeProgress( volume );
+			IsLoading = true;
 
-            progress.ProgressChanged += OnProgressChanged;
+			var volume = VolumeViewModel.Volume;
+			var progress = new VolumeProgress( volume );
 
-            if( volume is UncompressedVolume uncompressedVolume )
-                await Task.Run( () => uncompressedVolume.Save( stream, options, multiDirection, progress, _Logger ) );
-            else if( volume is StreamedVolume streamedVolume )
-                await Task.Run( () => streamedVolume.Save( stream, options, progress, _Logger ) );
+			progress.ProgressChanged += OnProgressChanged;
 
-            progress.ProgressChanged -= OnProgressChanged;
+			if( volume is UncompressedVolume uncompressedVolume )
+				await Task.Run( () => uncompressedVolume.Save( stream, options, multiDirection, progress, _Logger ) );
+			else if( volume is StreamedVolume streamedVolume )
+				await Task.Run( () => streamedVolume.Save( stream, options, progress, _Logger ) );
 
-            ProgressMessage = null;
-            Progress = 0.0;
+			progress.ProgressChanged -= OnProgressChanged;
 
-            IsLoading = false;
-        }
+			ProgressMessage = null;
+			Progress = 0.0;
 
-        private bool CanExecuteSaveVolume()
-        {
-            return VolumeViewModel?.Volume is UncompressedVolume ||
-                   VolumeViewModel?.Volume is StreamedVolume;
-        }
+			IsLoading = false;
+		}
 
-        private bool CanExecuteDecompress()
-        {
-            return VolumeViewModel?.Volume.GetCompressionState( Direction.Z ) == VolumeCompressionState.CompressedInDirection;
-        }
+		private async Task SaveCalypsoVolume( Stream stream )
+		{
+			IsLoading = true;
 
-        private async void ExecuteDecompress()
-        {
-            var volume = VolumeViewModel?.Volume as CompressedVolume;
-            if( volume?.GetCompressionState( Direction.Z ) != VolumeCompressionState.CompressedInDirection )
-                return;
+			var volume = VolumeViewModel.Volume;
+			var progress = new VolumeProgress( volume );
 
-            IsLoading = true;
+			progress.ProgressChanged += OnProgressChanged;
 
-            var progress = new VolumeProgress( volume );
+			var scv = Scv.FromMetaData( volume.Metadata, 8 );
+			scv.Write( stream );
+			stream.Seek( scv.HeaderLength, SeekOrigin.Begin );
 
-            progress.ProgressChanged += OnProgressChanged;
+			await Task.Run( () =>
+			{
+				var buffer = new byte[ volume.Metadata.GetSliceLength( Direction.Z ) ];
+				for( ushort z = 0; z < volume.Metadata.SizeZ; z++ )
+				{
+					volume.GetSlice( new VolumeSliceDefinition( Direction.Z, z ), buffer, progress );
+					stream.Write( buffer, 0, buffer.Length );
+				}
+			} );
 
-            var decompressedVolume = await Task.Run( () => volume.Decompress( progress, _Logger ) );
+			progress.ProgressChanged -= OnProgressChanged;
 
-            progress.ProgressChanged -= OnProgressChanged;
+			ProgressMessage = null;
+			Progress = 0.0;
 
-            ProgressMessage = null;
-            Progress = 0.0;
+			IsLoading = false;
+		}
 
-            VolumeViewModel = new VolumeViewModel( decompressedVolume, decompressedVolume, 1, _Logger );
+		private bool CanExecuteSaveVolume()
+		{
+			return VolumeViewModel?.Volume is UncompressedVolume ||
+				VolumeViewModel?.Volume is StreamedVolume;
+		}
 
-            IsLoading = false;
+		private bool CanExecuteDecompress()
+		{
+			return VolumeViewModel?.Volume.GetCompressionState( Direction.Z ) == VolumeCompressionState.CompressedInDirection;
+		}
+
+		private async void ExecuteDecompress()
+		{
+			var volume = VolumeViewModel?.Volume as CompressedVolume;
+			if( volume?.GetCompressionState( Direction.Z ) != VolumeCompressionState.CompressedInDirection )
+				return;
+
+			IsLoading = true;
+
+			var progress = new VolumeProgress( volume );
+
+			progress.ProgressChanged += OnProgressChanged;
+
+			var decompressedVolume = await Task.Run( () => volume.Decompress( progress, _Logger ) );
+
+			progress.ProgressChanged -= OnProgressChanged;
+
+			ProgressMessage = null;
+			Progress = 0.0;
+
+			VolumeViewModel = new VolumeViewModel( decompressedVolume, decompressedVolume, 1, _Logger );
+
+			IsLoading = false;
 
 			CommandManager.InvalidateRequerySuggested();
-        }
+		}
 
-        private bool CanExecuteCreatePreview()
-        {
-            return VolumeViewModel?.Volume is CompressedVolume ||
-                   VolumeViewModel?.Volume is StreamedVolume;
-        }
+		private bool CanExecuteCreatePreview()
+		{
+			return VolumeViewModel?.Volume is CompressedVolume ||
+				VolumeViewModel?.Volume is StreamedVolume;
+		}
 
-        private async void ExecuteCreatePreview()
-        {
-            await CreatePreview();
-        }
+		private async void ExecuteCreatePreview()
+		{
+			await CreatePreview();
+		}
 
-        private async void ExecuteOpenVolume()
-        {
-            if( !_FileService.SelectOpenFileName( out var fileName ) )
-                return;
+		private async void ExecuteOpenVolume()
+		{
+			if( !_FileService.SelectOpenFileName( out var fileName ) )
+				return;
 
-            IsLoading = true;
-            FileName = fileName;
+			IsLoading = true;
+			FileName = fileName;
 
-            switch( Path.GetExtension( fileName ).ToLowerInvariant() )
-            {
-                case ".volx":
-                    await LoadPiWebVolume();
-                    break;
-                case ".vgi":
-                    await LoadVgiVolume();
-                    break;
-                case ".uint16_scv":
-                    await LoadScvVolume();
-                    break;
-                default:
-                    IsLoading = false;
-                    FileName = null;
-                    break;
-            }
-        }
+			switch( Path.GetExtension( fileName ).ToLowerInvariant() )
+			{
+				case ".volx":
+					await LoadPiWebVolume();
+					break;
+				case ".vgi":
+					await LoadVgiVolume();
+					break;
+				case ".uint8_scv":
+				case ".uint16_scv":
+					await LoadScvVolume();
+					break;
+				default:
+					IsLoading = false;
+					FileName = null;
+					break;
+			}
+		}
 
-        private async Task LoadPiWebVolume()
-        {
-            await using var stream = File.OpenRead( FileName );
+		private async Task LoadPiWebVolume()
+		{
+			await using var stream = File.OpenRead( FileName );
 
-            var volume = Volume.Load( stream, _Logger );
+			var volume = Volume.Load( stream, _Logger );
 
-            ProgressMessage = null;
-            Progress = 0.0;
+			ProgressMessage = null;
+			Progress = 0.0;
 
-            VolumeViewModel = new VolumeViewModel( volume, null, 4, _Logger );
+			VolumeViewModel = new VolumeViewModel( volume, null, 4, _Logger );
 
-            IsLoading = false;
-        }
+			IsLoading = false;
+		}
 
-        private async Task LoadVgiVolume()
-        {
-            var uint16File = Path.ChangeExtension( FileName, ".uint16" );
-            if( !File.Exists( uint16File ) )
-            {
-                _MessageService.ShowMessage(
-                    MessageBoxImage.Error,
-                    "A '.uint16' file with the same name as the vgi file must be placed in the same directory as the vgi file" );
-                return;
-            }
+		private async Task LoadVgiVolume()
+		{
+			var uint16File = Path.ChangeExtension( FileName, ".uint16" );
+			if( !File.Exists( uint16File ) )
+			{
+				_MessageService.ShowMessage(
+					MessageBoxImage.Error,
+					"A '.uint16' file with the same name as the vgi file must be placed in the same directory as the vgi file" );
+				return;
+			}
 
-            var loadOptionsViewModel = new LoadOptionsViewModel();
-            if( _ViewService.RequestView( loadOptionsViewModel ) != true )
-                return;
+			var loadOptionsViewModel = new LoadOptionsViewModel();
+			if( _ViewService.RequestView( loadOptionsViewModel ) != true )
+				return;
 
-            await using var vgi = File.OpenRead( FileName );
-            await using var data = File.OpenRead( uint16File );
+			await using var vgi = File.OpenRead( FileName );
+			await using var data = File.OpenRead( uint16File );
 
-            var progress = new DoubleProgress();
+			var progress = new DoubleProgress();
 
-            progress.ProgressChanged += OnProgressChanged;
+			progress.ProgressChanged += OnProgressChanged;
 
-            var volume = await Task.Run( () => ConvertVolume.FromVgi(
-                vgi,
-                data,
-                loadOptionsViewModel.Extrapolate,
-                loadOptionsViewModel.Minimum,
-                loadOptionsViewModel.Maximum,
-                loadOptionsViewModel.Streamed,
-                progress, _Logger ) );
+			var volume = await Task.Run( () => ConvertVolume.FromVgi(
+				vgi,
+				data,
+				loadOptionsViewModel.Extrapolate,
+				loadOptionsViewModel.Minimum,
+				loadOptionsViewModel.Maximum,
+				loadOptionsViewModel.Streamed,
+				progress, _Logger ) );
 
-            progress.ProgressChanged -= OnProgressChanged;
+			progress.ProgressChanged -= OnProgressChanged;
 
-            ProgressMessage = null;
-            Progress = 0.0;
+			ProgressMessage = null;
+			Progress = 0.0;
 
-            VolumeViewModel = new VolumeViewModel( volume, volume, 1, _Logger );
-            IsLoading = false;
-        }
+			VolumeViewModel = new VolumeViewModel( volume, volume, 1, _Logger );
+			IsLoading = false;
+		}
 
-        private async Task LoadScvVolume()
-        {
-            var loadOptionsViewModel = new LoadOptionsViewModel();
-            if( _ViewService.RequestView( loadOptionsViewModel ) != true )
-                return;
+		private async Task LoadScvVolume()
+		{
+			var loadOptionsViewModel = new LoadOptionsViewModel();
+			if( _ViewService.RequestView( loadOptionsViewModel ) != true )
+				return;
 
-            var scv = File.OpenRead( FileName );
+			var scv = File.OpenRead( FileName );
 			var bitDepthFromExtension = string.Equals( Path.GetExtension( FileName ), ".uint16_scv" ) ? 16 : 8;
-            var progress = new DoubleProgress();
+			var progress = new DoubleProgress();
 
-            progress.ProgressChanged += OnProgressChanged;
+			progress.ProgressChanged += OnProgressChanged;
 
-            var volume = await Task.Run( () => ConvertVolume.FromScv(
-                scv,
+			var volume = await Task.Run( () => ConvertVolume.FromScv(
+				scv,
 				bitDepthFromExtension,
-                loadOptionsViewModel.Extrapolate,
-                loadOptionsViewModel.Minimum,
-                loadOptionsViewModel.Maximum,
-                loadOptionsViewModel.Streamed,
-                progress, _Logger ) );
+				loadOptionsViewModel.Extrapolate,
+				loadOptionsViewModel.Minimum,
+				loadOptionsViewModel.Maximum,
+				loadOptionsViewModel.Streamed,
+				progress, _Logger ) );
 
-            progress.ProgressChanged -= OnProgressChanged;
+			progress.ProgressChanged -= OnProgressChanged;
 
-            if( volume is StreamedVolume streamed )
-            {
-                VolumeViewModel = new VolumeViewModel( streamed, null, 1, _Logger );
-            }
-            else
-            {
-                scv.Close();
-                VolumeViewModel = new VolumeViewModel( volume, volume, 1, _Logger );
-            }
+			if( volume is StreamedVolume streamed )
+			{
+				VolumeViewModel = new VolumeViewModel( streamed, null, 1, _Logger );
+			}
+			else
+			{
+				scv.Close();
+				VolumeViewModel = new VolumeViewModel( volume, volume, 1, _Logger );
+			}
 
-            ProgressMessage = null;
-            Progress = 0.0;
+			ProgressMessage = null;
+			Progress = 0.0;
 
-            IsLoading = false;
-        }
+			IsLoading = false;
+		}
 
-        private async Task CreatePreview()
-        {
-            if( !( VolumeViewModel?.Volume is CompressedVolume ) &&
-                !( VolumeViewModel?.Volume is StreamedVolume  ))
-                return;
+		private async Task CreatePreview()
+		{
+			if( !( VolumeViewModel?.Volume is CompressedVolume ) &&
+				!( VolumeViewModel?.Volume is StreamedVolume ) )
+				return;
 
-            var volume = VolumeViewModel.Volume;
-            var progress = new VolumeProgress( volume );
+			var volume = VolumeViewModel.Volume;
+			var progress = new VolumeProgress( volume );
 
-            IsLoading = true;
+			IsLoading = true;
 
-            progress.ProgressChanged += OnProgressChanged;
+			progress.ProgressChanged += OnProgressChanged;
 
-            var preview = await Task.Run( () => volume.CreatePreview( 4, progress, _Logger ) );
+			var preview = await Task.Run( () => volume.CreatePreview( 4, progress, _Logger ) );
 
-            progress.ProgressChanged -= OnProgressChanged;
+			progress.ProgressChanged -= OnProgressChanged;
 
-            ProgressMessage = null;
-            Progress = 0.0;
+			ProgressMessage = null;
+			Progress = 0.0;
 
-            VolumeViewModel = new VolumeViewModel( volume, preview, 4, _Logger );
+			VolumeViewModel = new VolumeViewModel( volume, preview, 4, _Logger );
 
-            IsLoading = false;
-        }
+			IsLoading = false;
+		}
 
-        private void OnProgressChanged( object sender, VolumeProgressEventArgs e )
-        {
-            Progress = e.Progress;
-            ProgressMessage = e.Message;
-        }
+		private void OnProgressChanged( object sender, VolumeProgressEventArgs e )
+		{
+			Progress = e.Progress;
+			ProgressMessage = e.Message;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
