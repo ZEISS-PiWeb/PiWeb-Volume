@@ -23,7 +23,7 @@ namespace Zeiss.PiWeb.Volume.UI.Services
         #region constants
 
         private const string ReadableVolumeFileFilter = "All volume files|*.uint16_scv;*.uint8_scv;*.vgi;*.volx|PiWeb volumes|*.volx|Calypso volumes|*.uint16_scv;*.uint8_scv|VG volumes|*.vgi";
-        private const string WritableVolumeFileFilter = "PiWeb volumes|*.volx;|Calypso volumes|*.uint8_scv";
+        private const string WritableVolumeFileFilter = "PiWeb volumes|*.volx|Calypso volumes|*.uint8_scv";
 
         #endregion
 
