@@ -194,6 +194,33 @@ namespace Zeiss.PiWeb.Volume
 		}
 
 		/// <summary>
+		/// Returns the properties value as long in case it has the integer data type.
+		/// </summary>
+		public int? GetIntValue()
+		{
+			if( Value is long longValue and <= int.MaxValue and >= int.MinValue )
+				return (int)longValue;
+
+			return null;
+		}
+
+		/// <summary>
+		/// Returns the properties value as long in case it has the integer data type.
+		/// </summary>
+		public long? GetLongValue()
+		{
+			return DataType == DataTypeId.Integer ? (long)Value : null;
+		}
+
+		/// <summary>
+		/// Returns the properties value as long in case it has the integer data type.
+		/// </summary>
+		public double? GetDoubleValue()
+		{
+			return DataType == DataTypeId.Double ? (double)Value : null;
+		}
+
+		/// <summary>
 		/// Serializes the property.
 		/// </summary>
 		/// <param name="writer">The writer.</param>
