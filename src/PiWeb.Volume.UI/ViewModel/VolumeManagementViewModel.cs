@@ -143,7 +143,6 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 				return;
 
 			var options = codecViewModel.GetOptions();
-			var multiDirection = codecViewModel.MultiDirection;
 
 			IsLoading = true;
 
@@ -153,7 +152,7 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 			progress.ProgressChanged += OnProgressChanged;
 
 			if( volume is UncompressedVolume uncompressedVolume )
-				await Task.Run( () => uncompressedVolume.Save( stream, options, multiDirection, progress, _Logger ) );
+				await Task.Run( () => uncompressedVolume.Save( stream, options, false, progress, _Logger ) );
 			else if( volume is StreamedVolume streamedVolume )
 				await Task.Run( () => streamedVolume.Save( stream, options, progress, _Logger ) );
 

@@ -12,6 +12,7 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 {
 	#region usings
 
+	using System;
 	using System.Collections.Generic;
 	using GalaSoft.MvvmLight;
 	using GalaSoft.MvvmLight.Messaging;
@@ -22,18 +23,7 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 	{
 		#region members
 
-		private static string _Encoder = "zeiss.block";
-
-		private static Dictionary<string, string> _EncoderOptions = new Dictionary<string, string>
-		{
-			{ "quality", "75" }
-		};
-
-		private static int _Bitrate = -1;
-
-		private static string _PixelFormat = "gray8";
-
-		private bool _MultiDirection;
+		private int _Quality = 75;
 
 		#endregion
 
@@ -41,34 +31,10 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 
 		public IMessenger Messenger => MessengerInstance;
 
-		public string Encoder
+		public int Quality
 		{
-			get => _Encoder;
-			set => Set( ref _Encoder, value );
-		}
-
-		public Dictionary<string, string> EncoderOptions
-		{
-			get => _EncoderOptions;
-			set => Set( ref _EncoderOptions, value );
-		}
-
-		public int Bitrate
-		{
-			get => _Bitrate;
-			set => Set( ref _Bitrate, value );
-		}
-
-		public bool MultiDirection
-		{
-			get => _MultiDirection;
-			set => Set( ref _MultiDirection, value );
-		}
-
-		public string PixelFormat
-		{
-			get => _PixelFormat;
-			set => Set( ref _PixelFormat, value );
+			get => _Quality;
+			set => Set( ref _Quality, value );
 		}
 
 		#endregion
@@ -77,7 +43,10 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 
 		public VolumeCompressionOptions GetOptions()
 		{
-			return new VolumeCompressionOptions( Encoder, PixelFormat, EncoderOptions, Bitrate );
+			return new VolumeCompressionOptions( "zeiss.block", "gray8", new Dictionary<string, string>
+			{
+				{ "quality", Math.Max( 5, Math.Min( 100, Quality ) ).ToString() }
+			}, 0 );
 		}
 
 		#endregion
