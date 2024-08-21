@@ -1,0 +1,25 @@
+{volume1}
+[representation]
+size = 11 22 33 
+mirror = 0 0 0 0 
+datatype = unsigned integer
+datarange = 0 -1
+bitsperelement = 16
+[file1]
+SkipHeader = 1024
+RegionOfInterestStart = 0 0 0 
+RegionOfInterestEnd = 11 22 33 
+FileFormat = raw
+Size = 11 22 33 
+Name = Test_Kupplung_1GB_Vx64�m 2015-6-2 9-10.uint16_scv
+Datatype = unsigned integer
+datarange = 0 -1
+BitsPerElement = 16
+{volumeprimitive12}
+[geometry]
+resolution = 0.0644764750119862 0.0644764750119862 0.0644764750119862
+unit = mm
+[volume]
+volume = volume1
+[description]
+text = Test_Kupplung_1GB_Vx64�m
