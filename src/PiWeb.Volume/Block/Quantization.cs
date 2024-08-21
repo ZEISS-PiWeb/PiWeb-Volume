@@ -21,28 +21,12 @@ namespace Zeiss.PiWeb.Volume.Block
 	/// </summary>
 	internal static class Quantization
 	{
-		#region members
-
-		private static readonly int[] BaseValues =
-		{
-			16, 11, 10, 16, 24, 40, 51, 61,
-			12, 12, 14, 19, 26, 58, 60, 55,
-			14, 13, 16, 24, 40, 57, 69, 56,
-			14, 17, 22, 29, 51, 87, 80, 62,
-			18, 22, 37, 56, 68, 109, 103, 77,
-			24, 35, 55, 64, 81, 104, 113, 92,
-			49, 64, 78, 87, 103, 121, 120, 101,
-			72, 92, 95, 98, 112, 100, 103, 99
-		};
-
-		#endregion
-
 		#region methods
 
 		/// <summary>
-		/// Origin of base values: libjpeg
+		/// Calculates a generic quantization matrix based on the quality setting.
 		/// </summary>
-		internal static double[] Calculate( VolumeCompressionOptions options, bool invert )
+		public static double[] Calculate( VolumeCompressionOptions options, bool invert )
 		{
 			var scale = 100;
 
@@ -52,24 +36,15 @@ namespace Zeiss.PiWeb.Volume.Block
 			var values = new double[ BlockVolume.N3 ];
 
 			var i = 0;
+
 			for( var z = 0; z < BlockVolume.N; z++ )
 			for( var y = 0; y < BlockVolume.N; y++ )
 			for( var x = 0; x < BlockVolume.N; x++ )
 			{
-				var a = x;
-				var b = y;
-				var c = z;
+				var distance = Math.Max( 0, Math.Max( x, Math.Max( y, z ) ) - 1 );
+				var baseValue = 12 * ( 1 + distance );
 
-				if( a > c )
-					Swap( ref a, ref c );
-
-				if( a > b )
-					Swap( ref a, ref b );
-
-				if( b > c )
-					Swap( ref b, ref c );
-
-				var value = Math.Max( 1, Math.Min( short.MaxValue, ( BaseValues[ c + BlockVolume.N * b ] * 2.0 * scale + 50 ) / 100 ) );
+				var value = Math.Max( 1, Math.Min( short.MaxValue, ( baseValue * 2.0 * scale + 50 ) / 100 ) );
 				values[ i++ ] = invert ? value : 1.0 / value;
 			}
 
@@ -77,7 +52,7 @@ namespace Zeiss.PiWeb.Volume.Block
 		}
 
 		/// <summary>
-		/// Origin: libjpeg
+		/// Quality scaling as in libjpeg.
 		/// </summary>
 		private static int QualityScaling( int quality )
 		{
@@ -90,13 +65,6 @@ namespace Zeiss.PiWeb.Volume.Block
 				quality = 200 - quality * 2;
 
 			return quality;
-		}
-
-		private static void Swap( ref int a, ref int b )
-		{
-			var temp = a;
-			a = b;
-			b = temp;
 		}
 
 		#endregion
