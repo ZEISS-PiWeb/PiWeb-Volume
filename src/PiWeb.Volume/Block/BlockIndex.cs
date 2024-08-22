@@ -13,7 +13,7 @@ namespace Zeiss.PiWeb.Volume.Block
 	/// <summary>
 	/// Stores the index of a data block.
 	/// </summary>
-	internal readonly struct BlockIndex
+	internal readonly record struct BlockIndex
 	{
 		#region constructors
 

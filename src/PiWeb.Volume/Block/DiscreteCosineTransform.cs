@@ -23,8 +23,8 @@ namespace Zeiss.PiWeb.Volume.Block
 	{
 		#region members
 
-		private static readonly double[] U = CalculateCoefficients( false );
-		private static readonly double[] Ut = CalculateCoefficients( true );
+		public static readonly double[] U = CalculateCoefficients( false );
+		public static readonly double[] Ut = CalculateCoefficients( true );
 
 		#endregion
 
@@ -65,8 +65,8 @@ namespace Zeiss.PiWeb.Volume.Block
 					//u = x * N;
 					//p = z * NN + y * N;
 					var r = 0.0;
-					for( var i = 0; i < BlockVolume.N; i++ )
-						r += pValues[ p + i ] * pU[ u + i ];
+					for( var n = 0; n < BlockVolume.N; n++ )
+						r += pValues[ p + n ] * pU[ u + n ];
 
 					pResult[ z * BlockVolume.N2 + x * BlockVolume.N + y ] = r;
 				}
@@ -79,8 +79,8 @@ namespace Zeiss.PiWeb.Volume.Block
 					//u = y * N;
 					//p = z * NN + x * N;
 					var r = 0.0;
-					for( var i = 0; i < BlockVolume.N; i++ )
-						r += pResult[ p + i ] * pU[ u + i ];
+					for( var n = 0; n < BlockVolume.N; n++ )
+						r += pResult[ p + n ] * pU[ u + n ];
 					pValues[ y * BlockVolume.N2 + x * BlockVolume.N + z ] = r;
 				}
 
@@ -92,8 +92,8 @@ namespace Zeiss.PiWeb.Volume.Block
 					//u = z * N;
 					//p = y * NN + x * N;
 					var r = 0.0;
-					for( var i = 0; i < BlockVolume.N; i++ )
-						r += pValues[ p + i ] * pU[ u + i ];
+					for( var n = 0; n < BlockVolume.N; n++ )
+						r += pValues[ p + n ] * pU[ u + n ];
 					pResult[ z * BlockVolume.N2 + y * BlockVolume.N + x ] = r;
 				}
 			}

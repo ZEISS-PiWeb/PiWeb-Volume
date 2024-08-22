@@ -201,7 +201,7 @@ namespace Zeiss.PiWeb.Volume.Block
 					var gy = blockIndexY * BlockVolume.N + by;
 					var gx = blockIndexX * BlockVolume.N + bx;
 
-					block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ] = gz >= sz || gy >= sy || gx >= sx ? 0.0 : layer[ bz ][ gy * sx + gx ] - 128.0;
+					block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ] = gz >= sz || gy >= sy || gx >= sx ? 0.0 : layer[ bz ][ gy * sx + gx ];
 				}
 			} );
 		}

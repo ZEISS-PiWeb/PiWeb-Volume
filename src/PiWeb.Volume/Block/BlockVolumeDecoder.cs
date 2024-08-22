@@ -114,7 +114,7 @@ namespace Zeiss.PiWeb.Volume.Block
 				for( var j = 1; j < length; j++ )
 					blockBuffer[ dataIndex++ ] = otherLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
 
-				Buffer.BlockCopy( blockBuffer, 0, encodedBlocks, i * BlockVolume.N3 * sizeof(short), BlockVolume.N3 * sizeof(short) );
+				Buffer.BlockCopy( blockBuffer, 0, encodedBlocks, i * BlockVolume.N3 * sizeof( short ), BlockVolume.N3 * sizeof( short ) );
 			}
 
 			ArrayPool<short>.Shared.Return( blockBuffer );
@@ -167,7 +167,7 @@ namespace Zeiss.PiWeb.Volume.Block
 
 					//5. Discretization
 					for( var i = 0; i < BlockVolume.N3; i++ )
-						byteBuffer[ i ] = (byte)Math.Max( byte.MinValue, Math.Min( byte.MaxValue, Math.Round( doubleBuffer1[ i ] + 128.0 ) ) );
+						byteBuffer[ i ] = (byte)Math.Max( byte.MinValue, Math.Min( byte.MaxValue, Math.Round( doubleBuffer1[ i ] ) ) );
 
 					blockAction( byteBuffer, blockIndex );
 
