@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Platforms>x64</Platforms>
-    <LangVersion>9</LangVersion>
+    <LangVersion>latestmajor</LangVersion>
     <AssemblyName>PiWeb.Volume.Convert</AssemblyName>
     <RootNamespace>Zeiss.PiWeb.Volume.Convert</RootNamespace>
     <Copyright>Copyright © 2020 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>

@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.22621</TargetFramework>
     <Platforms>x64</Platforms>
-    <LangVersion>9</LangVersion>
+    <LangVersion>latestmajor</LangVersion>
     <AssemblyName>PiWeb.Volume.Compare</AssemblyName>
     <RootNamespace>Zeiss.PiWeb.Volume.Compare</RootNamespace>
     <Copyright>Copyright © 2020 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>
