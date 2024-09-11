@@ -13,18 +13,18 @@ namespace Zeiss.PiWeb.Volume.Convert
 	#region usings
 
 	using System;
+	using System.Drawing;
 	using System.IO;
 
 	#endregion
 
-	internal class Uint16Stream : Stream
+	internal class FloatStream : Stream
 	{
 		#region members
 
 		private readonly Stream _BaseStream;
-		private readonly ushort _MinValue;
-		private readonly bool _Extrapolate;
-		private readonly double _Factor;
+		private readonly float _MinValue;
+		private readonly float _Factor;
 		private readonly long _Offset;
 
 		private byte[]? _ByteBuffer;
@@ -33,19 +33,12 @@ namespace Zeiss.PiWeb.Volume.Convert
 
 		#region constructors
 
-		public Uint16Stream( Stream baseStream )
-		{
-			_Offset = baseStream.Position;
-			_BaseStream = baseStream;
-		}
-
-		public Uint16Stream( Stream baseStream, ushort minValue, ushort maxValue )
+		public FloatStream( Stream baseStream, float minValue = 0.0f, float maxValue = 1.0f )
 		{
 			_Offset = baseStream.Position;
 			_BaseStream = baseStream;
 			_MinValue = minValue;
-			_Extrapolate = true;
-			_Factor = Math.Min( 1.0, 1.0 / ( maxValue - minValue ) );
+			_Factor = Math.Max( 1.0f, 1.0f / ( maxValue - minValue ) );
 		}
 
 		#endregion
@@ -74,35 +67,24 @@ namespace Zeiss.PiWeb.Volume.Convert
 
 		public override int Read( byte[] buffer, int offset, int count )
 		{
-			if( _ByteBuffer is null || _ByteBuffer.Length != count * sizeof(ushort) )
-				_ByteBuffer = new byte[ count * sizeof( ushort ) ];
+			if( _ByteBuffer is null || _ByteBuffer.Length != count * sizeof( float ) )
+				_ByteBuffer = new byte[ count * sizeof( float ) ];
 
-			var read = _BaseStream.Read( _ByteBuffer, 0, count * sizeof(ushort) );
-
-			if( _Extrapolate )
+			var read = _BaseStream.Read( _ByteBuffer, 0, count * sizeof( float ) );
+			for( var i = 0; i < read / sizeof( float ); i++ )
 			{
-				for( var i = 0; i < read / 2; i++ )
-				{
-					var value = BitConverter.ToUInt16( _ByteBuffer, i * sizeof(ushort) );
-					buffer[ i + offset ] = 	(byte)Math.Min( byte.MaxValue, Math.Max( byte.MinValue, ( value - _MinValue ) * _Factor * byte.MaxValue ) );
-				}
-			}
-			else
-			{
-				for( var i = 0; i < read / 2; i++ )
-				{
-					buffer[ i + offset ] = _ByteBuffer[ i * 2 + 1 ];
-				}
+				var value = BitConverter.ToSingle( _ByteBuffer, i * sizeof(float) );
+				buffer[ i + offset ] = (byte)( Math.Min( 1.0, Math.Max( 0.0, ( value - _MinValue ) * _Factor ) ) * byte.MaxValue );
 			}
 
-			return read / 2;
+			return read / sizeof( float );
 		}
 
 		public override long Seek( long offset, SeekOrigin origin )
 		{
 			if( origin == SeekOrigin.Begin )
-				return _BaseStream.Seek( _Offset + offset * sizeof( ushort ), origin );
-			return _BaseStream.Seek( offset * sizeof( ushort ), origin );
+				return _BaseStream.Seek( _Offset + offset * sizeof( float ), origin );
+			return _BaseStream.Seek( offset * sizeof( float ), origin );
 		}
 
 		public override void SetLength( long value )

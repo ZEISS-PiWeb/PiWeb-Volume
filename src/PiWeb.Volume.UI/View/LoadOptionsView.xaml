@@ -25,10 +25,10 @@
         <CheckBox Margin="8" IsChecked="{Binding Path=Extrapolate}" />
 
         <TextBlock Margin="8">Minimum</TextBlock>
-        <xctk:IntegerUpDown Minimum="0" Maximum="255" IsEnabled="{extensions:IfBinding Extrapolate}" Value="{Binding Minimum}" Margin="8"  />
+        <xctk:DoubleUpDown Minimum="{Binding MinimumValue}" Maximum="{Binding MaximumValue}" FormatString="N1" IsEnabled="{extensions:IfBinding Extrapolate}" Value="{Binding Minimum}" Margin="8"  />
 
         <TextBlock Margin="8">Maximum</TextBlock>
-        <xctk:IntegerUpDown Minimum="0" Maximum="255" IsEnabled="{extensions:IfBinding Extrapolate}" Value="{Binding Maximum}" Margin="8"  />
+        <xctk:DoubleUpDown Minimum="{Binding MinimumValue}" Maximum="{Binding MaximumValue}" FormatString="N1" IsEnabled="{extensions:IfBinding Extrapolate}" Value="{Binding Maximum}" Margin="8"  />
 
         <Button Margin="8" IsCancel="True">Cancel</Button>
         <Button Margin="8"

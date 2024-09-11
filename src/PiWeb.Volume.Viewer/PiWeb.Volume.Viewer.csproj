@@ -32,7 +32,7 @@
 
   <ItemGroup>
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" NoWarn="NU1701" />
-    <PackageReference Include="System.Reactive" Version="4.4.1" />
+    <PackageReference Include="System.Reactive" Version="6.0.1" />
     <PackageReference Include="Unity" Version="5.11.10" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.0" NoWarn="NU1701" />
   </ItemGroup>
