@@ -5,39 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:viewModel="clr-namespace:Zeiss.PiWeb.Volume.UI.ViewModel"
-        xmlns:converters="clr-namespace:Zeiss.PiWeb.Volume.UI.Converters"
-        xmlns:validationRules="clr-namespace:Zeiss.PiWeb.Volume.UI.ValidationRules"
         Title="Encoding"
         Width="400"
         d:DataContext="{d:DesignInstance viewModel:CodecViewModel}"
         WindowStartupLocation="CenterOwner"
         SizeToContent="Height"
         mc:Ignorable="d">
-    <Window.Resources>
-        <converters:OptionsConverter x:Key="OptionsConverter" />
-    </Window.Resources>
     <UniformGrid Columns="2">
-        <TextBlock Margin="8" Text="Encoder" />
-        <TextBox Margin="8" Text="{Binding Path=Encoder}" />
-        <TextBlock Margin="8" Text="PixelFormat" />
-        <TextBox Margin="8" Text="{Binding Path=PixelFormat}" />
-        <TextBlock Margin="8" Text="Options" />
-        <TextBox Margin="8">
-            <TextBox.Text>
-                <Binding Path="EncoderOptions"
-                         Converter="{StaticResource OptionsConverter}"
-                         UpdateSourceTrigger="PropertyChanged">
-                    <Binding.ValidationRules>
-                        <validationRules:OptionsRule />
-                    </Binding.ValidationRules>
-                </Binding>
-            </TextBox.Text>
-        </TextBox>
-        <TextBlock Margin="8" Text="Bitrate" />
-        <xctk:IntegerUpDown Margin="8" Value="{Binding Path=Bitrate}" />
-
-        <TextBlock Margin="8" Text="MultiDirection" />
-        <CheckBox Margin="8" IsChecked="{Binding MultiDirection, Mode=TwoWay}" />
+        <TextBlock Margin="8" Text="Quality" />
+        <xctk:IntegerUpDown Margin="8" Minimum="5" Maximum="100" Value="{Binding Path=Quality}" />
 
         <Button Margin="8" IsCancel="True" Content="Cancel" />
         <Button Margin="8"

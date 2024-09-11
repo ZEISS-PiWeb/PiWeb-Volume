@@ -50,10 +50,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PiWeb.Volume.Core\PiWeb.Volume.Core.vcxproj" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Volume.de.resx">
       <DependentUpon>Volume.cs</DependentUpon>
     </EmbeddedResource>
