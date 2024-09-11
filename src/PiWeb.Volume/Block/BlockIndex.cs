@@ -28,9 +28,9 @@ namespace Zeiss.PiWeb.Volume.Block
 
 		#region properties
 
-		public ushort X { get; }
-		public ushort Y { get; }
-		public ushort Z { get; }
+		public readonly ushort X;
+		public readonly ushort Y;
+		public readonly ushort Z;
 
 		#endregion
 	}

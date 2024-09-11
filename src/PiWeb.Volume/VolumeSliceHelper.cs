@@ -23,6 +23,9 @@ namespace Zeiss.PiWeb.Volume
 	{
 		#region methods
 
+		/// <summary>
+		/// Creates a new slice buffer with the specified dimensions.
+		/// </summary>
 		public static byte[][] CreateSliceBuffer( ushort sizeX, ushort sizeY, ushort sizeZ )
 		{
 			var previewSliceSize = sizeX * sizeY;

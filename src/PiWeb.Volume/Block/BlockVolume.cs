@@ -75,8 +75,9 @@ namespace Zeiss.PiWeb.Volume.Block
 
 		private static DirectionMap CreateDirectionMap( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress )
 		{
+			var estimate = ((long)metadata.SizeX * metadata.SizeY * metadata.SizeZ) / N2;
 			var encoder = new BlockVolumeEncoder( options );
-			var output = new MemoryStream();
+			var output = new MemoryStream( (int)estimate );
 
 			encoder.Encode( input, output, metadata, progress );
 

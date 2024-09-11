@@ -13,6 +13,7 @@ namespace Zeiss.PiWeb.Volume.Block
 	#region usings
 
 	using System;
+	using System.Runtime.Intrinsics;
 
 	#endregion
 
@@ -49,52 +50,49 @@ namespace Zeiss.PiWeb.Volume.Block
 			return result;
 		}
 
-		internal static unsafe void Transform( double[] values, double[] result, bool inverse = false )
+		internal static void Transform( double[] values, double[] result, bool inverse = false )
 		{
-			fixed( double* pU = inverse ? Ut : U )
-			fixed( double* pValues = values )
-			fixed( double* pResult = result )
-			{
-				int u, p, x, y, z;
+			var pU = inverse ? Ut : U;
+			int u, p, x, y, z;
 
-				//iterieren über x (n 0..N): values[ n, y, z ] * u[ n, x ] ;
-				for( z = 0, p = 0; z < BlockVolume.N; z++ )
-				for( y = 0; y < BlockVolume.N; y++, p += BlockVolume.N )
+			Vector512<double> vecv;
+
+			//iterieren über x (n 0..N): values[ n, y, z ] * u[ n, x ] ;
+			for( z = 0, p = 0; z < BlockVolume.N; z++ )
+			for( y = 0; y < BlockVolume.N; y++, p += BlockVolume.N )
+			{
+				vecv = Vector512.Create( values, p );
 				for( x = 0, u = 0; x < BlockVolume.N; x++, u += BlockVolume.N )
 				{
 					//u = x * N;
 					//p = z * NN + y * N;
-					var r = 0.0;
-					for( var n = 0; n < BlockVolume.N; n++ )
-						r += pValues[ p + n ] * pU[ u + n ];
-
-					pResult[ z * BlockVolume.N2 + x * BlockVolume.N + y ] = r;
+					result[ z * BlockVolume.N2 + x * BlockVolume.N + y ] = Vector512.Sum( Vector512.Multiply( vecv, Vector512.Create( pU, u ) ) );
 				}
+			}
 
-				//iterieren über y (n 0..N): values[ x, n, z ] * u[ n, y ]
-				for( z = 0, p = 0; z < BlockVolume.N; z++ )
-				for( x = 0; x < BlockVolume.N; x++, p += BlockVolume.N )
+			//iterieren über y (n 0..N): values[ x, n, z ] * u[ n, y ]
+			for( z = 0, p = 0; z < BlockVolume.N; z++ )
+			for( x = 0; x < BlockVolume.N; x++, p += BlockVolume.N )
+			{
+				vecv = Vector512.Create( result, p );
 				for( y = 0, u = 0; y < BlockVolume.N; y++, u += BlockVolume.N )
 				{
 					//u = y * N;
 					//p = z * NN + x * N;
-					var r = 0.0;
-					for( var n = 0; n < BlockVolume.N; n++ )
-						r += pResult[ p + n ] * pU[ u + n ];
-					pValues[ y * BlockVolume.N2 + x * BlockVolume.N + z ] = r;
+					values[ y * BlockVolume.N2 + x * BlockVolume.N + z ] = Vector512.Sum( Vector512.Multiply( vecv, Vector512.Create( pU, u ) ) );
 				}
+			}
 
-				//iterieren über z (n 0..N): values[ x, y, n ] * u[ n, z ]
-				for( y = 0, p = 0; y < BlockVolume.N; y++ )
-				for( x = 0; x < BlockVolume.N; x++, p += BlockVolume.N )
+			//iterieren über z (n 0..N): values[ x, y, n ] * u[ n, z ]
+			for( y = 0, p = 0; y < BlockVolume.N; y++ )
+			for( x = 0; x < BlockVolume.N; x++, p += BlockVolume.N )
+			{
+				vecv = Vector512.Create( values, p );
 				for( z = 0, u = 0; z < BlockVolume.N; z++, u += BlockVolume.N )
 				{
 					//u = z * N;
 					//p = y * NN + x * N;
-					var r = 0.0;
-					for( var n = 0; n < BlockVolume.N; n++ )
-						r += pValues[ p + n ] * pU[ u + n ];
-					pResult[ z * BlockVolume.N2 + y * BlockVolume.N + x ] = r;
+					result[ z * BlockVolume.N2 + y * BlockVolume.N + x ] = Vector512.Sum( Vector512.Multiply( vecv, Vector512.Create( pU, u ) ) );
 				}
 			}
 		}
