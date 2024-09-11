@@ -33,6 +33,16 @@ namespace Zeiss.PiWeb.Volume.Block
 
 		internal const string EncoderID = "zeiss.block";
 
+		/// <summary>
+		/// File header to identify block volumes. Reads as JSVF.
+		/// </summary>
+		public const uint FileHeader = 0x4A535646;
+
+		/// <summary>
+		/// The current file version.
+		/// </summary>
+		public const uint Version = 0x00000001;
+
 		#endregion
 
 		#region constructors

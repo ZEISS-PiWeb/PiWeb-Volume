@@ -13,6 +13,8 @@ namespace Zeiss.PiWeb.Volume.Block
 	#region usings
 
 	using System;
+	using System.IO;
+	using System.Runtime.InteropServices;
 
 	#endregion
 
@@ -24,15 +26,47 @@ namespace Zeiss.PiWeb.Volume.Block
 		#region methods
 
 		/// <summary>
+		/// Reads a quantization matrix from the specified <paramref name="reader"/>
+		/// </summary>
+		public static double[] Read( BinaryReader reader, bool invert )
+		{
+			var data = reader.ReadBytes( BlockVolume.N3 * sizeof( double ) ).AsSpan();
+			var values = MemoryMarshal.Cast<byte, double>( data );
+
+			if( !invert )
+				return values.ToArray();
+
+			for( var i = 0; i < BlockVolume.N3; i++ )
+				values[ i ] = 1.0 / values[ i ];
+
+			return values.ToArray();
+		}
+
+		/// <summary>
+		/// Writes a quantization matrix to the specified <paramref name="writer"/>
+		/// </summary>
+		public static void Write( BinaryWriter writer, double[] values )
+		{
+			var data = MemoryMarshal.Cast<double, byte>( values );
+			writer.Write( data );
+		}
+
+		/// <summary>
 		/// Calculates a generic quantization matrix based on the quality setting.
 		/// </summary>
-		public static double[] Calculate( VolumeCompressionOptions options, bool invert )
+		public static double[] Calculate( VolumeCompressionOptions options, bool invert = false )
 		{
-			var scale = 100;
+			var quality = 75;
 
-			if( options.EncoderOptions.TryGetValue( "quality", out var qualityString ) && int.TryParse( qualityString, out var quality ) )
-				scale = QualityScaling( quality );
+			if( options.EncoderOptions.TryGetValue( "quality", out var qualityString ) && int.TryParse( qualityString, out var parsedQuality ) )
+				quality = parsedQuality;
 
+			return Calculate( quality, invert );
+		}
+
+		internal static double[] Calculate( int quality = 75, bool invert = false )
+		{
+			var scale = QualityScaling( quality );
 			var values = new double[ BlockVolume.N3 ];
 
 			var i = 0;
