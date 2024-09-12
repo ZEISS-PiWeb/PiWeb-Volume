@@ -28,5 +28,4 @@ jobs:
     - name: Build
       run: dotnet build ${{ github.workspace }}\src\PiWeb.Volume.sln
     - name: Test
-      run: dotnet test --no-build --verbosity normal ${{ github.workspace }}\bin\Test\PiWeb.Volume.Tests.dll
-
+      run: dotnet test --verbosity normal ${{ github.workspace }}\src\PiWeb.Volume.sln
