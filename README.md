@@ -55,7 +55,7 @@ PM> Install-Package Zeiss.IMT.PiWeb.Volume
 Or compile the library by yourself. Requirements:
 
 - Microsoft Visual Studio 2022
-- Microsoft .NET 6.0
+- Microsoft .NET 8.0
 
 ## Usage
 
@@ -91,14 +91,10 @@ var uncompressedVolume = new UncompressedVolume( metadata, data );
 
 #### Compress volume
 
-The compression options in this example are only one of many that FFmpeg supports. Depending on your hardware, you can also use encoders like `nvenc` or `libvpx`. For further information about codec options, please refer to the [FFmpeg codec documentation](www.ffmpeg.org/ffmpeg-codecs.html).
-
-##### Multidirectional data
-
-The compress method has an optional parameter `multidirection`, which will cause the library to store the compressed volume in three axis directions instead of only the z-direction. While this will triple the size of the compressed volume, it can reduce the access time for slices in x- and y-direction significantly when working with a compressed volume.
+The library comes with a builtin volume encoder with the name `zeiss.block`, which cuts the volume into cubic blocks with a side length of eight voxels which are separately compressed and stored. By storing the data block-wise rather than slice-wise, single slices of all directions can be decompressed and accessed fast.
 
 ```csharp
-var compressionOptions = new VolumeCompressionOptions( "libopenh264", "yuv420p", null, 1000000 );
+var compressionOptions = new VolumeCompressionOptions( "zeiss.block", "gray8", null, 1000000 );
 var compressedVolume = uncompressedVolume.Compress( compressionOptions );
 ```
 
@@ -158,9 +154,3 @@ In the solution, you'll find a project named `PiWeb.Volume.UI` which is a small 
 7. Zoom in and out with the mouse wheel and pan with the right mouse button pressed
 
 ![Testing UI][testingUI]
-
-## License
-
-While the PiWeb Volume Library is published under the **BSD 3-Clause "New" or "Revised" License**, it is built on top of [FFmpeg](https://www.ffmpeg.org), which is published under the **LGPL v2.1 License**. While building the FFmpeg binaries, we took care that neither third party libraries with GPL or other copy-left licenses nor commercial libraries were referenced.
-
-Please note, that some famous codecs like `libx264` and `libx265` cannot be used, since they are licensed under GPL.
