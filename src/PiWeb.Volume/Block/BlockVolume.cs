@@ -27,11 +27,22 @@ namespace Zeiss.PiWeb.Volume.Block
 	{
 		#region constants
 
+		/// <summary>
+		/// Side length of a block.
+		/// </summary>
 		internal const int N = 8;
 		internal const int N2 = N * N;
 		internal const int N3 = N * N * N;
 
+		/// <summary>
+		/// The id of the block volume encoder.
+		/// </summary>
 		internal const string EncoderID = "zeiss.block";
+
+		/// <summary>
+		///  The pixel format of the block volume encoder.
+		/// </summary>
+		internal const string PixelFormat = "gray8";
 
 		/// <summary>
 		/// File header to identify block volumes. Reads as JSVF.
