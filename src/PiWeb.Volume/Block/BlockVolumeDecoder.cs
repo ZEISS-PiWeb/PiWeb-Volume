@@ -1,7 +1,7 @@
 #region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2020                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -23,21 +23,6 @@ namespace Zeiss.PiWeb.Volume.Block
 
 	internal class BlockVolumeDecoder
 	{
-		#region members
-
-		private readonly VolumeCompressionOptions _Options;
-
-		#endregion
-
-		#region constructors
-
-		internal BlockVolumeDecoder( VolumeCompressionOptions options )
-		{
-			_Options = options;
-		}
-
-		#endregion
-
 		#region methods
 
 		internal void Decode( Stream input,
@@ -48,7 +33,6 @@ namespace Zeiss.PiWeb.Volume.Block
 			IProgress<VolumeSliceDefinition>? progress = null,
 			CancellationToken ct = default )
 		{
-			var quantization = Quantization.Calculate( _Options, true );
 			var zigzag = ZigZag.Calculate();
 			var (bcx, bcy, bcz) = BlockVolume.GetBlockCount( metadata );
 			var blockCount = bcx * bcy;
@@ -57,10 +41,12 @@ namespace Zeiss.PiWeb.Volume.Block
 
 			using var reader = new BinaryReader( input );
 
+			ReadMetadata( reader, out var quantization );
+
 			for( ushort biz = 0; biz < bcz; biz++ )
 			{
 				ct.ThrowIfCancellationRequested();
-				if( layerPredicate?.Invoke( biz ) == false )
+				if( layerPredicate?.Invoke( biz ) is false )
 				{
 					SkipLayer( reader, blockCount );
 				}
@@ -72,6 +58,19 @@ namespace Zeiss.PiWeb.Volume.Block
 
 				progress?.Report( new VolumeSliceDefinition( Direction.Z, (ushort)( biz * BlockVolume.N ) ) );
 			}
+		}
+
+		private static void ReadMetadata( BinaryReader reader, out double[] quantization )
+		{
+			var header = reader.ReadUInt32();
+			if( header != BlockVolume.FileHeader )
+				throw new FormatException( $"Encountered unexpected file header 0x{header:x8}, expected 0x{BlockVolume.FileHeader:x8}" );
+
+			var version = reader.ReadUInt32();
+			if( version != BlockVolume.Version )
+				throw new FormatException( $"Encountered unexpected file header '{version}', expected {BlockVolume.Version}" );
+
+			quantization = Quantization.Read( reader, true );
 		}
 
 		private static void SkipLayer( BinaryReader reader, int blockCount )
@@ -114,7 +113,7 @@ namespace Zeiss.PiWeb.Volume.Block
 				for( var j = 1; j < length; j++ )
 					blockBuffer[ dataIndex++ ] = otherLength == 2 ? reader.ReadInt16() : reader.ReadSByte();
 
-				Buffer.BlockCopy( blockBuffer, 0, encodedBlocks, i * BlockVolume.N3 * sizeof(short), BlockVolume.N3 * sizeof(short) );
+				Buffer.BlockCopy( blockBuffer, 0, encodedBlocks, i * BlockVolume.N3 * sizeof( short ), BlockVolume.N3 * sizeof( short ) );
 			}
 
 			ArrayPool<short>.Shared.Return( blockBuffer );
@@ -167,7 +166,7 @@ namespace Zeiss.PiWeb.Volume.Block
 
 					//5. Discretization
 					for( var i = 0; i < BlockVolume.N3; i++ )
-						byteBuffer[ i ] = (byte)Math.Max( byte.MinValue, Math.Min( byte.MaxValue, Math.Round( doubleBuffer1[ i ] + 128.0 ) ) );
+						byteBuffer[ i ] = (byte)Math.Max( byte.MinValue, Math.Min( byte.MaxValue, Math.Round( doubleBuffer1[ i ] ) ) );
 
 					blockAction( byteBuffer, blockIndex );
 

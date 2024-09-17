@@ -1,7 +1,7 @@
 ﻿#region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2019                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -22,6 +22,7 @@ namespace Zeiss.PiWeb.Volume
 	using System.Linq;
 	using System.Text;
 	using System.Xml;
+	using Zeiss.PiWeb.Volume.Block;
 
 	#endregion
 
@@ -44,7 +45,11 @@ namespace Zeiss.PiWeb.Volume
 		/// <param name="encoderOptions">The encoder options.</param>
 		/// <param name="pixelFormat">The pixelformat.</param>
 		/// <param name="bitrate">The bitrate.</param>
-		public VolumeCompressionOptions( string encoder = "libopenh264", string pixelFormat = "yuv420p", Dictionary<string, string>? encoderOptions = null, int bitrate = -1 )
+		public VolumeCompressionOptions(
+			string encoder = BlockVolume.EncoderID,
+			string pixelFormat = BlockVolume.PixelFormat,
+			Dictionary<string, string>? encoderOptions = null,
+			int bitrate = -1 )
 		{
 			Encoder = encoder;
 			EncoderOptions = encoderOptions ?? new Dictionary<string, string>();

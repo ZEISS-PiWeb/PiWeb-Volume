@@ -1,7 +1,7 @@
 #region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2019                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -136,8 +136,8 @@ namespace Zeiss.PiWeb.Volume.UI.Components
 
             ctx.PushGuidelineSet( new GuidelineSet( new[] { pen.Thickness / 2 }, new[] { pen.Thickness / 2 } ) );
 
-            var valueRange = Invert 
-	            ? new DoubleRange( ValueRange.Value.Stop, ValueRange.Value.Start ) 
+            var valueRange = Invert
+	            ? new DoubleRange( ValueRange.Value.Stop, ValueRange.Value.Start )
 	            : new DoubleRange( ValueRange.Value.Start, ValueRange.Value.Stop );
 
             var w = ActualWidth;
@@ -199,9 +199,9 @@ namespace Zeiss.PiWeb.Volume.UI.Components
 
         private void DrawHighlight( DrawingContext ctx, double h, DoubleRange valueRange, DoubleRange drawingRange )
         {
-	        if( !HighlightedRange.HasValue || HighlightedRange.Value.Size <= 0 ) 
+	        if( !HighlightedRange.HasValue || HighlightedRange.Value.Size <= 0 )
 		        return;
-	        
+
 	        var highlightedRange = HighlightedRange.Value;
 	        var highlightedValueRange = new DoubleRange( DoubleRange.Clip( valueRange, highlightedRange.Start ), DoubleRange.Clip( valueRange, highlightedRange.Stop ) );
 

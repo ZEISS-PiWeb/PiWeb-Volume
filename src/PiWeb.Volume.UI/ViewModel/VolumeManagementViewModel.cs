@@ -1,7 +1,7 @@
 #region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2020                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -251,28 +251,41 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 			IsLoading = true;
 			FileName = fileName;
 
-			switch( Path.GetExtension( fileName ).ToLowerInvariant() )
+			try
 			{
-				case ".volx":
-					await LoadPiWebVolume();
-					break;
-				case ".vgi":
-					await LoadVgiVolume();
-					break;
-				case ".uint8_scv":
-				case ".uint16_scv":
-					await LoadScvVolume();
-					break;
-				default:
-					IsLoading = false;
-					FileName = null;
-					break;
+				switch( Path.GetExtension( fileName ).ToLowerInvariant() )
+				{
+					case ".volx":
+						await LoadPiWebVolume( fileName );
+						break;
+					case ".vgi":
+						await LoadVgiVolume( fileName );
+						break;
+					case ".uint8_scv":
+					case ".uint16_scv":
+						await LoadScvVolume( fileName );
+						break;
+					case ".gom_volume":
+						await LoadGomVolume( fileName );
+						break;
+					default:
+						FileName = null;
+						break;
+				}
+			}
+			catch( Exception e )
+			{
+				_MessageService.ShowMessage( MessageBoxImage.Error, e.GetBaseException().Message );
+			}
+			finally
+			{
+				IsLoading = false;
 			}
 		}
 
-		private async Task LoadPiWebVolume()
+		private async Task LoadPiWebVolume( string filename )
 		{
-			await using var stream = File.OpenRead( FileName );
+			await using var stream = File.OpenRead( filename );
 
 			var volume = Volume.Load( stream, _Logger );
 
@@ -280,22 +293,19 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 			Progress = 0.0;
 
 			VolumeViewModel = new VolumeViewModel( volume, null, 4, _Logger );
-
-			IsLoading = false;
 		}
 
-		private async Task LoadVgiVolume()
+		private async Task LoadVgiVolume( string filename )
 		{
-			var uint16File = Path.ChangeExtension( FileName, ".uint16" );
-			if( !File.Exists( uint16File ) )
+			var uint16File = Path.ChangeExtension( filename, ".uint16" );
+			var loadOptionsViewModel = new LoadOptionsViewModel
 			{
-				_MessageService.ShowMessage(
-					MessageBoxImage.Error,
-					"A '.uint16' file with the same name as the vgi file must be placed in the same directory as the vgi file" );
-				return;
-			}
+				MinimumValue = 0,
+				MaximumValue = ushort.MaxValue,
+				Minimum = 0,
+				Maximum = ushort.MaxValue
+			};
 
-			var loadOptionsViewModel = new LoadOptionsViewModel();
 			if( _ViewService.RequestView( loadOptionsViewModel ) != true )
 				return;
 
@@ -310,8 +320,8 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 				vgi,
 				data,
 				loadOptionsViewModel.Extrapolate,
-				loadOptionsViewModel.Minimum,
-				loadOptionsViewModel.Maximum,
+				(ushort)loadOptionsViewModel.Minimum,
+				(ushort)loadOptionsViewModel.Maximum,
 				loadOptionsViewModel.Streamed,
 				progress, _Logger ) );
 
@@ -321,17 +331,82 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 			Progress = 0.0;
 
 			VolumeViewModel = new VolumeViewModel( volume, volume, 1, _Logger );
-			IsLoading = false;
 		}
 
-		private async Task LoadScvVolume()
+		private async Task LoadGomVolume( string filename )
 		{
-			var loadOptionsViewModel = new LoadOptionsViewModel();
+			await using var gomStream = File.OpenRead( FileName );
+
+			var metadata = Gom.ParseMetadata( gomStream, out var min, out var max, out var dataFile, out var rawDataType );
+			var (minval, maxval) = rawDataType switch
+			{
+				Gom.DataType.Int16  => ( short.MinValue, short.MaxValue ),
+				Gom.DataType.UInt16 => ( ushort.MinValue, ushort.MaxValue ),
+				Gom.DataType.Single => ( -1.0f, 1.0f ),
+			};
+
+			var dataPath = Path.Combine( Path.GetDirectoryName( filename )!, dataFile );
+			var rawData = File.OpenRead( dataPath );
+
+			var loadOptionsViewModel = new LoadOptionsViewModel
+			{
+				MinimumValue = minval,
+				MaximumValue = maxval,
+				Maximum = max,
+				Minimum = min
+			};
+
 			if( _ViewService.RequestView( loadOptionsViewModel ) != true )
 				return;
 
-			var scv = File.OpenRead( FileName );
-			var bitDepthFromExtension = string.Equals( Path.GetExtension( FileName ), ".uint16_scv" ) ? 16 : 8;
+			var progress = new DoubleProgress();
+
+			progress.ProgressChanged += OnProgressChanged;
+
+			var volume = await Task.Run( () => ConvertVolume.FromGomVolume(
+				metadata,
+				rawData,
+				rawDataType,
+				loadOptionsViewModel.Extrapolate,
+				loadOptionsViewModel.Minimum,
+				loadOptionsViewModel.Maximum,
+				loadOptionsViewModel.Streamed,
+				progress,
+				_Logger ) );
+
+			progress.ProgressChanged -= OnProgressChanged;
+
+			if( volume is StreamedVolume streamed )
+			{
+				VolumeViewModel = new VolumeViewModel( streamed, null, 1, _Logger );
+			}
+			else
+			{
+				rawData.Close();
+				VolumeViewModel = new VolumeViewModel( volume, volume, 1, _Logger );
+			}
+
+			ProgressMessage = null;
+			Progress = 0.0;
+		}
+
+		private async Task LoadScvVolume( string filename )
+		{
+			var bitDepthFromExtension = string.Equals( Path.GetExtension( filename ), ".uint16_scv" ) ? 16 : 8;
+			var maximumValue = bitDepthFromExtension == 8 ? byte.MaxValue : ushort.MaxValue;
+			var loadOptionsViewModel = new LoadOptionsViewModel
+			{
+				MinimumValue = 0,
+				MaximumValue = maximumValue,
+				Minimum = 0,
+				Maximum = maximumValue
+			};
+
+			if( _ViewService.RequestView( loadOptionsViewModel ) != true )
+				return;
+
+			var scv = File.OpenRead( filename );
+
 			var progress = new DoubleProgress();
 
 			progress.ProgressChanged += OnProgressChanged;
@@ -340,8 +415,8 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 				scv,
 				bitDepthFromExtension,
 				loadOptionsViewModel.Extrapolate,
-				loadOptionsViewModel.Minimum,
-				loadOptionsViewModel.Maximum,
+				(ushort)loadOptionsViewModel.Minimum,
+				(ushort)loadOptionsViewModel.Maximum,
 				loadOptionsViewModel.Streamed,
 				progress, _Logger ) );
 
@@ -359,8 +434,6 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 
 			ProgressMessage = null;
 			Progress = 0.0;
-
-			IsLoading = false;
 		}
 
 		private async Task CreatePreview()

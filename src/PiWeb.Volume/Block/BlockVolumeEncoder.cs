@@ -1,7 +1,7 @@
 #region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2020                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -44,16 +44,9 @@ namespace Zeiss.PiWeb.Volume.Block
 		/// </summary>
 		internal void Encode( IReadOnlyList<VolumeSlice> slices, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition>? progress )
 		{
-			var z = 0;
-			var buffer = new byte[ BlockVolume.N ][];
+			var quantization = Quantization.Calculate( _Options );
 
-			Encode( () =>
-			{
-				for( var bz = 0; bz < BlockVolume.N && z < metadata.SizeZ; bz++, z++ )
-					buffer[ bz ] = slices[ z ].Data;
-
-				return buffer;
-			}, output, metadata, progress );
+			Encode( EnumerateBlockLayersFromSlices( slices, metadata ), output, metadata, quantization, progress );
 		}
 
 		/// <summary>
@@ -61,22 +54,44 @@ namespace Zeiss.PiWeb.Volume.Block
 		/// </summary>
 		internal void Encode( Stream input, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition>? progress )
 		{
-			var z = 0;
+			var quantization = Quantization.Calculate( _Options );
+			Encode( EnumerateBlockLayersFromStream( input, metadata ), output, metadata, quantization, progress );
+		}
 
+		private static IEnumerable<byte[][]> EnumerateBlockLayersFromStream( Stream input, VolumeMetadata metadata )
+		{
+			var z = 0;
+			var (_, _, layerCount) = BlockVolume.GetBlockCount( metadata );
 			var layerBuffer = new byte[ BlockVolume.N ][];
+
 			for( var i = 0; i < BlockVolume.N; i++ )
 				layerBuffer[ i ] = new byte[ metadata.SizeX * metadata.SizeY ];
 
-			Encode( () =>
+			for( var layerIndex = 0; layerIndex < layerCount; layerIndex++ )
 			{
 				for( var bz = 0; bz < BlockVolume.N && z < metadata.SizeZ; bz++, z++ )
 					input.Read( layerBuffer[ bz ], 0, metadata.SizeX * metadata.SizeY );
 
-				return layerBuffer;
-			}, output, metadata, progress );
+				yield return layerBuffer;
+			}
 		}
 
-		private void Encode( Func<byte[][]> getLayerAction, Stream output, VolumeMetadata metadata, IProgress<VolumeSliceDefinition>? progress )
+		private static IEnumerable<byte[][]> EnumerateBlockLayersFromSlices( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata )
+		{
+			var z = 0;
+			var buffer = new byte[ BlockVolume.N ][];
+			var (_, _, layerCount) = BlockVolume.GetBlockCount( metadata );
+
+			for( var layerIndex = 0; layerIndex < layerCount; layerIndex++ )
+			{
+				for( var bz = 0; bz < BlockVolume.N && z < metadata.SizeZ; bz++, z++ )
+					buffer[ bz ] = slices[ z ].Data;
+
+				yield return buffer;
+			}
+		}
+
+		private void Encode( IEnumerable<byte[][]> blockLayers, Stream output, VolumeMetadata metadata, double[] quantization, IProgress<VolumeSliceDefinition>? progress )
 		{
 			var (bcx, bcy, _) = BlockVolume.GetBlockCount( metadata );
 
@@ -93,12 +108,14 @@ namespace Zeiss.PiWeb.Volume.Block
 
 			using var writer = new BinaryWriter( output );
 
-			var quantization = Quantization.Calculate( _Options, false );
+			WriteMetadata( writer, quantization );
 			var zigzag = ZigZag.Calculate();
 
-			for( ushort layerZ = 0, blockIndexZ = 0; layerZ < metadata.SizeZ; layerZ += BlockVolume.N, blockIndexZ++ )
+			var blockIndexZ = (ushort)0;
+
+			foreach( var blockLayer in blockLayers )
 			{
-				CreateLayer( getLayerAction(), inputBlocks, blockIndexZ, metadata );
+				CreateLayer( blockLayer, inputBlocks, blockIndexZ, metadata );
 				EncodeLayer( inputBlocks, resultBlocks, resultLengths, quantization, zigzag );
 
 				for( var blockIndex = 0; blockIndex < blockCount; blockIndex++ )
@@ -126,10 +143,30 @@ namespace Zeiss.PiWeb.Volume.Block
 				}
 
 				progress?.Report( new VolumeSliceDefinition( Direction.Z, (ushort)( blockIndexZ * BlockVolume.N ) ) );
+
+				blockIndexZ++;
 			}
 		}
 
-		private static void EncodeLayer( double[][] inputBlocks, short[][] resultBlocks, ushort[] resultLengths, double[] quantization, int[] zigzag )
+		private static void WriteMetadata( BinaryWriter writer, double[] quantization )
+		{
+			//File header, read as 'JSVF'
+			writer.Write( BlockVolume.FileHeader );
+
+			//Version
+			writer.Write( BlockVolume.Version );
+
+			//Quantization
+			Quantization.Write( writer, quantization );
+		}
+
+		private static void EncodeLayer(
+			double[][] inputBlocks,
+			short[][] resultBlocks,
+			ushort[] resultLengths,
+			double[] quantization,
+			int[] zigzag
+		)
 		{
 			Parallel.For( 0, inputBlocks.Length,
 				() => ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
@@ -201,7 +238,7 @@ namespace Zeiss.PiWeb.Volume.Block
 					var gy = blockIndexY * BlockVolume.N + by;
 					var gx = blockIndexX * BlockVolume.N + bx;
 
-					block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ] = gz >= sz || gy >= sy || gx >= sx ? 0.0 : layer[ bz ][ gy * sx + gx ] - 128.0;
+					block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ] = gz >= sz || gy >= sy || gx >= sx ? 0.0 : layer[ bz ][ gy * sx + gx ];
 				}
 			} );
 		}

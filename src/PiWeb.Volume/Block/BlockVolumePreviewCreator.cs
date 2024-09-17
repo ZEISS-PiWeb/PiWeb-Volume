@@ -1,7 +1,7 @@
 #region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2020                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -64,7 +64,7 @@ namespace Zeiss.PiWeb.Volume.Block
 			if( _Volume.CompressedData[ Direction.Z ] is not {} data )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
-			var decoder = new BlockVolumeDecoder( _Volume.CompressionOptions );
+			var decoder = new BlockVolumeDecoder();
 			var input = new MemoryStream( data );
 
 			var result = VolumeSliceHelper.CreateSliceBuffer( _PreviewSizeX, _PreviewSizeY, _PreviewSizeZ );

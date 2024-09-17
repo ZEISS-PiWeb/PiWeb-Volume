@@ -1,7 +1,7 @@
 #region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2019                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -22,7 +22,7 @@ namespace Zeiss.PiWeb.Volume.UI.Services
     {
         #region constants
 
-        private const string ReadableVolumeFileFilter = "All volume files|*.uint16_scv;*.uint8_scv;*.vgi;*.volx|PiWeb volumes|*.volx|Calypso volumes|*.uint16_scv;*.uint8_scv|VG volumes|*.vgi";
+        private const string ReadableVolumeFileFilter = "All volume files|*.uint16_scv;*.uint8_scv;*.vgi;*.gom_volume;*.volx|PiWeb volumes|*.volx|Calypso volumes|*.uint16_scv;*.uint8_scv|GOM volumes|*.gom_volume|VG volumes|*.vgi";
         private const string WritableVolumeFileFilter = "PiWeb volumes|*.volx|Calypso volumes|*.uint8_scv";
 
         #endregion

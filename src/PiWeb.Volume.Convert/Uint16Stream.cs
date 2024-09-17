@@ -1,7 +1,7 @@
 #region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2020                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -27,7 +27,7 @@ namespace Zeiss.PiWeb.Volume.Convert
 		private readonly double _Factor;
 		private readonly long _Offset;
 
-		private byte[] _ByteBuffer;
+		private byte[]? _ByteBuffer;
 
 		#endregion
 
@@ -39,13 +39,13 @@ namespace Zeiss.PiWeb.Volume.Convert
 			_BaseStream = baseStream;
 		}
 
-		public Uint16Stream( Stream baseStream, byte minValue, byte maxValue )
+		public Uint16Stream( Stream baseStream, ushort minValue, ushort maxValue )
 		{
 			_Offset = baseStream.Position;
 			_BaseStream = baseStream;
-			_MinValue = ( ushort ) ( minValue << 8 );
+			_MinValue = minValue;
 			_Extrapolate = true;
-			_Factor = ( double ) ushort.MaxValue / ( ( ushort ) ( maxValue << 8 ) - _MinValue );
+			_Factor = Math.Min( 1.0, 1.0 / ( maxValue - minValue ) );
 		}
 
 		#endregion
@@ -74,17 +74,17 @@ namespace Zeiss.PiWeb.Volume.Convert
 
 		public override int Read( byte[] buffer, int offset, int count )
 		{
-			if( _ByteBuffer is null || _ByteBuffer.Length != count * 2 )
-				_ByteBuffer = new byte[count * sizeof( ushort )];
+			if( _ByteBuffer is null || _ByteBuffer.Length != count * sizeof(ushort) )
+				_ByteBuffer = new byte[ count * sizeof( ushort ) ];
 
-			var read = _BaseStream.Read( _ByteBuffer, 0, count * 2 );
+			var read = _BaseStream.Read( _ByteBuffer, 0, count * sizeof(ushort) );
 
 			if( _Extrapolate )
 			{
 				for( var i = 0; i < read / 2; i++ )
 				{
-					var value = ( ushort ) ( _ByteBuffer[ i * 2 ] | _ByteBuffer[ i * 2 + 1 ] << 8 );
-					buffer[ i + offset ] = ( byte ) ( ( ushort ) Math.Min( ushort.MaxValue, Math.Max( ushort.MinValue, value - _MinValue ) * _Factor ) >> 8 );
+					var value = BitConverter.ToUInt16( _ByteBuffer, i * sizeof(ushort) );
+					buffer[ i + offset ] = 	(byte)Math.Min( byte.MaxValue, Math.Max( byte.MinValue, ( value - _MinValue ) * _Factor * byte.MaxValue ) );
 				}
 			}
 			else

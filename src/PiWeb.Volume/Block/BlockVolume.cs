@@ -1,7 +1,7 @@
 #region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2020                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -27,11 +27,32 @@ namespace Zeiss.PiWeb.Volume.Block
 	{
 		#region constants
 
+		/// <summary>
+		/// Side length of a block.
+		/// </summary>
 		internal const int N = 8;
 		internal const int N2 = N * N;
 		internal const int N3 = N * N * N;
 
+		/// <summary>
+		/// The id of the block volume encoder.
+		/// </summary>
 		internal const string EncoderID = "zeiss.block";
+
+		/// <summary>
+		///  The pixel format of the block volume encoder.
+		/// </summary>
+		internal const string PixelFormat = "gray8";
+
+		/// <summary>
+		/// File header to identify block volumes. Reads as JSVF.
+		/// </summary>
+		public const uint FileHeader = 0x4A535646;
+
+		/// <summary>
+		/// The current file version.
+		/// </summary>
+		public const uint Version = 0x00000001;
 
 		#endregion
 
@@ -65,8 +86,9 @@ namespace Zeiss.PiWeb.Volume.Block
 
 		private static DirectionMap CreateDirectionMap( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress )
 		{
+			var estimate = ((long)metadata.SizeX * metadata.SizeY * metadata.SizeZ) / N2;
 			var encoder = new BlockVolumeEncoder( options );
-			var output = new MemoryStream();
+			var output = new MemoryStream( (int)estimate );
 
 			encoder.Encode( input, output, metadata, progress );
 
