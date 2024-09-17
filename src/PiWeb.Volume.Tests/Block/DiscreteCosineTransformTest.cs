@@ -8,7 +8,7 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.Tests;
+namespace Zeiss.PiWeb.Volume.Tests.Block;
 
 #region usings
 
