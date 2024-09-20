@@ -33,16 +33,16 @@ namespace Zeiss.PiWeb.Volume.Block
 		/// </summary>
 		public static double[] Read( BinaryReader reader, bool invert )
 		{
-			var data = reader.ReadBytes( BlockVolume.N3 * sizeof( double ) ).AsSpan();
-			var values = MemoryMarshal.Cast<byte, double>( data );
+			var values = new double[ BlockVolume.N3 ];
+			_ = reader.Read( MemoryMarshal.Cast<double, byte>( values.AsSpan() ) );
 
 			if( !invert )
-				return values.ToArray();
+				return values;
 
 			for( var i = 0; i < BlockVolume.N3; i++ )
 				values[ i ] = 1.0 / values[ i ];
 
-			return values.ToArray();
+			return values;
 		}
 
 		/// <summary>
