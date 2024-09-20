@@ -1,7 +1,7 @@
 ﻿#region Copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2019                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -28,14 +28,16 @@ namespace Zeiss.PiWeb.Volume
 		/// <summary>
 		/// Initializes a new instance of the <see cref="VolumeSliceRangeDefinition"/> struct.
 		/// </summary>
-		/// <param name="direction"></param>
-		/// <param name="first">The first.</param>
-		/// <param name="last">The last.</param>
-		public VolumeSliceRangeDefinition( Direction direction, ushort first, ushort last )
+		/// <param name="direction">The projection direction of the slices.</param>
+		/// <param name="first">The first index of the slices in the volume.</param>
+		/// <param name="last">The last index of the slices in the volume.</param>
+		/// <param name="regionOfInterest">The region of interest inside the slices.</param>
+		public VolumeSliceRangeDefinition( Direction direction, ushort first, ushort last, VolumeRegion? regionOfInterest = null )
 		{
 			First = Math.Min( first, last );
 			Last = Math.Max( first, last );
 			Direction = direction;
+			RegionOfInterest = regionOfInterest;
 		}
 
 		#endregion
@@ -45,18 +47,20 @@ namespace Zeiss.PiWeb.Volume
 		/// <summary>
 		/// Gets the direction.
 		/// </summary>
-		/// <value>
-		/// The direction.
-		/// </value>
 		public Direction Direction { get; }
 
 		/// <summary>
-		/// Gets the inclusive first slice.
+		/// The region of interest inside the slices.
+		/// </summary>
+		public VolumeRegion? RegionOfInterest { get; }
+
+		/// <summary>
+		/// The inclusive first slice.
 		/// </summary>
 		public ushort First { get; }
 
 		/// <summary>
-		/// Gets the inclusive last slice.
+		/// The inclusive last slice.
 		/// </summary>
 		public ushort Last { get; }
 
@@ -84,7 +88,7 @@ namespace Zeiss.PiWeb.Volume
 		{
 			for( var i = First; i <= Last; i++ )
 			{
-				yield return new VolumeSliceDefinition( Direction, i );
+				yield return new VolumeSliceDefinition( Direction, i, RegionOfInterest );
 			}
 		}
 

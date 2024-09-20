@@ -1,7 +1,7 @@
 ﻿#region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2013                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -35,10 +35,10 @@ namespace Zeiss.PiWeb.Volume
 		/// <param name="value">The value.</param>
 		/// <param name="description">The description.</param>
 		/// <exception cref="System.ArgumentException">name must not be null or empty</exception>
-		private Property( string name, DataTypeId datatype, object value, string description )
+		private Property( string name, DataTypeId datatype, object value, string? description )
 		{
 			if( string.IsNullOrWhiteSpace( name ) )
-				throw new ArgumentException( "name must not be null or empty", nameof( name ) );
+				throw new ArgumentException( @"name must not be null or empty", nameof( name ) );
 
 
 			Name = name;
@@ -69,7 +69,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <summary>
 		/// Gets a culture invariant description.
 		/// </summary>
-		public string Description { get; }
+		public string? Description { get; }
 
 		#endregion
 
@@ -82,7 +82,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <param name="value">The value.</param>
 		/// <param name="description">The description.</param>
 		/// <returns></returns>
-		public static Property Create( string name, long value, string description = null )
+		public static Property Create( string name, long value, string? description = null )
 		{
 			return new Property( name, DataTypeId.Integer, value, description );
 		}
@@ -94,7 +94,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <param name="value">The value.</param>
 		/// <param name="description">The description.</param>
 		/// <returns></returns>
-		public static Property Create( string name, double value, string description = null )
+		public static Property Create( string name, double value, string? description = null )
 		{
 			return new Property( name, DataTypeId.Double, value, description );
 		}
@@ -106,7 +106,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <param name="value">The value.</param>
 		/// <param name="description">The description.</param>
 		/// <returns></returns>
-		public static Property Create( string name, string value, string description = null )
+		public static Property Create( string name, string value, string? description = null )
 		{
 			return new Property( name, DataTypeId.String, value, description );
 		}
@@ -118,7 +118,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <param name="value">The value.</param>
 		/// <param name="description">The description.</param>
 		/// <returns></returns>
-		public static Property Create( string name, DateTime value, string description = null )
+		public static Property Create( string name, DateTime value, string? description = null )
 		{
 			return new Property( name, DataTypeId.DateTime, value, description );
 		}
@@ -130,7 +130,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <param name="value">The value.</param>
 		/// <param name="description">The description.</param>
 		/// <returns></returns>
-		public static Property Create( string name, TimeSpan value, string description = null )
+		public static Property Create( string name, TimeSpan value, string? description = null )
 		{
 			return new Property( name, DataTypeId.TimeSpan, value, description );
 		}
@@ -143,7 +143,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <param name="value">The value.</param>
 		/// <param name="description">The description.</param>
 		/// <returns></returns>
-		public static Property TryToDetectTypeAndCreate( string name, string value, string description )
+		public static Property TryToDetectTypeAndCreate( string name, string value, string? description )
 		{
 			if( string.IsNullOrWhiteSpace( value ) ) return new Property( name, DataTypeId.String, value, description );
 
@@ -194,6 +194,33 @@ namespace Zeiss.PiWeb.Volume
 		}
 
 		/// <summary>
+		/// Returns the properties value as long in case it has the integer data type.
+		/// </summary>
+		public int? GetIntValue()
+		{
+			if( Value is long longValue and <= int.MaxValue and >= int.MinValue )
+				return (int)longValue;
+
+			return null;
+		}
+
+		/// <summary>
+		/// Returns the properties value as long in case it has the integer data type.
+		/// </summary>
+		public long? GetLongValue()
+		{
+			return DataType == DataTypeId.Integer ? (long)Value : null;
+		}
+
+		/// <summary>
+		/// Returns the properties value as long in case it has the integer data type.
+		/// </summary>
+		public double? GetDoubleValue()
+		{
+			return DataType == DataTypeId.Double ? (double)Value : null;
+		}
+
+		/// <summary>
 		/// Serializes the property.
 		/// </summary>
 		/// <param name="writer">The writer.</param>
@@ -223,13 +250,20 @@ namespace Zeiss.PiWeb.Volume
 		/// <returns></returns>
 		/// <exception cref="System.ArgumentNullException">reader</exception>
 		/// <exception cref="System.NotSupportedException"></exception>
-		internal static Property Deserialize( XmlReader reader )
+		internal static Property? Deserialize( XmlReader reader )
 		{
 			if( reader == null )
 				throw new ArgumentNullException( nameof( reader ) );
 
 			var name = reader.GetAttribute( "Name" );
-			var dataType = (DataTypeId)Enum.Parse( typeof( DataTypeId ), reader.GetAttribute( "Type" ) );
+			if( string.IsNullOrEmpty( name ) )
+				return null;
+
+			var type = reader.GetAttribute( "Type" );
+			if( string.IsNullOrEmpty( type ) )
+				return null;
+
+			var dataType = (DataTypeId)Enum.Parse( typeof( DataTypeId ), type );
 			var description = reader.GetAttribute( "Description" );
 			var stringValue = reader.ReadString();
 
@@ -247,7 +281,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <summary>
 		/// Determines, whether the two specified instances are equal.
 		/// </summary>
-		private static bool Equals( Property m1, Property m2 )
+		private static bool Equals( Property? m1, Property? m2 )
 		{
 			if( ReferenceEquals( m1, m2 ) )
 			{
@@ -272,7 +306,7 @@ namespace Zeiss.PiWeb.Volume
 		/// </returns>
 		public override int GetHashCode()
 		{
-			return Name.GetHashCode() ^ DataType.GetHashCode() ^ ( Value?.GetHashCode() ?? 0 );
+			return HashCode.Combine( Name, DataType, Value );
 		}
 
 		/// <summary>
@@ -282,7 +316,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <returns>
 		///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
 		/// </returns>
-		public override bool Equals( object obj )
+		public override bool Equals( object? obj )
 		{
 			return Equals( this, obj as Property );
 		}
@@ -303,22 +337,22 @@ namespace Zeiss.PiWeb.Volume
 			return sb.ToString();
 		}
 
-		private static DateTime? ObjectToNullableDateTime( string stringValue, IFormatProvider provider = null, DateTimeStyles style = DateTimeStyles.RoundtripKind )
+		private static DateTime? ObjectToNullableDateTime( string stringValue, IFormatProvider? provider = null, DateTimeStyles style = DateTimeStyles.RoundtripKind )
 		{
-			return DateTime.TryParse( stringValue, provider ?? CultureInfo.CurrentCulture, style, out var result ) ? (DateTime?)result : null;
+			return DateTime.TryParse( stringValue, provider ?? CultureInfo.CurrentCulture, style, out var result ) ? result : null;
 		}
 
-		private static long? ObjectToNullableInt64( string stringValue, IFormatProvider provider = null, NumberStyles style = NumberStyles.Integer )
+		private static long? ObjectToNullableInt64( string stringValue, IFormatProvider? provider = null, NumberStyles style = NumberStyles.Integer )
 		{
-			return long.TryParse( stringValue, style, provider, out var result ) ? (long?)result : null;
+			return long.TryParse( stringValue, style, provider, out var result ) ? result : null;
 		}
 
-		internal static double? ObjectToNullableDouble( string stringValue, IFormatProvider provider = null, NumberStyles style = NumberStyles.Float | NumberStyles.AllowThousands )
+		internal static double? ObjectToNullableDouble( string stringValue, IFormatProvider? provider = null, NumberStyles style = NumberStyles.Float | NumberStyles.AllowThousands )
 		{
-			return double.TryParse( stringValue, style, provider, out var result ) ? (double?)result : null;
+			return double.TryParse( stringValue, style, provider, out var result ) ? result : null;
 		}
 
-		private static TimeSpan? ObjectToNullableTimeSpan( string stringValue, IFormatProvider provider = null )
+		private static TimeSpan? ObjectToNullableTimeSpan( string stringValue, IFormatProvider? provider = null )
 		{
 			if( TimeSpan.TryParse( stringValue, provider, out var result ) ) return result;
 			if( TryXmlConvertToTimeSpan( stringValue, out result ) ) return result;

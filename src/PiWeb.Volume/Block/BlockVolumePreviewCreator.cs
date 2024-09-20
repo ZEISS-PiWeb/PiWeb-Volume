@@ -1,7 +1,7 @@
 #region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2020                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -59,18 +59,14 @@ namespace Zeiss.PiWeb.Volume.Block
 
 		#region methods
 
-		internal UncompressedVolume CreatePreview( IProgress<VolumeSliceDefinition> progress, CancellationToken ct )
+		internal UncompressedVolume CreatePreview( IProgress<VolumeSliceDefinition>? progress, CancellationToken ct )
 		{
-			if( _Volume.CompressedData[ Direction.Z ] == null )
+			if( _Volume.CompressedData[ Direction.Z ] is not {} data )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
-
-			var decoder = new BlockVolumeDecoder( _Volume.CompressionOptions );
-			var data = _Volume.CompressedData[ Direction.Z ];
-			var input = new MemoryStream( data );
 
 			var result = VolumeSliceHelper.CreateSliceBuffer( _PreviewSizeX, _PreviewSizeY, _PreviewSizeZ );
 
-			decoder.Decode( input, _Metadata, ( block, index ) =>
+			BlockVolumeDecoder.Decode( data, _Metadata, ( block, index ) =>
 			{
 				for( var bz = 0; bz < BlockVolume.N; bz++ )
 				for( var by = 0; by < BlockVolume.N; by++ )

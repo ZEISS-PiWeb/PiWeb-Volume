@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Platforms>x64</Platforms>
-    <LangVersion>9</LangVersion>
+    <LangVersion>latestmajor</LangVersion>
     <AssemblyName>PiWeb.Volume</AssemblyName>
     <RootNamespace>Zeiss.PiWeb.Volume</RootNamespace>
     <Copyright>Copyright © 2020 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>
@@ -19,6 +19,8 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Configurations>Debug;Release;Test;Pack</Configurations>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -37,7 +39,7 @@
       volumemetric data for visualization in PiWeb.
     </Description>
     <PackageId>Zeiss.PiWeb.Volume</PackageId>
-    <Version>2.0.4</Version>
+    <Version>3.0.0</Version>
     <PackageIcon>logo_128x128.png</PackageIcon>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/ZEISS-PiWeb/PiWeb-Volume</PackageProjectUrl>
@@ -46,10 +48,6 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>Carl Zeiss PiWeb Volume</PackageTags>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\PiWeb.Volume.Core\PiWeb.Volume.Core.vcxproj" PrivateAssets="all" />
-  </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Volume.de.resx">
@@ -61,11 +59,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\PiWeb.Volume.Core\lib\*.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
-    <None Include="..\..\bin\$(Configuration)\PiWeb.Volume.Core.dll" Pack="true" PackagePath="runtimes\win-x64\native\" Visible="false" />
     <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
-    <None Include="..\..\gfx\logo_128x128.png" Pack="true" PackagePath="logo_128x128.png" />
-    <None Include="..\..\third_party\third_party_notices.txt" Pack="true" PackagePath="third_party_notices.txt" />
+    <None Include="..\..\docs\img\logo_128x128.png" Pack="true" PackagePath="logo_128x128.png" />
   </ItemGroup>
 
 </Project>

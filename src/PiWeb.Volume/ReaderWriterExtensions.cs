@@ -1,7 +1,7 @@
 ﻿#region Copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2019                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -41,9 +41,6 @@ namespace Zeiss.PiWeb.Volume
 		/// </summary>
 		internal static byte[] StreamToArray( this Stream stream, int expectedSize = 64 * 1024 )
 		{
-			if( stream == null )
-				return null;
-
 			using var memStream = new MemoryStream( expectedSize );
 
 			const int bufferSize = 64 * 1024;

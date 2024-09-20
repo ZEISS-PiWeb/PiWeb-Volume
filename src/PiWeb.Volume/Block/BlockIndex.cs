@@ -1,7 +1,7 @@
 #region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2020                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -13,7 +13,7 @@ namespace Zeiss.PiWeb.Volume.Block
 	/// <summary>
 	/// Stores the index of a data block.
 	/// </summary>
-	internal readonly struct BlockIndex
+	internal readonly record struct BlockIndex
 	{
 		#region constructors
 
@@ -28,9 +28,9 @@ namespace Zeiss.PiWeb.Volume.Block
 
 		#region properties
 
-		public ushort X { get; }
-		public ushort Y { get; }
-		public ushort Z { get; }
+		public readonly ushort X;
+		public readonly ushort Y;
+		public readonly ushort Z;
 
 		#endregion
 	}

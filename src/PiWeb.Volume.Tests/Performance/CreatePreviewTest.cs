@@ -11,7 +11,7 @@ namespace Zeiss.PiWeb.Volume.Tests.Performance
 	{
 		#region members
 
-		private static readonly string SamplePath = Path.Combine( Paths.TestData, "testcube_singledirection.volx" );
+		private static readonly string SamplePath = Path.Combine( Paths.TestData, "seatbelt_button.volx" );
 
 		private CompressedVolume _SampleCompressedVolume;
 		private UncompressedVolume _SampleDecompressedVolume;

@@ -1,7 +1,7 @@
 #region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2019                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -22,8 +22,8 @@ namespace Zeiss.PiWeb.Volume.UI.Services
     {
         #region constants
 
-        private const string AllVolumeFileFilter = "All volume files|*.uint16_scv;*.vgi;*.volx|PiWeb volumes|*.volx|Calypso volumes|*.uint16_scv|VG volumes|*.vgi";
-        private const string PiWebVolumeFileFilter = "PiWeb volumes|*.volx";
+        private const string ReadableVolumeFileFilter = "All volume files|*.uint16_scv;*.uint8_scv;*.vgi;*.gom_volume;*.volx|PiWeb volumes|*.volx|Calypso volumes|*.uint16_scv;*.uint8_scv|GOM volumes|*.gom_volume|VG volumes|*.vgi";
+        private const string WritableVolumeFileFilter = "PiWeb volumes|*.volx|Calypso volumes|*.uint8_scv";
 
         #endregion
 
@@ -35,7 +35,7 @@ namespace Zeiss.PiWeb.Volume.UI.Services
 
             var dialog = new OpenFileDialog
             {
-                Filter = AllVolumeFileFilter,
+                Filter = ReadableVolumeFileFilter,
                 CheckFileExists = true,
                 CheckPathExists = true,
                 Multiselect = false
@@ -47,14 +47,14 @@ namespace Zeiss.PiWeb.Volume.UI.Services
             fileName = dialog.FileName;
             return true;
         }
-        
+
         public bool SelectSaveFileName( out string fileName )
         {
 	        fileName = null;
 
 	        var dialog = new SaveFileDialog
 	        {
-		        Filter = PiWebVolumeFileFilter
+		        Filter = WritableVolumeFileFilter
 	        };
 
 	        if( dialog.ShowDialog() != true || string.IsNullOrEmpty( dialog.FileName ) )

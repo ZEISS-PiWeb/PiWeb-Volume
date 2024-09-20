@@ -1,7 +1,7 @@
 ﻿#region Copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2019                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -28,7 +28,7 @@ namespace Zeiss.PiWeb.Volume
 		#region members
 
 		private readonly Direction _Direction;
-		private readonly IProgress<VolumeSliceDefinition> _ProgressNotifier;
+		private readonly IProgress<VolumeSliceDefinition>? _ProgressNotifier;
 		private readonly CancellationToken _Ct;
 
 		private readonly Dictionary<ushort, byte[]> _SlicesX = new Dictionary<ushort, byte[]>();
@@ -43,7 +43,7 @@ namespace Zeiss.PiWeb.Volume
 
 		#region constructors
 
-		internal VolumeSliceRangeCollector( VolumeMetadata metaData, Direction direction, IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default )
+		internal VolumeSliceRangeCollector( VolumeMetadata metaData, Direction direction, IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition>? progressNotifier = null, CancellationToken ct = default )
 		{
 			if( direction != Direction.Z && ranges.Any( r => r.Direction != direction ) )
 				throw new ArgumentException( "Collecting slices ranges for different directions than input is only allowed for z-directed input" );

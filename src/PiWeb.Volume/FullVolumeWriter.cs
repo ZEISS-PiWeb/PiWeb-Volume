@@ -1,7 +1,7 @@
 ﻿#region Copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2019                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -24,7 +24,7 @@ namespace Zeiss.PiWeb.Volume
 	{
 		#region members
 
-		private readonly IProgress<VolumeSliceDefinition> _ProgressNotifier;
+		private readonly IProgress<VolumeSliceDefinition>? _ProgressNotifier;
 		private readonly CancellationToken _Ct;
 
 		private readonly VolumeSlice[] _Slices;
@@ -38,7 +38,7 @@ namespace Zeiss.PiWeb.Volume
 
 		#region constructors
 
-		internal FullVolumeWriter( VolumeMetadata metadata, Direction direction, IProgress<VolumeSliceDefinition> progressNotifier = null, CancellationToken ct = default )
+		internal FullVolumeWriter( VolumeMetadata metadata, Direction direction, IProgress<VolumeSliceDefinition>? progressNotifier = null, CancellationToken ct = default )
 		{
 			if( metadata == null )
 				throw new ArgumentNullException( nameof( metadata ) );

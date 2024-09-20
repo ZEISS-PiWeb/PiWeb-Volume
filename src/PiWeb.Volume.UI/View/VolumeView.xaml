@@ -45,7 +45,7 @@
                 BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
                 BorderThickness="0,0,0,1">
                 <StackPanel Margin="0,4" Orientation="Horizontal">
-                    <Image Source="/Resources/16px/page_size.png" Style="{StaticResource Icon}" />
+                    <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/page_size.png" Style="{StaticResource Icon}" />
                     <TextBlock Style="{StaticResource Header}">Size</TextBlock>
                 </StackPanel>
             </Border>
@@ -83,7 +83,7 @@
                 BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
                 BorderThickness="0,0,0,1">
                 <StackPanel Margin="0,4" Orientation="Horizontal">
-                    <Image Source="/Resources/16px/grid.png" Style="{StaticResource Icon}" />
+                    <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/grid.png" Style="{StaticResource Icon}" />
                     <TextBlock Style="{StaticResource Header}">Resolution</TextBlock>
                 </StackPanel>
             </Border>
@@ -120,7 +120,7 @@
                 BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
                 BorderThickness="0,0,0,1">
                 <StackPanel Margin="0,4" Orientation="Horizontal">
-                    <Image Source="/Resources/16px/list_bullets.png" Style="{StaticResource Icon}" />
+                    <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/list_bullets.png" Style="{StaticResource Icon}" />
                     <TextBlock Style="{StaticResource Header}">Properties</TextBlock>
                 </StackPanel>
             </Border>
@@ -164,7 +164,7 @@
                 BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
                 BorderThickness="0,0,0,1">
                 <StackPanel Margin="0,4" Orientation="Horizontal">
-                    <Image Source="/Resources/16px/compress_table.png" Style="{StaticResource Icon}" />
+                    <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/compress_table.png" Style="{StaticResource Icon}" />
                     <TextBlock Style="{StaticResource Header}">Compression</TextBlock>
                 </StackPanel>
             </Border>
@@ -279,6 +279,7 @@
                         <Image
                             x:Name="Full"
                             Panel.ZIndex="0"
+                            RenderOptions.BitmapScalingMode="NearestNeighbor"
                             RenderTransformOrigin="0.5,0.5"
                             Source="{Binding Path=SelectedLayerImage}"
                             Stretch="None">
@@ -300,9 +301,25 @@
                             </Image.RenderTransform>
                         </Image>
 
+                        <components:SliceCrosshair
+                            x:Name="Crosshair"
+                            Width="{Binding ElementName=Full, Path=ActualWidth}"
+                            Height="{Binding ElementName=Full, Path=ActualHeight}"
+                            Panel.ZIndex="2"
+                            Background="Transparent"
+                            Foreground="CornflowerBlue"
+                            RenderTransformOrigin="0.5,0.5" />
 
                     </Grid>
                 </components:Navigator>
+
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="8"
+                    Foreground="CornflowerBlue"
+                    IsHitTestVisible="False"
+                    Text="{Binding ElementName=Crosshair, Path=LastMousePosition}" />
 
                 <!--  Direction selector  -->
                 <Border
@@ -367,14 +384,14 @@
                             CommandParameter="{Binding ElementName=Navigator}"
                             Style="{StaticResource ToolbarButtonStyle}"
                             ToolTip="Fit into view">
-                            <Image Source="/Resources/16px/zoom_fit.png" Style="{StaticResource Icon}" />
+                            <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/zoom_fit.png" Style="{StaticResource Icon}" />
                         </Button>
                         <Button
                             Command="{x:Static components:Navigator.ResetZoomCommand}"
                             CommandParameter="{Binding ElementName=Navigator}"
                             Style="{StaticResource ToolbarButtonStyle}"
                             ToolTip="Original size">
-                            <Image Source="/Resources/16px/zoom_reset.png" Style="{StaticResource Icon}" />
+                            <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/zoom_reset.png" Style="{StaticResource Icon}" />
                         </Button>
                     </StackPanel>
                 </Border>
@@ -409,7 +426,7 @@
                         Margin="4"
                         Command="{Binding ShowPreviousSliceCommand}"
                         Style="{StaticResource ToolbarButtonStyle}">
-                        <Image Source="/Resources/16px/arrow_left.png" Style="{StaticResource Icon}" />
+                        <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/arrow_left.png" Style="{StaticResource Icon}" />
                     </Button>
                     <Slider
                         Width="240"
@@ -424,7 +441,7 @@
                         Margin="4"
                         Command="{Binding ShowNextSliceCommand}"
                         Style="{StaticResource ToolbarButtonStyle}">
-                        <Image Source="/Resources/16px/arrow_right.png" Style="{StaticResource Icon}" />
+                        <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/arrow_right.png" Style="{StaticResource Icon}" />
                     </Button>
                 </StackPanel>
             </Grid>

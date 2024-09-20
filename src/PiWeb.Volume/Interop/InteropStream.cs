@@ -1,7 +1,7 @@
 ﻿#region Copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2019                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -29,11 +29,11 @@ namespace Zeiss.PiWeb.Volume.Interop
 	{
 		#region members
 
-		public Read Read;
+		public Read? Read;
 
-		public Write Write;
+		public Write? Write;
 
-		public Seek Seek;
+		public Seek? Seek;
 
 		#endregion
 	}

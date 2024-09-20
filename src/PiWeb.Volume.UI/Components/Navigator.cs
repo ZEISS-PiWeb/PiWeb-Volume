@@ -1,7 +1,7 @@
 #region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2019                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -66,7 +66,7 @@ namespace Zeiss.PiWeb.Volume.UI.Components
 
         public static readonly DependencyProperty VerticalRangeProperty = DependencyProperty.Register(
             "VerticalRange", typeof( DoubleRange ), typeof( Navigator ), new PropertyMetadata( default( DoubleRange ) ) );
-        
+
 
         public static readonly ICommand ZoomToContentSizeCommand = new RelayCommand<Navigator>( ExecuteZoomToContentSize );
 
@@ -347,9 +347,9 @@ namespace Zeiss.PiWeb.Volume.UI.Components
         protected override void OnScrollChanged( ScrollChangedEventArgs e )
         {
             base.OnScrollChanged( e );
-            
+
             UpdateRanges();
-            
+
             HorizontalPanning = HorizontalOffset;
             VerticalPanning = VerticalOffset;
         }

@@ -1,7 +1,7 @@
 ﻿#region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2019                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -59,7 +59,7 @@ namespace Zeiss.PiWeb.Volume
 		/// Compresses the volume with the specified compression options.
 		/// </summary>
 		/// <exception cref="VolumeException">Error during encoding</exception>
-		public CompressedVolume Compress( VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public CompressedVolume Compress( VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
 			try
@@ -80,7 +80,7 @@ namespace Zeiss.PiWeb.Volume
 			}
 		}
 
-		private byte[] CompressDirection( VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, CancellationToken ct = default )
+		private byte[] CompressDirection( VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress = null, CancellationToken ct = default )
 		{
 			_Stream.Seek( 0, SeekOrigin.Begin );
 
@@ -106,7 +106,7 @@ namespace Zeiss.PiWeb.Volume
 		}
 
 		/// <inheritdoc />
-		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public override UncompressedVolume CreatePreview( ushort minification, IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
 
@@ -119,7 +119,7 @@ namespace Zeiss.PiWeb.Volume
 		}
 
 		/// <inheritdoc />
-		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
 
@@ -130,7 +130,7 @@ namespace Zeiss.PiWeb.Volume
 		}
 
 		/// <inheritdoc />
-		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
 		{
 			throw new NotImplementedException();
 
@@ -140,8 +140,8 @@ namespace Zeiss.PiWeb.Volume
 		public override void GetSlice(
 			VolumeSliceDefinition slice,
 			byte[] buffer,
-			IProgress<VolumeSliceDefinition> progress = null,
-			ILogger logger = null,
+			IProgress<VolumeSliceDefinition>? progress = null,
+			ILogger? logger = null,
 			CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
@@ -225,7 +225,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <summary>
 		/// Compresses and saves the volume in the specified stream.
 		/// </summary>
-		public void Save( Stream stream, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition> progress = null, ILogger logger = null, CancellationToken ct = default )
+		public void Save( Stream stream, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
 		{
 			var sw = Stopwatch.StartNew();
 			try

@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.22621</TargetFramework>
     <Platforms>x64</Platforms>
-    <LangVersion>9</LangVersion>
+    <LangVersion>latestmajor</LangVersion>
     <AssemblyName>PiWeb.Volume.Compare</AssemblyName>
     <RootNamespace>Zeiss.PiWeb.Volume.Compare</RootNamespace>
     <Copyright>Copyright © 2020 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>
@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.2.0" NoWarn="NU1701" />
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.0" NoWarn="NU1701" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" NoWarn="NU1701" />
     <PackageReference Include="Unity" Version="5.11.10" />
   </ItemGroup>

@@ -1,7 +1,7 @@
 ﻿#region Copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2019                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -71,7 +71,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <param name="slices">The decompressed volume as 8-Bit grayscale values. The array dimensions must match the specified <paramref name="metadata"/> (byte[z][x*y]).</param>
 		/// <param name="logger">The logger to use for log messages</param>
 		/// <exception cref="IndexOutOfRangeException">The specified data did not match the dimensions of the specified <paramref name="metadata"/>.</exception>
-		public static UncompressedVolume CreateUncompressed( VolumeMetadata metadata, IReadOnlyList<VolumeSlice> slices, ILogger logger = null )
+		public static UncompressedVolume CreateUncompressed( VolumeMetadata metadata, IReadOnlyList<VolumeSlice> slices, ILogger? logger = null )
 		{
 			var sw = Stopwatch.StartNew();
 
@@ -98,8 +98,8 @@ namespace Zeiss.PiWeb.Volume
 			IReadOnlyList<VolumeSlice> slices,
 			VolumeCompressionOptions options,
 			bool multiDirection = false,
-			IProgress<VolumeSliceDefinition> progress = null,
-			ILogger logger = null,
+			IProgress<VolumeSliceDefinition>? progress = null,
+			ILogger? logger = null,
 			CancellationToken ct = default )
 		{
 			var volume = new UncompressedVolume( metadata, slices );
@@ -119,8 +119,8 @@ namespace Zeiss.PiWeb.Volume
 			VolumeMetadata metadata,
 			Stream stream,
 			VolumeCompressionOptions options,
-			IProgress<VolumeSliceDefinition> progress = null,
-			ILogger logger = null )
+			IProgress<VolumeSliceDefinition>? progress = null,
+			ILogger? logger = null )
 		{
 			var sw = Stopwatch.StartNew();
 			try
@@ -154,8 +154,8 @@ namespace Zeiss.PiWeb.Volume
 		/// <exception cref="VolumeException">Error during decoding</exception>
 		public abstract VolumeSliceCollection GetSliceRanges(
 			IReadOnlyCollection<VolumeSliceRangeDefinition> ranges,
-			IProgress<VolumeSliceDefinition> progress = null,
-			ILogger logger = null,
+			IProgress<VolumeSliceDefinition>? progress = null,
+			ILogger? logger = null,
 			CancellationToken ct = default );
 
 		/// <summary>
@@ -169,8 +169,8 @@ namespace Zeiss.PiWeb.Volume
 		/// <exception cref="VolumeException">Error during decoding</exception>
 		public abstract VolumeSliceRange GetSliceRange(
 			VolumeSliceRangeDefinition range,
-			IProgress<VolumeSliceDefinition> progress = null,
-			ILogger logger = null,
+			IProgress<VolumeSliceDefinition>? progress = null,
+			ILogger? logger = null,
 			CancellationToken ct = default );
 
 		/// <summary>
@@ -185,8 +185,8 @@ namespace Zeiss.PiWeb.Volume
 		public abstract void GetSlice(
 			VolumeSliceDefinition slice,
 			byte[] sliceBuffer,
-			IProgress<VolumeSliceDefinition> progress = null,
-			ILogger logger = null,
+			IProgress<VolumeSliceDefinition>? progress = null,
+			ILogger? logger = null,
 			CancellationToken ct = default );
 
 		/// <summary>
@@ -199,8 +199,8 @@ namespace Zeiss.PiWeb.Volume
 		/// <exception cref="VolumeException">Error during decoding</exception>
 		public VolumeSlice GetSlice(
 			VolumeSliceDefinition slice,
-			IProgress<VolumeSliceDefinition> progress = null,
-			ILogger logger = null,
+			IProgress<VolumeSliceDefinition>? progress = null,
+			ILogger? logger = null,
 			CancellationToken ct = default )
 		{
 			var sliceBuffer = new byte[ Metadata.GetSliceLength( slice.Direction ) ];
@@ -220,8 +220,8 @@ namespace Zeiss.PiWeb.Volume
 		/// <exception cref="VolumeException">Error during decoding</exception>
 		public abstract UncompressedVolume CreatePreview(
 			ushort minification,
-			IProgress<VolumeSliceDefinition> progress = null,
-			ILogger logger = null,
+			IProgress<VolumeSliceDefinition>? progress = null,
+			ILogger? logger = null,
 			CancellationToken ct = default );
 
 		internal static void GetEncodedSliceSize( VolumeMetadata metadata, Direction direction, out ushort x, out ushort y )
@@ -251,7 +251,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <exception cref="VolumeException">Error during decoding</exception>
 		/// <exception cref="NotSupportedException">The volume has no compressed data</exception>
 		/// <exception cref="InvalidOperationException">One or more entries are missing in the archive.</exception>
-		public static CompressedVolume Load( Stream stream, ILogger logger = null )
+		public static CompressedVolume Load( Stream stream, ILogger? logger = null )
 		{
 			var sw = Stopwatch.StartNew();
 			try
@@ -265,7 +265,7 @@ namespace Zeiss.PiWeb.Volume
 				var compressionOptions = ReadVolumeCompressionOptions( archive );
 				var directionMap = ReadVolumeVoxels( archive );
 
-				if( compressionOptions?.Encoder == BlockVolume.EncoderID )
+				if( compressionOptions.Encoder == BlockVolume.EncoderID )
 					return new BlockVolume( metaData, compressionOptions, directionMap );
 
 				return new CompressedVolume( metaData, compressionOptions, directionMap );
@@ -292,7 +292,7 @@ namespace Zeiss.PiWeb.Volume
 			return directionMap;
 		}
 
-		private static bool ReadVoxelData( ZipArchiveEntry dataEntry, Direction direction, DirectionMap directionMap )
+		private static bool ReadVoxelData( ZipArchiveEntry? dataEntry, Direction direction, DirectionMap directionMap )
 		{
 			if( dataEntry == null )
 				return false;
@@ -323,7 +323,7 @@ namespace Zeiss.PiWeb.Volume
 			var compressionOptionsEntry = archive.GetEntry( "CompressionOptions.xml" );
 
 			if( compressionOptionsEntry == null )
-				return null;
+				throw new InvalidOperationException( Resources.FormatResource<Volume>( "InvalidFormatMissingFile_ErrorText", "CompressionOptions.xml" ) );
 
 			using var entryStream = compressionOptionsEntry.Open();
 			return VolumeCompressionOptions.Deserialize( entryStream );

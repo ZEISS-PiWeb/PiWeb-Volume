@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  
+
   <PropertyGroup>
     <Platforms>x64</Platforms>
     <OutputType>WinExe</OutputType>
     <AssemblyName>PiWeb.Volume.Viewer</AssemblyName>
     <RootNamespace>Zeiss.PiWeb.Volume.Viewer</RootNamespace>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.22621</TargetFramework>
     <UseWPF>true</UseWPF>
     <IsPackable>false</IsPackable>
     <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
@@ -13,34 +13,35 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Configurations>Debug;Release;Test;Pack</Configurations>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Pack|x64'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-    
+
   <ItemGroup>
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" NoWarn="NU1701" />
-    <PackageReference Include="System.Reactive" Version="4.4.1" />
+    <PackageReference Include="System.Reactive" Version="6.0.1" />
     <PackageReference Include="Unity" Version="5.11.10" />
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.0" NoWarn="NU1701" />
   </ItemGroup>
-      
+
   <ItemGroup>
     <Resource Include="Effects\*.ps" />
     <Resource Include="Resources\**\*.png" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\PiWeb.Volume\PiWeb.Volume.csproj" />
     <ProjectReference Include="$(SolutionDir)\PiWeb.Volume.Convert\PiWeb.Volume.Convert.csproj" />

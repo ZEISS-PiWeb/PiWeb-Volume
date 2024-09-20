@@ -1,7 +1,7 @@
 ﻿#region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2020                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -12,18 +12,19 @@ namespace Zeiss.PiWeb.Volume.Convert
 {
 	#region usings
 
+	using System;
 	using System.IO;
+	using System.Linq;
 	using System.Text;
 
 	#endregion
 
-	internal class Scv
+	public class Scv
 	{
 		#region constructors
 
 		private Scv()
-		{
-		}
+		{ }
 
 		#endregion
 
@@ -131,19 +132,19 @@ namespace Zeiss.PiWeb.Volume.Convert
 
 		public static implicit operator VolumeMetadata( Scv scv ) => scv.ToMetadata();
 
-		private VolumeMetadata ToMetadata()
+		public VolumeMetadata ToMetadata()
 		{
 			var result = new VolumeMetadata(
-				( ushort ) VolumeSizeX,
-				( ushort ) VolumeSizeY,
-				( ushort ) VolumeSizeZ,
+				(ushort)VolumeSizeX,
+				(ushort)VolumeSizeY,
+				(ushort)VolumeSizeZ,
 				ResolutionX,
 				ResolutionY,
 				ResolutionZ );
 
 			result.Properties.Add( Property.Create( "HeaderSize", HeaderLength ) );
 			result.Properties.Add( Property.Create( "MirrorZ", MirrorZ ) );
-			result.Properties.Add( Property.Create( "Bitdepth", BitDepth ) );
+			result.Properties.Add( Property.Create( "BitDepth", BitDepth ) );
 			result.Properties.Add( Property.Create( "MinBitDepth", MinBitDepth ) );
 			result.Properties.Add( Property.Create( "MaxBitDepth", MaxBitDepth ) );
 			result.Properties.Add( Property.Create( "ScannerPositionX", ScannerPositionX ) );
@@ -187,7 +188,24 @@ namespace Zeiss.PiWeb.Volume.Convert
 			return result;
 		}
 
-		public static Scv Parse( Stream stream )
+		public static Scv FromMetaData( VolumeMetadata metadata, int bitDepth )
+		{
+			var scv = new Scv
+			{
+				VolumeSizeX = metadata.SizeX,
+				VolumeSizeY = metadata.SizeY,
+				VolumeSizeZ = metadata.SizeZ,
+				ResolutionX = metadata.ResolutionX,
+				ResolutionY = metadata.ResolutionY,
+				ResolutionZ = metadata.ResolutionZ,
+				HeaderLength = 1024,
+				BitDepth = bitDepth
+			};
+
+			return scv;
+		}
+
+		public static Scv Parse( Stream stream, int bitDepthFromExtension )
 		{
 			var result = new Scv();
 
@@ -249,7 +267,73 @@ namespace Zeiss.PiWeb.Volume.Convert
 			result.Angle = reader.ReadSingle();
 			result.Merge = reader.ReadByte();
 
+			if( result.BitDepth == 0 )
+				result.BitDepth = bitDepthFromExtension;
+
 			return result;
+		}
+
+		public void Write( Stream stream )
+		{
+			using var writer = new BinaryWriter( stream, Encoding.UTF8, true );
+
+			writer.Write( HeaderLength );
+			writer.Write( MirrorZ );
+			writer.Write( BitDepth );
+			writer.Write( VolumeSizeX );
+			writer.Write( VolumeSizeY );
+			writer.Write( VolumeSizeZ );
+			writer.Write( ResolutionX );
+			writer.Write( ResolutionY );
+			writer.Write( ResolutionZ );
+
+			writer.Write( MinBitDepth );
+			writer.Write( MaxBitDepth );
+
+			writer.Write( ScannerPositionX );
+			writer.Write( ScannerPositionY );
+			writer.Write( ScannerPositionZ );
+			writer.Write( ScannerCurrent );
+			writer.Write( ScannerVoltage );
+
+			writer.Write( RtPositionX );
+			writer.Write( RtPositionY );
+			writer.Write( RtPositionZ );
+			writer.Write( DetectorTime );
+			writer.Write( DetectorGain );
+			writer.Write( DetectorPositionX );
+			writer.Write( DetectorPositionY );
+			writer.Write( DetectorPositionZ );
+			writer.Write( DetectorVoxelSizeX );
+			writer.Write( DetectorVoxelSizeY );
+
+			writer.Write( DetectorBitDepth );
+			writer.Write( DetectorWidth );
+			writer.Write( DetectorHeight );
+			writer.Write( DetectorImageWidth );
+			writer.Write( DetectorImageHeight );
+
+			writer.Write( Projections );
+
+			writer.Write( RoiX );
+			writer.Write( RoiY );
+			writer.Write( RoiW );
+			writer.Write( RoiH );
+
+			writer.Write( NoiseReductionFilter );
+			writer.Write( VoxelReductionFactor );
+			writer.Write( Amplification );
+			writer.Write( BinningMode );
+			var buffer = Encoding.UTF8.GetBytes( PreFilter );
+			Array.Resize( ref buffer, 128 );
+			writer.Write( buffer );
+			writer.Write( PositionX );
+			writer.Write( PositionY );
+			writer.Write( PositionZ );
+			writer.Write( MinReko );
+			writer.Write( MaxReko );
+			writer.Write( Angle );
+			writer.Write( Merge );
 		}
 
 		#endregion

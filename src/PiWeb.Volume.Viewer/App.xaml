@@ -8,8 +8,6 @@
                 <ResourceDictionary Source="pack://application:,,,/PiWeb.Volume.UI;component/Styles/Style.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/PiWeb.Volume.UI;component/Converters/Converters.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-
         </ResourceDictionary>
     </Application.Resources>
 </Application>

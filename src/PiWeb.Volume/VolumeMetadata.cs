@@ -1,7 +1,7 @@
 ﻿#region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2019                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -26,12 +26,6 @@ namespace Zeiss.PiWeb.Volume
 	/// </summary>
 	public sealed class VolumeMetadata
 	{
-		#region members
-
-		private ICollection<Property> _Properties = new List<Property>();
-
-		#endregion
-
 		#region constructors
 
 		private VolumeMetadata()
@@ -129,11 +123,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <summary>
 		/// Gets or sets the metadata.
 		/// </summary>
-		public ICollection<Property> Properties
-		{
-			get => _Properties;
-			set => _Properties = value ?? Array.Empty<Property>();
-		}
+		public ICollection<Property> Properties { get; } = new List<Property>();
 
 		#endregion
 
@@ -184,7 +174,7 @@ namespace Zeiss.PiWeb.Volume
 		/// Returns the required size of the slice buffer in the specified direction.
 		/// </summary>
 		/// <param name="direction"></param>
-		internal int GetSliceLength( Direction direction )
+		public int GetSliceLength( Direction direction )
 		{
 			switch( direction )
 			{
@@ -292,7 +282,9 @@ namespace Zeiss.PiWeb.Volume
 						result.ResolutionZ = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 						break;
 					case "Property":
-						result.Properties.Add( Property.Deserialize( reader ) );
+						var property = Property.Deserialize( reader );
+						if( property is not null )
+							result.Properties.Add( property );
 						break;
 					case "PositionX":
 						result.PositionX = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );

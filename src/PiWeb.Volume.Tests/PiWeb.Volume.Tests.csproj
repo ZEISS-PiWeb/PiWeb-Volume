@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Platforms>x64</Platforms>
-    <LangVersion>9</LangVersion>
+    <LangVersion>latestmajor</LangVersion>
     <RootNamespace>Zeiss.PiWeb.Volume.Tests</RootNamespace>
     <IsPackable>false</IsPackable>
     <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\PiWeb.Volume\PiWeb.Volume.csproj" />
+    <ProjectReference Include="$(SolutionDir)\PiWeb.Volume.Convert\PiWeb.Volume.Convert.csproj" />
   </ItemGroup>
 
 </Project>

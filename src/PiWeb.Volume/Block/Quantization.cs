@@ -1,7 +1,7 @@
 #region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2020                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -13,6 +13,11 @@ namespace Zeiss.PiWeb.Volume.Block
 	#region usings
 
 	using System;
+	using System.Collections.Generic;
+	using System.Diagnostics.CodeAnalysis;
+	using System.Globalization;
+	using System.IO;
+	using System.Runtime.InteropServices;
 
 	#endregion
 
@@ -21,63 +26,104 @@ namespace Zeiss.PiWeb.Volume.Block
 	/// </summary>
 	internal static class Quantization
 	{
-		#region members
-
-		private static readonly int[] BaseValues =
-		{
-			16, 11, 10, 16, 24, 40, 51, 61,
-			12, 12, 14, 19, 26, 58, 60, 55,
-			14, 13, 16, 24, 40, 57, 69, 56,
-			14, 17, 22, 29, 51, 87, 80, 62,
-			18, 22, 37, 56, 68, 109, 103, 77,
-			24, 35, 55, 64, 81, 104, 113, 92,
-			49, 64, 78, 87, 103, 121, 120, 101,
-			72, 92, 95, 98, 112, 100, 103, 99
-		};
-
-		#endregion
-
 		#region methods
 
 		/// <summary>
-		/// Origin of base values: libjpeg
+		/// Reads a quantization matrix from the specified <paramref name="reader"/>
 		/// </summary>
-		internal static double[] Calculate( VolumeCompressionOptions options, bool invert )
+		public static double[] Read( BinaryReader reader, bool invert )
 		{
-			var scale = 100;
+			var data = reader.ReadBytes( BlockVolume.N3 * sizeof( double ) ).AsSpan();
+			var values = MemoryMarshal.Cast<byte, double>( data );
 
-			if( options.EncoderOptions.TryGetValue( "quality", out var qualityString ) && int.TryParse( qualityString, out var quality ) )
-				scale = QualityScaling( quality );
+			if( !invert )
+				return values.ToArray();
 
+			for( var i = 0; i < BlockVolume.N3; i++ )
+				values[ i ] = 1.0 / values[ i ];
+
+			return values.ToArray();
+		}
+
+		/// <summary>
+		/// Writes a quantization matrix to the specified <paramref name="writer"/>
+		/// </summary>
+		public static void Write( BinaryWriter writer, double[] values )
+		{
+			var data = MemoryMarshal.Cast<double, byte>( values );
+			writer.Write( data );
+		}
+
+		/// <summary>
+		/// Calculates a generic quantization matrix based on the quality setting.
+		/// </summary>
+		public static double[] Calculate( VolumeCompressionOptions options )
+		{
+			if( options.EncoderOptions.TryGetQuantization( out var result ) )
+				return result;
+			if( !options.EncoderOptions.TryGetDouble( "quality", out var quality ) )
+				quality = 75;
+			if( !options.EncoderOptions.TryGetDouble( "quantizationBase", out var quantizationBase ) )
+				quantizationBase = 12;
+			if( !options.EncoderOptions.TryGetDouble( "quantizationGain", out var quantizationGain ) )
+				quantizationGain = 1;
+
+			return Calculate( quality, quantizationBase, quantizationGain );
+		}
+
+		private static bool TryGetQuantization( this IReadOnlyDictionary<string, string> options, [NotNullWhen( true )] out double[]? result )
+		{
+			result = default;
+			if( !options.TryGetValue( "quantization", out var quantizationString ) )
+				return false;
+
+			var parts = quantizationString.Split( ';' );
+			if( parts.Length != BlockVolume.N3 )
+				return false;
+
+			result = new double[ BlockVolume.N3 ];
+			for( var i = 0; i < BlockVolume.N3; i++ )
+			{
+				if( !double.TryParse( parts[ i ], NumberStyles.Float, CultureInfo.InvariantCulture, out var value ) )
+					return false;
+
+				result[ i ] = value;
+			}
+
+			return true;
+		}
+
+		private static bool TryGetDouble( this IReadOnlyDictionary<string, string> options, string name, out double value )
+		{
+			value = default;
+			return
+				options.TryGetValue( name, out var valueString ) &&
+				double.TryParse( valueString, NumberStyles.Float, CultureInfo.InvariantCulture, out value );
+		}
+
+		private static double[] Calculate( double quality = 75, double quantizationBase = 12, double quantizationGain = 1 )
+		{
+			var scale = QualityScaling( (int)quality );
 			var values = new double[ BlockVolume.N3 ];
 
 			var i = 0;
+
 			for( var z = 0; z < BlockVolume.N; z++ )
 			for( var y = 0; y < BlockVolume.N; y++ )
 			for( var x = 0; x < BlockVolume.N; x++ )
 			{
-				var a = x;
-				var b = y;
-				var c = z;
+				var distance = Math.Max( 0, Math.Max( x, Math.Max( y, z ) ) - 1 );
+				var baseValue = quantizationBase * ( 1 + quantizationGain * distance );
 
-				if( a > c )
-					Swap( ref a, ref c );
-
-				if( a > b )
-					Swap( ref a, ref b );
-
-				if( b > c )
-					Swap( ref b, ref c );
-
-				var value = Math.Max( 1, Math.Min( short.MaxValue, ( BaseValues[ c + BlockVolume.N * b ] * 2.0 * scale + 50 ) / 100 ) );
-				values[ i++ ] = invert ? value : 1.0 / value;
+				var value = Math.Max( 1, Math.Min( short.MaxValue, ( baseValue * 2.0 * scale + 50 ) / 100 ) );
+				values[ i++ ] = 1.0 / value;
 			}
 
 			return values;
 		}
 
 		/// <summary>
-		/// Origin: libjpeg
+		/// Quality scaling as in libjpeg.
 		/// </summary>
 		private static int QualityScaling( int quality )
 		{
@@ -90,13 +136,6 @@ namespace Zeiss.PiWeb.Volume.Block
 				quality = 200 - quality * 2;
 
 			return quality;
-		}
-
-		private static void Swap( ref int a, ref int b )
-		{
-			var temp = a;
-			a = b;
-			b = temp;
 		}
 
 		#endregion

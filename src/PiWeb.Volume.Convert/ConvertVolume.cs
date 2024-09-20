@@ -1,7 +1,7 @@
 ﻿#region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2020                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -29,22 +29,15 @@ namespace Zeiss.PiWeb.Volume.Convert
 		/// that represent grayscale voxels. The voxels must be ordered in z, y, x direction.
 		/// (slice by slice, row by row).
 		/// </summary>
-		/// <param name="streamed"></param>
-		/// <param name="progress">Progress</param>
-		/// <param name="dataStream">Stream containing the voxel data</param>
-		/// <param name="vgiStream">Stream containing the vgi data.</param>
-		/// <param name="extraPolate"></param>
-		/// <param name="minValue"></param>
-		/// <param name="maxValue"></param>
 		public static Volume FromVgi(
 			Stream vgiStream,
 			Stream dataStream,
 			bool extraPolate,
-			byte minValue,
-			byte maxValue,
+			ushort minValue,
+			ushort maxValue,
 			bool streamed,
-			IProgress<double> progress,
-			ILogger logger = null )
+			IProgress<double>? progress = null,
+			ILogger? logger = null )
 		{
 			var sw = Stopwatch.StartNew();
 			try
@@ -63,7 +56,7 @@ namespace Zeiss.PiWeb.Volume.Convert
 
 					case 8:
 						var uint8Stream = extraPolate
-							? new Uint8Stream( dataStream, minValue, maxValue )
+							? new Uint8Stream( dataStream, Crop( minValue ), Crop( maxValue ) )
 							: new Uint8Stream( dataStream );
 						return streamed ? new StreamedVolume( vgi, uint8Stream ) : FromUint8( uint8Stream, vgi, progress, logger );
 
@@ -77,29 +70,65 @@ namespace Zeiss.PiWeb.Volume.Convert
 		}
 
 		/// <summary>
+		/// Creates an uncompressed volume from vgi header stream and a data stream that contains uint8 or uint16 values
+		/// that represent grayscale voxels. The voxels must be ordered in z, y, x direction.
+		/// (slice by slice, row by row).
+		/// </summary>
+		public static Volume FromGomVolume(
+			VolumeMetadata metadata,
+			Stream dataStream,
+			Gom.DataType dataType,
+			bool extraPolate,
+			double minValue,
+			double maxValue,
+			bool streamed,
+			IProgress<double>? progress = null,
+			ILogger? logger = null )
+		{
+			var sw = Stopwatch.StartNew();
+
+			try
+			{
+				var voxelStream = dataType switch
+				{
+					Gom.DataType.Int16 when extraPolate is false  => new Int16Stream( dataStream ),
+					Gom.DataType.Int16 when extraPolate           => new Int16Stream( dataStream, (short)minValue, (short)maxValue ),
+					Gom.DataType.UInt16 when extraPolate is false => new Uint16Stream( dataStream ),
+					Gom.DataType.UInt16 when extraPolate          => new Uint16Stream( dataStream, (ushort)minValue, (ushort)maxValue ),
+					Gom.DataType.Single when extraPolate is false => new FloatStream( dataStream ),
+					Gom.DataType.Single when extraPolate          => new FloatStream( dataStream, (float)minValue, (float)maxValue ),
+					_                                             => dataStream
+				};
+
+				return streamed
+					? new StreamedVolume( metadata, voxelStream )
+					: FromUint8( voxelStream, metadata, progress, logger );
+			}
+			finally
+			{
+				logger?.Log( LogLevel.Info, $"Loaded VGI volume data in {sw.ElapsedMilliseconds} ms." );
+			}
+		}
+
+		/// <summary>
 		/// Creates an uncompressed volume from a signed calypso volume stream that contains an scv header and uint8 or
 		/// uint16 values that represent grayscale voxels. The voxels must be ordered in z, y, x direction.
 		/// (slice by slice, row by row).
 		/// </summary>
-		/// <param name="scvStream">Stream containing the scv data.</param>
-		/// <param name="streamed"></param>
-		/// <param name="progress">Progress</param>
-		/// <param name="extraPolate"></param>
-		/// <param name="minValue"></param>
-		/// <param name="maxValue"></param>
 		public static Volume FromScv(
 			Stream scvStream,
+			int bitDepthFromExtension,
 			bool extraPolate,
-			byte minValue,
-			byte maxValue,
+			ushort minValue,
+			ushort maxValue,
 			bool streamed,
-			IProgress<double> progress,
-			ILogger logger = null )
+			IProgress<double>? progress = null,
+			ILogger? logger = null )
 		{
 			var sw = Stopwatch.StartNew();
 			try
 			{
-				var scv = Scv.Parse( scvStream );
+				var scv = Scv.Parse( scvStream, bitDepthFromExtension );
 
 				scvStream.Seek( scv.HeaderLength, SeekOrigin.Begin );
 
@@ -112,7 +141,7 @@ namespace Zeiss.PiWeb.Volume.Convert
 						return streamed ? new StreamedVolume( scv, uint16Stream ) : FromUint8( uint16Stream, scv, progress, logger );
 					case 8:
 						var uint8Stream = extraPolate
-							? new Uint8Stream( scvStream, minValue, maxValue )
+							? new Uint8Stream( scvStream, Crop( minValue ), Crop( maxValue ) )
 							: new Uint8Stream( scvStream );
 
 						return streamed ? new StreamedVolume( scv, uint8Stream ) : FromUint8( uint8Stream, scv, progress, logger );
@@ -130,11 +159,7 @@ namespace Zeiss.PiWeb.Volume.Convert
 		/// Creates an uncompressed volume from a stream that contains uint16 values that represent grayscale voxels.
 		/// The voxels must be ordered in z, y, x direction (slice by slice, row by row).
 		/// </summary>
-		/// <param name="uint16Stream">Stream containing the uint16 data.</param>
-		/// <param name="metadata">Metadata</param>
-		/// <param name="streamed"></param>
-		/// <param name="progress">Progress</param>
-		public static Volume FromUint16( Stream uint16Stream, VolumeMetadata metadata, bool streamed, IProgress<double> progress, ILogger logger = null )
+		public static Volume FromUint16( Stream uint16Stream, VolumeMetadata metadata, IProgress<double> progress, ILogger? logger = null )
 		{
 			var sw = Stopwatch.StartNew();
 			try
@@ -175,7 +200,7 @@ namespace Zeiss.PiWeb.Volume.Convert
 		/// Creates an uncompressed volume from a stream that contains uint8 values that represent grayscale voxels.
 		/// The voxels must be ordered in z, y, x direction (slice by slice, row by row).
 		/// </summary>
-		public static Volume FromUint8( Stream uint8Stream, VolumeMetadata metadata, IProgress<double> progress, ILogger logger = null )
+		public static Volume FromUint8( Stream uint8Stream, VolumeMetadata metadata, IProgress<double>? progress, ILogger? logger = null )
 		{
 			var sw = Stopwatch.StartNew();
 			try
@@ -204,6 +229,11 @@ namespace Zeiss.PiWeb.Volume.Convert
 			{
 				logger?.Log( LogLevel.Info, $"Loaded UINT8 volume data in {sw.ElapsedMilliseconds} ms." );
 			}
+		}
+
+		private static byte Crop( ushort value )
+		{
+			return (byte)Math.Min( byte.MaxValue, Math.Max( byte.MinValue, value ) );
 		}
 
 		#endregion

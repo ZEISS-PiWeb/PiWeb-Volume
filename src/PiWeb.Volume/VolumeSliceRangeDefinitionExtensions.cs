@@ -1,7 +1,7 @@
 ﻿#region copyright
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Carl Zeiss IMT (IZfM Dresden)                   */
+/* Carl Zeiss Industrielle Messtechnik GmbH        */
 /* Softwaresystem PiWeb                            */
 /* (c) Carl Zeiss 2019                             */
 /* * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -50,7 +50,7 @@ namespace Zeiss.PiWeb.Volume
 					}
 				}
 
-				if( first.HasValue )
+				if( first.HasValue && last.HasValue )
 					yield return new VolumeSliceRangeDefinition( group.Key, first.Value, last.Value );
 			}
 		}
