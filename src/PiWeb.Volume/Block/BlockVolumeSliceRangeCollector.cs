@@ -119,10 +119,7 @@ namespace Zeiss.PiWeb.Volume.Block
 			if( _Volume.CompressedData[ Direction.Z ] is not { } data )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
-			var decoder = new BlockVolumeDecoder();
-			var input = new MemoryStream( data );
-
-			decoder.Decode( input, _Metadata, BlockAction, LayerPredicate, BlockPredicate, progress, ct );
+			BlockVolumeDecoder.Decode( data, _Metadata, BlockAction, LayerPredicate, BlockPredicate, progress, ct );
 
 			return new VolumeSliceCollection(
 				_SlicesX.Values

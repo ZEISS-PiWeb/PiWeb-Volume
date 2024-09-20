@@ -50,9 +50,9 @@ namespace Zeiss.PiWeb.Volume.Block
 			return result;
 		}
 
-		internal static void Transform( double[] values, double[] result, bool inverse = false )
+		internal static void Transform( Span<double> values, Span<double> result, bool inverse = false )
 		{
-			var pU = inverse ? Ut : U;
+			var pU = inverse ? Ut.AsSpan() : U.AsSpan();
 			int u, p, x, y, z;
 
 			Vector512<double> vecv;
@@ -61,12 +61,12 @@ namespace Zeiss.PiWeb.Volume.Block
 			for( z = 0, p = 0; z < BlockVolume.N; z++ )
 			for( y = 0; y < BlockVolume.N; y++, p += BlockVolume.N )
 			{
-				vecv = Vector512.Create( values, p );
+				vecv = Vector512.Create<double>( values.Slice( p, BlockVolume.N ) );
 				for( x = 0, u = 0; x < BlockVolume.N; x++, u += BlockVolume.N )
 				{
 					//u = x * N;
 					//p = z * NN + y * N;
-					result[ z * BlockVolume.N2 + x * BlockVolume.N + y ] = Vector512.Sum( Vector512.Multiply( vecv, Vector512.Create( pU, u ) ) );
+					result[ z * BlockVolume.N2 + x * BlockVolume.N + y ] = Vector512.Sum( Vector512.Multiply( vecv, Vector512.Create<double>( pU.Slice( u, BlockVolume.N ) ) ) );
 				}
 			}
 
@@ -74,12 +74,12 @@ namespace Zeiss.PiWeb.Volume.Block
 			for( z = 0, p = 0; z < BlockVolume.N; z++ )
 			for( x = 0; x < BlockVolume.N; x++, p += BlockVolume.N )
 			{
-				vecv = Vector512.Create( result, p );
+				vecv = Vector512.Create<double>( result.Slice( p, BlockVolume.N ) );
 				for( y = 0, u = 0; y < BlockVolume.N; y++, u += BlockVolume.N )
 				{
 					//u = y * N;
 					//p = z * NN + x * N;
-					values[ y * BlockVolume.N2 + x * BlockVolume.N + z ] = Vector512.Sum( Vector512.Multiply( vecv, Vector512.Create( pU, u ) ) );
+					values[ y * BlockVolume.N2 + x * BlockVolume.N + z ] = Vector512.Sum( Vector512.Multiply( vecv, Vector512.Create<double>( pU.Slice( u, BlockVolume.N ) ) ) );
 				}
 			}
 
@@ -87,12 +87,12 @@ namespace Zeiss.PiWeb.Volume.Block
 			for( y = 0, p = 0; y < BlockVolume.N; y++ )
 			for( x = 0; x < BlockVolume.N; x++, p += BlockVolume.N )
 			{
-				vecv = Vector512.Create( values, p );
+				vecv = Vector512.Create<double>( values.Slice( p, BlockVolume.N ) );
 				for( z = 0, u = 0; z < BlockVolume.N; z++, u += BlockVolume.N )
 				{
 					//u = z * N;
 					//p = y * NN + x * N;
-					result[ z * BlockVolume.N2 + y * BlockVolume.N + x ] = Vector512.Sum( Vector512.Multiply( vecv, Vector512.Create( pU, u ) ) );
+					result[ z * BlockVolume.N2 + y * BlockVolume.N + x ] = Vector512.Sum( Vector512.Multiply( vecv, Vector512.Create<double>( pU.Slice( u, BlockVolume.N ) ) ) );
 				}
 			}
 		}
