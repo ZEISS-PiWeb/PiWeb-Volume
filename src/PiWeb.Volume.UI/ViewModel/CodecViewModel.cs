@@ -14,6 +14,7 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 
 	using System;
 	using System.Collections.Generic;
+	using System.Globalization;
 	using GalaSoft.MvvmLight;
 	using GalaSoft.MvvmLight.Messaging;
 
@@ -23,7 +24,9 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 	{
 		#region members
 
-		private int _Quality = 75;
+		private static int _Quality = 75;
+		private static double _QuantizationBase = 12;
+		private static double _QuantizationGain = 1;
 
 		#endregion
 
@@ -37,6 +40,18 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 			set => Set( ref _Quality, value );
 		}
 
+		public double QuantizationBase
+		{
+			get => _QuantizationBase;
+			set => Set( ref _QuantizationBase, value );
+		}
+
+		public double QuantizationGain
+		{
+			get => _QuantizationGain;
+			set => Set( ref _QuantizationGain, value );
+		}
+
 		#endregion
 
 		#region methods
@@ -45,7 +60,9 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 		{
 			return new VolumeCompressionOptions( "zeiss.block", "gray8", new Dictionary<string, string>
 			{
-				{ "quality", Math.Max( 5, Math.Min( 100, Quality ) ).ToString() }
+				{ "quality", Math.Max( 5, Math.Min( 100, Quality ) ).ToString(CultureInfo.InvariantCulture) },
+				{ "quantizationBase", Math.Max( 4, Math.Min( 24, QuantizationBase ) ).ToString(CultureInfo.InvariantCulture) },
+				{ "quantizationGain", Math.Max( 0.25, Math.Min( 4, QuantizationGain ) ).ToString(CultureInfo.InvariantCulture) }
 			}, 0 );
 		}
 

@@ -160,10 +160,18 @@ namespace Zeiss.PiWeb.Volume.Block
 		private static void ReadBlock( ReadOnlySpan<byte> data, EncodedBlockInfo encodedBlockInfo, Span<double> result )
 		{
 			var encodedBlockData = data.Slice( encodedBlockInfo.StartIndex, encodedBlockInfo.Length );
+			for( var i = 1; i < BlockVolume.N3; i++ )
+				result[ i ] = 0;
+
+			if( encodedBlockInfo.Length == 0 )
+				return;
 
 			result[ 0 ] = encodedBlockInfo.FirstValueSize == 1
 				? MemoryMarshal.Read<sbyte>( encodedBlockData )
 				: MemoryMarshal.Read<short>( encodedBlockData );
+
+			if( encodedBlockInfo.Length == encodedBlockInfo.FirstValueSize )
+				return;
 
 			var otherValueData = encodedBlockData
 				.Slice( encodedBlockInfo.FirstValueSize, encodedBlockInfo.Length - encodedBlockInfo.FirstValueSize );
@@ -171,14 +179,14 @@ namespace Zeiss.PiWeb.Volume.Block
 			if( encodedBlockInfo.OtherValuesSize == 1 )
 			{
 				var values = MemoryMarshal.Cast<byte, sbyte>( otherValueData );
-				for( ushort i = 1, vi = 0; i < BlockVolume.N3; i++, vi++ )
-					result[ i ] = i >= encodedBlockInfo.ValueCount ? 0 : values[ vi ];
+				for( ushort i = 1, vi = 0; i < encodedBlockInfo.ValueCount; i++, vi++ )
+					result[ i ] = values[ vi ];
 			}
 			else
 			{
 				var values = MemoryMarshal.Cast<byte, short>( otherValueData );
-				for( ushort i = 1, vi = 0; i < BlockVolume.N3; i++, vi++ )
-					result[ i ] = i >= encodedBlockInfo.ValueCount ? 0 : values[ vi ];
+				for( ushort i = 1, vi = 0; i < encodedBlockInfo.ValueCount; i++, vi++ )
+					result[ i ] = values[ vi ];
 			}
 		}
 

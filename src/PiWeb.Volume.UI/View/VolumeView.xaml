@@ -1,16 +1,16 @@
 <UserControl
-    d:DataContext="{d:DesignInstance viewModel:VolumeViewModel}"
-    d:DesignHeight="600"
-    d:DesignWidth="800"
-    mc:Ignorable="d"
     x:Class="Zeiss.PiWeb.Volume.UI.View.VolumeView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:components="clr-namespace:Zeiss.PiWeb.Volume.UI.Components"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="clr-namespace:Zeiss.PiWeb.Volume.UI.ViewModel"
     xmlns:volume="clr-namespace:Zeiss.PiWeb.Volume;assembly=PiWeb.Volume"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    d:DataContext="{d:DesignInstance viewModel:VolumeViewModel}"
+    d:DesignHeight="600"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -39,13 +39,13 @@
 
             <!--  Title Size  -->
             <Border
-                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
-                BorderThickness="0,0,0,1"
                 Grid.Row="0"
                 Margin="8,8,8,0"
-                VerticalAlignment="Center">
+                VerticalAlignment="Center"
+                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+                BorderThickness="0,0,0,1">
                 <StackPanel Margin="0,4" Orientation="Horizontal">
-                    <Image Source="/Resources/16px/page_size.png" Style="{StaticResource Icon}" />
+                    <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/page_size.png" Style="{StaticResource Icon}" />
                     <TextBlock Style="{StaticResource Header}">Size</TextBlock>
                 </StackPanel>
             </Border>
@@ -57,33 +57,33 @@
                     <HeaderedContentControl Header="X">
                         <TextBlock
                             HorizontalAlignment="Right"
-                            Text="{Binding Volume.Metadata.SizeX, StringFormat={}{0} Voxels}"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{Binding Volume.Metadata.SizeX, StringFormat={}{0} Voxels}" />
                     </HeaderedContentControl>
                     <HeaderedContentControl Header="Y">
                         <TextBlock
                             HorizontalAlignment="Right"
-                            Text="{Binding Volume.Metadata.SizeY, StringFormat={}{0} Voxels}"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{Binding Volume.Metadata.SizeY, StringFormat={}{0} Voxels}" />
                     </HeaderedContentControl>
                     <HeaderedContentControl Header="Z">
                         <TextBlock
                             HorizontalAlignment="Right"
-                            Text="{Binding Volume.Metadata.SizeZ, StringFormat={}{0} Voxels}"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{Binding Volume.Metadata.SizeZ, StringFormat={}{0} Voxels}" />
                     </HeaderedContentControl>
                 </StackPanel>
             </DockPanel>
 
             <!--  Title Resolution  -->
             <Border
-                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
-                BorderThickness="0,0,0,1"
                 Grid.Row="2"
                 Margin="8,0"
-                VerticalAlignment="Center">
+                VerticalAlignment="Center"
+                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+                BorderThickness="0,0,0,1">
                 <StackPanel Margin="0,4" Orientation="Horizontal">
-                    <Image Source="/Resources/16px/grid.png" Style="{StaticResource Icon}" />
+                    <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/grid.png" Style="{StaticResource Icon}" />
                     <TextBlock Style="{StaticResource Header}">Resolution</TextBlock>
                 </StackPanel>
             </Border>
@@ -94,33 +94,33 @@
                     <HeaderedContentControl Header="X">
                         <TextBlock
                             HorizontalAlignment="Right"
-                            Text="{Binding Volume.Metadata.ResolutionX, StringFormat={}{0:F3} mm}"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{Binding Volume.Metadata.ResolutionX, StringFormat={}{0:F3} mm}" />
                     </HeaderedContentControl>
                     <HeaderedContentControl Header="Y">
                         <TextBlock
                             HorizontalAlignment="Right"
-                            Text="{Binding Volume.Metadata.ResolutionY, StringFormat={}{0:F3} mm}"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{Binding Volume.Metadata.ResolutionY, StringFormat={}{0:F3} mm}" />
                     </HeaderedContentControl>
                     <HeaderedContentControl Header="Z">
                         <TextBlock
                             HorizontalAlignment="Right"
-                            Text="{Binding Volume.Metadata.ResolutionZ, StringFormat={}{0:F3} mm}"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{Binding Volume.Metadata.ResolutionZ, StringFormat={}{0:F3} mm}" />
                     </HeaderedContentControl>
                 </StackPanel>
             </DockPanel>
 
             <!--  Title Properties  -->
             <Border
-                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
-                BorderThickness="0,0,0,1"
                 Grid.Row="4"
                 Margin="8,0"
-                VerticalAlignment="Center">
+                VerticalAlignment="Center"
+                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+                BorderThickness="0,0,0,1">
                 <StackPanel Margin="0,4" Orientation="Horizontal">
-                    <Image Source="/Resources/16px/list_bullets.png" Style="{StaticResource Icon}" />
+                    <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/list_bullets.png" Style="{StaticResource Icon}" />
                     <TextBlock Style="{StaticResource Header}">Properties</TextBlock>
                 </StackPanel>
             </Border>
@@ -128,15 +128,15 @@
             <!--  Content Properties  -->
             <ScrollViewer
                 Grid.Row="5"
-                HorizontalScrollBarVisibility="Disabled"
                 Margin="8"
+                HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding Volume.Metadata.Properties}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition SharedSizeGroup="HeaderColumn" Width="Auto" />
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="HeaderColumn" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock
@@ -145,8 +145,8 @@
                                     Text="{Binding Path=Name}" />
                                 <TextBlock
                                     Grid.Column="1"
-                                    HorizontalAlignment="Right"
                                     Margin="4"
+                                    HorizontalAlignment="Right"
                                     Text="{Binding Path=Value}" />
                             </Grid>
                         </DataTemplate>
@@ -158,45 +158,45 @@
 
             <!--  Title Compression  -->
             <Border
-                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
-                BorderThickness="0,0,0,1"
                 Grid.Row="6"
                 Margin="8,0"
-                VerticalAlignment="Center">
+                VerticalAlignment="Center"
+                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+                BorderThickness="0,0,0,1">
                 <StackPanel Margin="0,4" Orientation="Horizontal">
-                    <Image Source="/Resources/16px/compress_table.png" Style="{StaticResource Icon}" />
+                    <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/compress_table.png" Style="{StaticResource Icon}" />
                     <TextBlock Style="{StaticResource Header}">Compression</TextBlock>
                 </StackPanel>
             </Border>
 
             <!--  Content Compression  -->
             <StackPanel
-                DockPanel.Dock="Right"
                 Grid.Row="7"
-                Margin="8">
+                Margin="8"
+                DockPanel.Dock="Right">
                 <HeaderedContentControl Header="Encoder">
                     <TextBlock
                         HorizontalAlignment="Right"
-                        Text="{Binding Volume.CompressionOptions.Encoder}"
-                        VerticalAlignment="Center" />
+                        VerticalAlignment="Center"
+                        Text="{Binding Volume.CompressionOptions.Encoder}" />
                 </HeaderedContentControl>
                 <HeaderedContentControl Header="Bitrate">
                     <TextBlock
                         HorizontalAlignment="Right"
-                        Text="{Binding Volume.CompressionOptions.Bitrate}"
-                        VerticalAlignment="Center" />
+                        VerticalAlignment="Center"
+                        Text="{Binding Volume.CompressionOptions.Bitrate}" />
                 </HeaderedContentControl>
                 <HeaderedContentControl Header="PixelFormat">
                     <TextBlock
                         HorizontalAlignment="Right"
-                        Text="{Binding Volume.CompressionOptions.PixelFormat}"
-                        VerticalAlignment="Center" />
+                        VerticalAlignment="Center"
+                        Text="{Binding Volume.CompressionOptions.PixelFormat}" />
                 </HeaderedContentControl>
                 <HeaderedContentControl Header="Options">
                     <TextBlock
                         HorizontalAlignment="Right"
-                        Text="{Binding Volume.CompressionOptions.EncoderOptions, Converter={StaticResource DictionaryToStringConverter}}"
-                        VerticalAlignment="Center" />
+                        VerticalAlignment="Center"
+                        Text="{Binding Volume.CompressionOptions.EncoderOptions, Converter={StaticResource DictionaryToStringConverter}}" />
                 </HeaderedContentControl>
 
             </StackPanel>
@@ -204,10 +204,10 @@
 
         <!--  View Area  -->
         <Border
-            BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
-            BorderThickness="1,0,0,0"
             Grid.Column="1"
-            Margin="8,0,0,0">
+            Margin="8,0,0,0"
+            BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+            BorderThickness="1,0,0,0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -222,43 +222,43 @@
 
                 <!--  Top left corner  -->
                 <Border
-                    Background="{StaticResource LightGrayBrush}"
+                    Grid.Row="0"
                     Grid.Column="0"
-                    Grid.Row="0" />
+                    Background="{StaticResource LightGrayBrush}" />
 
                 <!--  Horizontal ruler  -->
                 <components:Ruler
-                    Background="{StaticResource LightGrayBrush}"
-                    Grid.Column="1"
                     Grid.Row="0"
+                    Grid.Column="1"
                     Height="24"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Background="{StaticResource LightGrayBrush}"
                     HighlightBrush="White"
                     HighlightedRange="{Binding Path=HorizontalRange}"
-                    HorizontalAlignment="Stretch"
                     Orientation="Horizontal"
                     SnapsToDevicePixels="True"
                     Stroke="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
                     UseLayoutRounding="True"
-                    ValueRange="{Binding ElementName=Navigator, Path=HorizontalRange}"
-                    VerticalAlignment="Stretch" />
+                    ValueRange="{Binding ElementName=Navigator, Path=HorizontalRange}" />
 
                 <!--  Vertical ruler  -->
                 <components:Ruler
-                    Background="{StaticResource LightGrayBrush}"
-                    Grid.Column="0"
                     Grid.Row="1"
+                    Grid.Column="0"
+                    Width="24"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Background="{StaticResource LightGrayBrush}"
                     HighlightBrush="White"
                     HighlightedRange="{Binding Path=VerticalRange}"
-                    HorizontalAlignment="Stretch"
                     Invert="True"
                     Orientation="Vertical"
                     RenderTransformOrigin="0.5,0.5"
                     SnapsToDevicePixels="True"
                     Stroke="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
                     UseLayoutRounding="True"
-                    ValueRange="{Binding ElementName=Navigator, Path=VerticalRange}"
-                    VerticalAlignment="Stretch"
-                    Width="24">
+                    ValueRange="{Binding ElementName=Navigator, Path=VerticalRange}">
                     <components:Ruler.RenderTransform>
                         <RotateTransform Angle="180" />
                     </components:Ruler.RenderTransform>
@@ -266,55 +266,71 @@
 
                 <!--  Volume view  -->
                 <components:Navigator
-                    Background="#202020"
-                    Grid.Column="1"
+                    x:Name="Navigator"
                     Grid.Row="1"
+                    Grid.Column="1"
+                    Background="#202020"
                     HorizontalScrollBarVisibility="Auto"
                     IsPanningEnabled="True"
                     IsZoomEnabled="True"
                     Style="{StaticResource OverlayScrollViewer}"
-                    VerticalScrollBarVisibility="Auto"
-                    x:Name="Navigator">
+                    VerticalScrollBarVisibility="Auto">
                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Image
+                            x:Name="Full"
                             Panel.ZIndex="0"
                             RenderOptions.BitmapScalingMode="NearestNeighbor"
                             RenderTransformOrigin="0.5,0.5"
                             Source="{Binding Path=SelectedLayerImage}"
-                            Stretch="None"
-                            x:Name="Full">
+                            Stretch="None">
                             <Image.RenderTransform>
                                 <ScaleTransform ScaleX="1" ScaleY="-1" />
                             </Image.RenderTransform>
                         </Image>
 
                         <Image
+                            Width="{Binding ElementName=Full, Path=ActualWidth}"
                             Height="{Binding ElementName=Full, Path=ActualHeight}"
                             Panel.ZIndex="1"
                             RenderTransformOrigin="0.5,0.5"
                             Source="{Binding Path=PreviewLayerImage}"
                             Stretch="Fill"
-                            Visibility="{Binding ShowPreview, Converter={StaticResource BooleanToVisibilityConverter}}"
-                            Width="{Binding ElementName=Full, Path=ActualWidth}">
+                            Visibility="{Binding ShowPreview, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <Image.RenderTransform>
                                 <ScaleTransform ScaleX="1" ScaleY="-1" />
                             </Image.RenderTransform>
                         </Image>
 
+                        <components:SliceCrosshair
+                            x:Name="Crosshair"
+                            Width="{Binding ElementName=Full, Path=ActualWidth}"
+                            Height="{Binding ElementName=Full, Path=ActualHeight}"
+                            Panel.ZIndex="2"
+                            Background="Transparent"
+                            Foreground="CornflowerBlue"
+                            RenderTransformOrigin="0.5,0.5" />
 
                     </Grid>
                 </components:Navigator>
 
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="8"
+                    Foreground="CornflowerBlue"
+                    IsHitTestVisible="False"
+                    Text="{Binding ElementName=Crosshair, Path=LastMousePosition}" />
+
                 <!--  Direction selector  -->
                 <Border
-                    Grid.Column="1"
                     Grid.Row="1"
+                    Grid.Column="1"
+                    Width="48"
                     Height="48"
-                    HorizontalAlignment="Left"
                     Margin="24"
-                    Panel.ZIndex="99"
+                    HorizontalAlignment="Left"
                     VerticalAlignment="Bottom"
-                    Width="48">
+                    Panel.ZIndex="99">
 
                     <Canvas>
                         <Canvas.RenderTransform>
@@ -349,50 +365,50 @@
 
                 <!--  Zoom panel  -->
                 <Border
-                    Background="{StaticResource LightGrayBrush}"
-                    CornerRadius="2"
-                    Grid.Column="1"
                     Grid.Row="1"
-                    HorizontalAlignment="Right"
+                    Grid.Column="1"
                     Margin="24"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
                     Panel.ZIndex="99"
-                    VerticalAlignment="Bottom">
+                    Background="{StaticResource LightGrayBrush}"
+                    CornerRadius="2">
                     <StackPanel Margin="4" Orientation="Horizontal">
                         <TextBlock
                             Margin="4,0"
-                            Text="{Binding ElementName=Navigator, Path=Zoom, StringFormat='Zoom: {0:F2}x'}"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{Binding ElementName=Navigator, Path=Zoom, StringFormat='Zoom: {0:F2}x'}" />
                         <Button
+                            Margin="4,0"
                             Command="{x:Static components:Navigator.ZoomToContentSizeCommand}"
                             CommandParameter="{Binding ElementName=Navigator}"
-                            Margin="4,0"
                             Style="{StaticResource ToolbarButtonStyle}"
                             ToolTip="Fit into view">
-                            <Image Source="/Resources/16px/zoom_fit.png" Style="{StaticResource Icon}" />
+                            <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/zoom_fit.png" Style="{StaticResource Icon}" />
                         </Button>
                         <Button
                             Command="{x:Static components:Navigator.ResetZoomCommand}"
                             CommandParameter="{Binding ElementName=Navigator}"
                             Style="{StaticResource ToolbarButtonStyle}"
                             ToolTip="Original size">
-                            <Image Source="/Resources/16px/zoom_reset.png" Style="{StaticResource Icon}" />
+                            <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/zoom_reset.png" Style="{StaticResource Icon}" />
                         </Button>
                     </StackPanel>
                 </Border>
 
                 <Border
-                    BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
-                    BorderThickness="0,1,0,0"
+                    Grid.Row="2"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
-                    Grid.Row="2" />
+                    BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+                    BorderThickness="0,1,0,0" />
 
                 <!--  Slice selector  -->
                 <TextBlock
-                    Grid.Column="1"
                     Grid.Row="2"
-                    HorizontalAlignment="Center"
-                    Margin="0,0,0,4">
+                    Grid.Column="1"
+                    Margin="0,0,0,4"
+                    HorizontalAlignment="Center">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="{}Slice: {0}/{1}">
                             <Binding Path="SelectedLayerIndex" />
@@ -401,31 +417,31 @@
                     </TextBlock.Text>
                 </TextBlock>
                 <StackPanel
-                    Grid.Column="1"
                     Grid.Row="3"
-                    HorizontalAlignment="Center"
+                    Grid.Column="1"
                     Margin="0,0,0,8"
+                    HorizontalAlignment="Center"
                     Orientation="Horizontal">
                     <Button
-                        Command="{Binding ShowPreviousSliceCommand}"
                         Margin="4"
+                        Command="{Binding ShowPreviousSliceCommand}"
                         Style="{StaticResource ToolbarButtonStyle}">
-                        <Image Source="/Resources/16px/arrow_left.png" Style="{StaticResource Icon}" />
+                        <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/arrow_left.png" Style="{StaticResource Icon}" />
                     </Button>
                     <Slider
+                        Width="240"
+                        VerticalAlignment="Center"
                         LargeChange="10"
                         Maximum="{Binding MaxLayer}"
                         Minimum="0"
                         Orientation="Horizontal"
                         SmallChange="1"
-                        Value="{Binding SelectedLayerIndex}"
-                        VerticalAlignment="Center"
-                        Width="240" />
+                        Value="{Binding SelectedLayerIndex}" />
                     <Button
-                        Command="{Binding ShowNextSliceCommand}"
                         Margin="4"
+                        Command="{Binding ShowNextSliceCommand}"
                         Style="{StaticResource ToolbarButtonStyle}">
-                        <Image Source="/Resources/16px/arrow_right.png" Style="{StaticResource Icon}" />
+                        <Image Source="pack://application:,,,/PiWeb.Volume.UI;component/Resources/16px/arrow_right.png" Style="{StaticResource Icon}" />
                     </Button>
                 </StackPanel>
             </Grid>

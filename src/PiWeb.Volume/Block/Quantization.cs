@@ -13,6 +13,9 @@ namespace Zeiss.PiWeb.Volume.Block
 	#region usings
 
 	using System;
+	using System.Collections.Generic;
+	using System.Diagnostics.CodeAnalysis;
+	using System.Globalization;
 	using System.IO;
 	using System.Runtime.InteropServices;
 
@@ -54,19 +57,53 @@ namespace Zeiss.PiWeb.Volume.Block
 		/// <summary>
 		/// Calculates a generic quantization matrix based on the quality setting.
 		/// </summary>
-		public static double[] Calculate( VolumeCompressionOptions options, bool invert = false )
+		public static double[] Calculate( VolumeCompressionOptions options )
 		{
-			var quality = 75;
+			if( options.EncoderOptions.TryGetQuantization( out var result ) )
+				return result;
+			if( !options.EncoderOptions.TryGetDouble( "quality", out var quality ) )
+				quality = 75;
+			if( !options.EncoderOptions.TryGetDouble( "quantizationBase", out var quantizationBase ) )
+				quantizationBase = 12;
+			if( !options.EncoderOptions.TryGetDouble( "quantizationGain", out var quantizationGain ) )
+				quantizationGain = 1;
 
-			if( options.EncoderOptions.TryGetValue( "quality", out var qualityString ) && int.TryParse( qualityString, out var parsedQuality ) )
-				quality = parsedQuality;
-
-			return Calculate( quality, invert );
+			return Calculate( quality, quantizationBase, quantizationGain );
 		}
 
-		internal static double[] Calculate( int quality = 75, bool invert = false )
+		private static bool TryGetQuantization( this IReadOnlyDictionary<string, string> options, [NotNullWhen( true )] out double[]? result )
 		{
-			var scale = QualityScaling( quality );
+			result = default;
+			if( !options.TryGetValue( "quantization", out var quantizationString ) )
+				return false;
+
+			var parts = quantizationString.Split( ';' );
+			if( parts.Length != BlockVolume.N3 )
+				return false;
+
+			result = new double[ BlockVolume.N3 ];
+			for( var i = 0; i < BlockVolume.N3; i++ )
+			{
+				if( !double.TryParse( parts[ i ], NumberStyles.Float, CultureInfo.InvariantCulture, out var value ) )
+					return false;
+
+				result[ i ] = value;
+			}
+
+			return true;
+		}
+
+		private static bool TryGetDouble( this IReadOnlyDictionary<string, string> options, string name, out double value )
+		{
+			value = default;
+			return
+				options.TryGetValue( name, out var valueString ) &&
+				double.TryParse( valueString, NumberStyles.Float, CultureInfo.InvariantCulture, out value );
+		}
+
+		private static double[] Calculate( double quality = 75, double quantizationBase = 12, double quantizationGain = 1 )
+		{
+			var scale = QualityScaling( (int)quality );
 			var values = new double[ BlockVolume.N3 ];
 
 			var i = 0;
@@ -76,10 +113,10 @@ namespace Zeiss.PiWeb.Volume.Block
 			for( var x = 0; x < BlockVolume.N; x++ )
 			{
 				var distance = Math.Max( 0, Math.Max( x, Math.Max( y, z ) ) - 1 );
-				var baseValue = 12 * ( 1 + distance );
+				var baseValue = quantizationBase * ( 1 + quantizationGain * distance );
 
 				var value = Math.Max( 1, Math.Min( short.MaxValue, ( baseValue * 2.0 * scale + 50 ) / 100 ) );
-				values[ i++ ] = invert ? value : 1.0 / value;
+				values[ i++ ] = 1.0 / value;
 			}
 
 			return values;

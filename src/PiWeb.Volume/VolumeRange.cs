@@ -17,6 +17,15 @@ namespace Zeiss.PiWeb.Volume;
 /// <param name="End">Inclusive end</param>
 public readonly record struct VolumeRange( ushort Start, ushort End )
 {
+	#region properties
+
+	/// <summary>
+	/// The size of the range.
+	/// </summary>
+	public ushort Size => (ushort)( End - Start + 1 );
+
+	#endregion
+
 	#region methods
 
 	/// <summary>

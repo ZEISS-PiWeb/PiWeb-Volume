@@ -14,6 +14,10 @@
     <UniformGrid Columns="2">
         <TextBlock Margin="8" Text="Quality" />
         <xctk:IntegerUpDown Margin="8" Minimum="5" Maximum="100" Value="{Binding Path=Quality}" />
+        <TextBlock Margin="8" Text="QuantizationBase" />
+        <xctk:DoubleUpDown Margin="8" Minimum="4" Maximum="24" Value="{Binding Path=QuantizationBase}" />
+        <TextBlock Margin="8" Text="QuantizationGain" />
+        <xctk:DoubleUpDown Margin="8" Minimum="0.25" Maximum="4" Value="{Binding Path=QuantizationGain}" />
 
         <Button Margin="8" IsCancel="True" Content="Cancel" />
         <Button Margin="8"
