@@ -14,15 +14,16 @@ namespace Zeiss.PiWeb.Volume.Block
 	#region usings
 
 	using System;
-	using System.Buffers;
 	using System.IO;
+	using System.Numerics;
 	using System.Runtime.InteropServices;
+	using System.Runtime.Intrinsics;
 	using System.Threading;
 	using System.Threading.Tasks;
 
 	#endregion
 
-	internal class BlockVolumeDecoder
+	internal static class BlockVolumeDecoder
 	{
 		#region methods
 
@@ -52,7 +53,6 @@ namespace Zeiss.PiWeb.Volume.Block
 					continue;
 
 				DecodeLayer( data, encodedBlockInfos, bcx, bcy, biz, quantization, zigzag, blockPredicate, blockAction );
-
 
 				progress?.Report( new VolumeSliceDefinition( Direction.Z, (ushort)( biz * BlockVolume.N ) ) );
 			}
@@ -109,59 +109,70 @@ namespace Zeiss.PiWeb.Volume.Block
 			BlockPredicate? blockPredicate,
 			BlockAction blockAction )
 		{
-			Parallel.For( 0, blockCountX * blockCountY, () => (
-					ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
-					ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
-					ArrayPool<byte>.Shared.Rent( BlockVolume.N3 )
-				), ( index, _, buffers ) =>
-				{
-					var blockIndexX = index % blockCountX;
-					var blockIndexY = index / blockCountX;
-					var blockIndex = new BlockIndex( (ushort)blockIndexX, (ushort)blockIndexY, blockIndexZ );
+			Parallel.For( 0, blockCountX * blockCountY, index =>
+			{
+				var blockIndexX = index % blockCountX;
+				var blockIndexY = index / blockCountX;
+				var blockIndex = new BlockIndex( (ushort)blockIndexX, (ushort)blockIndexY, blockIndexZ );
 
-					if( blockPredicate?.Invoke( blockIndex ) == false )
-						return buffers;
+				if( blockPredicate?.Invoke( blockIndex ) == false )
+					return;
 
-					var doubleBuffer1 = buffers.Item1.AsSpan();
-					var doubleBuffer2 = buffers.Item2.AsSpan();
-					var byteBuffer = buffers.Item3;
-					var encodedBlockInfo = encodedBlockInfos[ index ];
+				Span<double> doubleBuffer1 = stackalloc double[ BlockVolume.N3 ];
+				Span<double> doubleBuffer2 = stackalloc double[ BlockVolume.N3 ];
+				Span<byte> byteBuffer = stackalloc byte[ BlockVolume.N3 ];
 
-					//1. Dediscretization
-					ReadBlock( encodedBlocks.AsSpan(), encodedBlockInfo, doubleBuffer1 );
+				var encodedBlockInfo = encodedBlockInfos[ index ];
 
-					//2. ZigZag
-					for( var i = 0; i < BlockVolume.N3; i++ )
-						doubleBuffer2[ zigzag[ i ] ] = doubleBuffer1[ i ];
+				//1. Dediscretization
+				ReadBlock( encodedBlocks.AsSpan(), encodedBlockInfo, doubleBuffer1 );
 
-					//3. Quantization
-					for( var i = 0; i < BlockVolume.N3; i++ )
-						doubleBuffer2[ i ] *= quantization[ i ];
+				//2. ZigZag
+				for( var i = 0; i < BlockVolume.N3; i++ )
+					doubleBuffer2[ zigzag[ i ] ] = doubleBuffer1[ i ];
 
-					//4. Cosine transform
-					DiscreteCosineTransform.Transform( doubleBuffer2, doubleBuffer1, true );
+				//3. Quantization
+				PerformQuantization( quantization, doubleBuffer2 );
 
-					//5. Discretization
-					for( var i = 0; i < BlockVolume.N3; i++ )
-						byteBuffer[ i ] = (byte)Math.Clamp( Math.Round( doubleBuffer1[ i ] ), byte.MinValue, byte.MaxValue );
+				//4. Cosine transform
+				DiscreteCosineTransform.Transform( doubleBuffer2, doubleBuffer1, true );
 
-					blockAction( byteBuffer, blockIndex );
+				//5. Discretization
+				for( var i = 0; i < BlockVolume.N3; i++ )
+					byteBuffer[ i ] = (byte)Math.Clamp( Math.Round( doubleBuffer1[ i ] ), byte.MinValue, byte.MaxValue );
 
-					return buffers;
-				},
-				buffers =>
-				{
-					ArrayPool<double>.Shared.Return( buffers.Item1 );
-					ArrayPool<double>.Shared.Return( buffers.Item2 );
-					ArrayPool<byte>.Shared.Return( buffers.Item3 );
-				} );
+				blockAction( byteBuffer, blockIndex );
+			} );
+		}
+
+		private static void PerformQuantization( ReadOnlySpan<double> quantization, Span<double> result )
+		{
+			var remainingStartIndex = 0;
+			var vectorSize = Vector<float>.Count;
+
+			if( Vector.IsHardwareAccelerated && result.Length > vectorSize )
+			{
+				var length = quantization.Length;
+				var vectorCount = length / Vector256<double>.Count;
+
+				var numberVectors = result.Length / vectorSize;
+
+				var resultVector = MemoryMarshal.Cast<double, Vector<double>>(result);
+				var quantizationVector = MemoryMarshal.Cast<double, Vector<double>>(quantization);
+
+				for( var i = 0; i < numberVectors; i++ )
+					resultVector[ i ] *= quantizationVector[ i ];
+
+				remainingStartIndex = vectorCount * vectorSize;
+			}
+			for( var i = remainingStartIndex; i < BlockVolume.N3; i++ )
+				result[ i ] *= quantization[ i ];
 		}
 
 		private static void ReadBlock( ReadOnlySpan<byte> data, EncodedBlockInfo encodedBlockInfo, Span<double> result )
 		{
 			var encodedBlockData = data.Slice( encodedBlockInfo.StartIndex, encodedBlockInfo.Length );
-			for( var i = 1; i < BlockVolume.N3; i++ )
-				result[ i ] = 0;
+			result.Slice( 1, BlockVolume.N3 - 1 ).Clear();
 
 			if( encodedBlockInfo.Length == 0 )
 				return;
@@ -192,7 +203,7 @@ namespace Zeiss.PiWeb.Volume.Block
 
 		#endregion
 
-		internal delegate void BlockAction( byte[] data, BlockIndex index );
+		internal delegate void BlockAction( ReadOnlySpan<byte> data, BlockIndex index );
 
 		internal delegate bool BlockPredicate( BlockIndex index );
 

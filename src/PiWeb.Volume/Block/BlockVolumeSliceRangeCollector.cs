@@ -14,7 +14,6 @@ namespace Zeiss.PiWeb.Volume.Block
 
 	using System;
 	using System.Collections.Generic;
-	using System.IO;
 	using System.Linq;
 	using System.Runtime.CompilerServices;
 	using System.Threading;
@@ -140,7 +139,7 @@ namespace Zeiss.PiWeb.Volume.Block
 			);
 		}
 
-		private void BlockAction( byte[] data, BlockIndex index )
+		private void BlockAction( ReadOnlySpan<byte> data, BlockIndex index )
 		{
 			if( _SlicesZ.TryGetValue( index.Z, out var slicesZ ) )
 				ReadZSlices( data, index, slicesZ );
@@ -188,81 +187,106 @@ namespace Zeiss.PiWeb.Volume.Block
 			return false;
 		}
 
-		private void ReadZSlices( byte[] block, BlockIndex index, List<BlockSliceBuffer> slices )
+		private void ReadZSlices( ReadOnlySpan<byte> block, BlockIndex index, List<BlockSliceBuffer> slices )
 		{
 			foreach( var slice in slices )
 				ReadZSlice( block, index, slice );
 		}
 
-		private void ReadZSlice( byte[] block, BlockIndex index, BlockSliceBuffer slice )
+		private void ReadZSlice( ReadOnlySpan<byte> block, BlockIndex index, BlockSliceBuffer slice )
 		{
 			var bz = slice.Definition.Index - index.Z * BlockVolume.N;
-			if( bz < 0 || bz > BlockVolume.N )
+			if( bz is < 0 or > BlockVolume.N )
 				throw new ArgumentOutOfRangeException( nameof( slice ) );
 
-			for( var by = 0; by < BlockVolume.N; by++ )
-			for( var bx = 0; bx < BlockVolume.N; bx++ )
-			{
-				var gz = index.Z * BlockVolume.N + bz;
-				var gy = index.Y * BlockVolume.N + by;
-				var gx = index.X * BlockVolume.N + bx;
+			var gz = index.Z * BlockVolume.N + bz;
+			if( gz >= _SizeZ )
+				return;
 
-				if( gz >= _SizeZ || gy >= _SizeY || gx >= _SizeX )
+			var dataSpan = slice.Data.AsSpan();
+			for( var by = 0; by < BlockVolume.N; by++ )
+			{
+				var gy = index.Y * BlockVolume.N + by;
+				if( gy >= _SizeY )
 					continue;
 
-				slice.Data[ gy * _SizeX + gx ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
+				for( var bx = 0; bx < BlockVolume.N; bx++ )
+				{
+					var gx = index.X * BlockVolume.N + bx;
+					if( gx >= _SizeX )
+						continue;
+
+					dataSpan[ gy * _SizeX + gx ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
+				}
 			}
 		}
 
-		private void ReadYSlices( byte[] block, BlockIndex index, List<BlockSliceBuffer> slices )
+		private void ReadYSlices( ReadOnlySpan<byte> block, BlockIndex index, List<BlockSliceBuffer> slices )
 		{
 			foreach( var slice in slices )
 				ReadYSlice( block, index, slice );
 		}
 
-		private void ReadYSlice( byte[] block, BlockIndex index, BlockSliceBuffer slice )
+		private void ReadYSlice( ReadOnlySpan<byte> block, BlockIndex index, BlockSliceBuffer slice )
 		{
 			var by = slice.Definition.Index - index.Y * BlockVolume.N;
-			if( by < 0 || by > BlockVolume.N )
+			if( by is < 0 or > BlockVolume.N )
 				throw new ArgumentOutOfRangeException( nameof( slice ) );
 
+			var gy = index.Y * BlockVolume.N + by;
+			if( gy >= _SizeY )
+				return;
+
+			var dataSpan = slice.Data.AsSpan();
 			for( var bz = 0; bz < BlockVolume.N; bz++ )
-			for( var bx = 0; bx < BlockVolume.N; bx++ )
 			{
 				var gz = index.Z * BlockVolume.N + bz;
-				var gy = index.Y * BlockVolume.N + by;
-				var gx = index.X * BlockVolume.N + bx;
-
-				if( gz >= _SizeZ || gy >= _SizeY || gx >= _SizeX )
+				if( gz >= _SizeZ )
 					continue;
 
-				slice.Data[ gz * _SizeX + gx ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
+				for( var bx = 0; bx < BlockVolume.N; bx++ )
+				{
+					var gx = index.X * BlockVolume.N + bx;
+					if( gx >= _SizeX )
+						continue;
+
+					dataSpan[ gz * _SizeX + gx ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
+				}
 			}
 		}
 
-		private void ReadXSlices( byte[] block, BlockIndex index, List<BlockSliceBuffer> slices )
+		private void ReadXSlices( ReadOnlySpan<byte> block, BlockIndex index, List<BlockSliceBuffer> slices )
 		{
 			foreach( var slice in slices )
 				ReadXSlice( block, index, slice );
 		}
 
-		private void ReadXSlice( byte[] block, BlockIndex index, BlockSliceBuffer slice )
+		private void ReadXSlice( ReadOnlySpan<byte> block, BlockIndex index, BlockSliceBuffer slice )
 		{
 			var bx = slice.Definition.Index - index.X * BlockVolume.N;
 			if( bx is < 0 or > BlockVolume.N )
 				throw new ArgumentOutOfRangeException( nameof( slice ) );
 
+			var gx = index.X * BlockVolume.N + bx;
+			if( gx >= _SizeX )
+				return;
+
+			var dataSpan = slice.Data.AsSpan();
 			for( var bz = 0; bz < BlockVolume.N; bz++ )
-			for( var by = 0; by < BlockVolume.N; by++ )
 			{
 				var gz = index.Z * BlockVolume.N + bz;
-				var gy = index.Y * BlockVolume.N + by;
-				var gx = index.X * BlockVolume.N + bx;
 
-				if( gz >= _SizeZ || gy >= _SizeY || gx >= _SizeX )
+				if( gz >= _SizeZ )
 					continue;
 
-				slice.Data[ gz * _SizeY + gy ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
+				for( var by = 0; by < BlockVolume.N; by++ )
+				{
+					var gy = index.Y * BlockVolume.N + by;
+					if( gy >= _SizeY )
+						continue;
+
+					dataSpan[ gz * _SizeY + gy ] = block[ bz * BlockVolume.N2 + by * BlockVolume.N + bx ];
+				}
 			}
 		}
 
