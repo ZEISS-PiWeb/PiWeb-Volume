@@ -118,6 +118,67 @@ public static class VolumeTestHelper
 		return new UncompressedVolume( metaData, slices );
 	}
 
+
+	public static UncompressedVolume CreateSectionVolume()
+	{
+		var slices = new byte[ BlockVolume.N ][];
+		for( var z = 0; z < BlockVolume.N; z++ )
+			slices[ z ] = new byte[ BlockVolume.N2 * BlockVolume.N2 ];
+
+		for( var x = 0; x < BlockVolume.N; x++ )
+		for( var y = 0; y < BlockVolume.N; y++ )
+		{
+			var m = ( x + 1 ) * 0.25;
+			var n = y * -1;
+			var block = CreateSectionBlock( m, n );
+			WriteBlockToSlices( x, y, 0, block, slices );
+		}
+
+		var metaData = new VolumeMetadata( BlockVolume.N2, BlockVolume.N2, BlockVolume.N, 1, 1, 1 );
+
+		return new UncompressedVolume( metaData, slices );
+	}
+
+	public static UncompressedVolume CreatePartialVolume( Volume source, VolumeRange rx, VolumeRange ry, VolumeRange rz )
+	{
+		var region = new VolumeRegion( rx, ry );
+		var slices = new byte[ rz.Size ][];
+		var sx = rx.Size;
+		var sy = ry.Size;
+		var sliceSize = sx * sy;
+		for( var z = 0; z < rz.Size; z++ )
+			slices[ z ] = new byte[ sliceSize ];
+
+		var buffer = new byte[ source.Metadata.GetSliceLength( Direction.Z ) ];
+		var stride = source.Metadata.SizeX;
+
+		for( ushort z = rz.Start, lz = 0; z <= rz.End; z++, lz++ )
+		{
+			source.GetSlice( new VolumeSliceDefinition( Direction.Z, z, region ), buffer );
+			for( ushort y = ry.Start, ly = 0; y <= ry.End; y++, ly++ )
+				Array.Copy( buffer, y * stride + rx.Start, slices[ lz ], ly * sx, sx );
+		}
+
+		var metaData = new VolumeMetadata( rx.Size, ry.Size, rz.Size, 1, 1, 1 );
+
+		return new UncompressedVolume( metaData, slices );
+	}
+
+	public static byte[] CreateSectionBlock( double m, double n )
+	{
+		var result = new byte[ BlockVolume.N3 ];
+
+		for( var z = 0; z < BlockVolume.N; z++ )
+		for( var y = 0; y < BlockVolume.N; y++ )
+		for( var x = 0; x < BlockVolume.N; x++ )
+		{
+			var value = y < m * x + n ? byte.MaxValue : byte.MinValue;
+			result[ z * BlockVolume.N2 + y * BlockVolume.N + x ] = value;
+		}
+
+		return result;
+	}
+
 	public static byte[] CreateHighNoiseBlock( int u, int v, int w )
 	{
 		var result = new byte[ BlockVolume.N3 ];

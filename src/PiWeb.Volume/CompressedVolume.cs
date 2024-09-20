@@ -300,7 +300,7 @@ namespace Zeiss.PiWeb.Volume
 			var sw = Stopwatch.StartNew();
 			try
 			{
-				using var zipOutput = new ZipArchive( stream, ZipArchiveMode.Create );
+				using var zipOutput = new ZipArchive( stream, ZipArchiveMode.Create, true );
 
 				var metaDataEntry = zipOutput.CreateNormalizedEntry( "Metadata.xml", CompressionLevel.Optimal );
 				using( var metaDataEntryStream = metaDataEntry.Open() )

@@ -129,6 +129,25 @@ namespace Zeiss.PiWeb.Volume.Tests
 		}
 
 		[Test, Explicit]
+		public void SaveSectionVolume()
+		{
+			using var stream = File.Create( "section_volume.uint8_scv" );
+
+			var volume = VolumeTestHelper.CreateSectionVolume();
+			SaveUncompressedVolume( stream, volume );
+		}
+
+		[Test, Explicit]
+		public void SavePartialVolume()
+		{
+			using var outputStream = File.Create( "partial_volume.uint8_scv" );
+
+			var sourceVolume = VolumeTestHelper.LoadUncompressedVolume( @"C:\Daten\Stecker.uint8_scv" );
+			var partialVolume = VolumeTestHelper.CreatePartialVolume( sourceVolume, new VolumeRange( 824, 855 ), new VolumeRange( 496, 527 ), new VolumeRange( 496, 527 ) );
+			SaveUncompressedVolume( outputStream, partialVolume );
+		}
+
+		[Test, Explicit]
 		public void CompareHighNoiseVolume( [Values( 25, 50, 75, 85, 90, 95, 100 )] int quality )
 		{
 			var original = VolumeTestHelper.CreateHighNoiseVolume();
@@ -169,7 +188,6 @@ namespace Zeiss.PiWeb.Volume.Tests
 			Console.WriteLine( @$"Quality {quality} mean: {noise.Value.Mean}" );
 			Console.WriteLine( @$"Quality {quality} q95: {noise.Value.Q95}" );
 		}
-
 
 
 		private static void SaveUncompressedVolume( Stream stream, UncompressedVolume volume )
