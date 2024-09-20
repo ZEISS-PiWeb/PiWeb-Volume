@@ -39,9 +39,9 @@ namespace Zeiss.PiWeb.Volume
 		/// <summary>
 		/// Reads all data from the specified stream and returns it as a byte array.
 		/// </summary>
-		internal static byte[] StreamToArray( this Stream stream, int expectedSize = 64 * 1024 )
+		internal static byte[] StreamToArray( this Stream stream )
 		{
-			using var memStream = new MemoryStream( expectedSize );
+			using var memStream = new MemoryStream();
 
 			const int bufferSize = 64 * 1024;
 
@@ -56,6 +56,33 @@ namespace Zeiss.PiWeb.Volume
 			ArrayPool<byte>.Shared.Return( buffer );
 
 			return memStream.ToArray();
+		}
+
+		/// <summary>
+		/// Reads all data from the specified stream and returns it as a byte array.
+		/// </summary>
+		internal static byte[] StreamToArray( this Stream stream, int size )
+		{
+			var result = new byte[ size ];
+			const int bufferSize = 64 * 1024;
+
+			var buffer = ArrayPool<byte>.Shared.Rent( bufferSize );
+			try
+			{
+				int count;
+				var totalRead = 0;
+				while( ( count = stream.Read( buffer, 0, bufferSize ) ) > 0 )
+				{
+					buffer.AsSpan( 0, count ).CopyTo( result.AsSpan( totalRead ) );
+					totalRead += count;
+				}
+			}
+			finally
+			{
+				ArrayPool<byte>.Shared.Return( buffer );
+			}
+
+			return result;
 		}
 
 		#endregion
