@@ -18,6 +18,7 @@ namespace Zeiss.PiWeb.Volume.Block
 	using System.Globalization;
 	using System.IO;
 	using System.Runtime.InteropServices;
+	using System.Runtime.Intrinsics;
 
 	#endregion
 
@@ -136,6 +137,21 @@ namespace Zeiss.PiWeb.Volume.Block
 				quality = 200 - quality * 2;
 
 			return quality;
+		}
+
+		/// <summary>
+		/// Multiplies the <paramref name="quantization"/> with <paramref name="values"/> and stores the result in
+		/// <paramref name="result"/>.
+		/// </summary>
+		public static void Apply( ReadOnlySpan<double> quantization, ReadOnlySpan<double> values, Span<double> result )
+		{
+			for( var i = 0; i < BlockVolume.N3; i += 8 )
+			{
+				Vector512.Multiply(
+						Vector512.Create( values.Slice( i, 8 ) ),
+						Vector512.Create( quantization.Slice( i, 8 ) ) )
+					.CopyTo( result.Slice( i, 8 ) );
+			}
 		}
 
 		#endregion

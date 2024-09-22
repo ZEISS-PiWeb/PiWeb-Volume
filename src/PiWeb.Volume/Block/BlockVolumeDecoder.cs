@@ -46,13 +46,12 @@ namespace Zeiss.PiWeb.Volume.Block
 			{
 				ct.ThrowIfCancellationRequested();
 
-				ReadLayerInfos( reader, blockCount, encodedBlockInfos );
+				ReadBlockInfos( reader, blockCount, encodedBlockInfos );
 
 				if( layerPredicate?.Invoke( biz ) is false )
 					continue;
 
 				DecodeLayer( data, encodedBlockInfos, bcx, bcy, biz, quantization, zigzag, blockPredicate, blockAction );
-
 
 				progress?.Report( new VolumeSliceDefinition( Direction.Z, (ushort)( biz * BlockVolume.N ) ) );
 			}
@@ -71,7 +70,7 @@ namespace Zeiss.PiWeb.Volume.Block
 			quantization = Quantization.Read( reader, true );
 		}
 
-		private static void ReadLayerInfos( BinaryReader reader, int blockCount, EncodedBlockInfo[] encodedBlockInfos )
+		private static void ReadBlockInfos( BinaryReader reader, int blockCount, EncodedBlockInfo[] encodedBlockInfos )
 		{
 			for( var i = 0; i < blockCount; i++ )
 			{
@@ -131,19 +130,19 @@ namespace Zeiss.PiWeb.Volume.Block
 					ReadBlock( encodedBlocks.AsSpan(), encodedBlockInfo, doubleBuffer1 );
 
 					//2. ZigZag
+					var zigZagBuffer = zigzag.AsSpan();
 					for( var i = 0; i < BlockVolume.N3; i++ )
-						doubleBuffer2[ zigzag[ i ] ] = doubleBuffer1[ i ];
+						doubleBuffer2[ zigZagBuffer[ i ] ] = doubleBuffer1[ i ];
 
 					//3. Quantization
-					for( var i = 0; i < BlockVolume.N3; i++ )
-						doubleBuffer2[ i ] *= quantization[ i ];
+					Quantization.Apply( quantization.AsSpan(), doubleBuffer2, doubleBuffer1 );
 
 					//4. Cosine transform
-					DiscreteCosineTransform.Transform( doubleBuffer2, doubleBuffer1, true );
+					DiscreteCosineTransform.Transform( doubleBuffer1, doubleBuffer2, true );
 
 					//5. Discretization
 					for( var i = 0; i < BlockVolume.N3; i++ )
-						byteBuffer[ i ] = (byte)Math.Clamp( Math.Round( doubleBuffer1[ i ] ), byte.MinValue, byte.MaxValue );
+						byteBuffer[ i ] = (byte)Math.Clamp( doubleBuffer2[ i ], byte.MinValue, byte.MaxValue );
 
 					blockAction( byteBuffer, blockIndex );
 
@@ -192,7 +191,7 @@ namespace Zeiss.PiWeb.Volume.Block
 
 		#endregion
 
-		internal delegate void BlockAction( byte[] data, BlockIndex index );
+		internal delegate void BlockAction( ReadOnlySpan<byte> data, BlockIndex index );
 
 		internal delegate bool BlockPredicate( BlockIndex index );
 
