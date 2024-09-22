@@ -24,15 +24,15 @@ namespace Zeiss.PiWeb.Volume.Block
 	{
 		#region members
 
-		public static readonly double[] U = CalculateCoefficients( false );
-		public static readonly double[] Ut = CalculateCoefficients( true );
+		public static readonly Vector512<double>[] U = CalculateCoefficients( false );
+		public static readonly Vector512<double>[] Ut = CalculateCoefficients( true );
 
 		#endregion
 
 		#region methods
 
 		//https://dev.to/marycheung021213/understanding-dct-and-quantization-in-jpeg-compression-1col
-		private static double[] CalculateCoefficients( bool invert )
+		private static Vector512<double>[] CalculateCoefficients( bool invert )
 		{
 			var result = new double[ BlockVolume.N2 ];
 
@@ -47,13 +47,23 @@ namespace Zeiss.PiWeb.Volume.Block
 				}
 			}
 
-			return result;
+			return
+			[
+				Vector512.Create( result, 0 ),
+				Vector512.Create( result, BlockVolume.N ),
+				Vector512.Create( result, BlockVolume.N * 2 ),
+				Vector512.Create( result, BlockVolume.N * 3 ),
+				Vector512.Create( result, BlockVolume.N * 4 ),
+				Vector512.Create( result, BlockVolume.N * 5 ),
+				Vector512.Create( result, BlockVolume.N * 6 ),
+				Vector512.Create( result, BlockVolume.N * 7 ),
+			];
 		}
 
 		internal static void Transform( Span<double> values, Span<double> result, bool inverse = false )
 		{
 			var pU = inverse ? Ut.AsSpan() : U.AsSpan();
-			int u, p, x, y, z;
+			int p, x, y, z;
 
 			Vector512<double> vecv;
 
@@ -62,11 +72,11 @@ namespace Zeiss.PiWeb.Volume.Block
 			for( y = 0; y < BlockVolume.N; y++, p += BlockVolume.N )
 			{
 				vecv = Vector512.Create<double>( values.Slice( p, BlockVolume.N ) );
-				for( x = 0, u = 0; x < BlockVolume.N; x++, u += BlockVolume.N )
+				for( x = 0; x < BlockVolume.N; x++ )
 				{
 					//u = x * N;
 					//p = z * NN + y * N;
-					result[ z * BlockVolume.N2 + x * BlockVolume.N + y ] = Vector512.Sum( Vector512.Multiply( vecv, Vector512.Create<double>( pU.Slice( u, BlockVolume.N ) ) ) );
+					result[ z * BlockVolume.N2 + x * BlockVolume.N + y ] = Vector512.Sum( Vector512.Multiply( vecv, pU[ x ] ) );
 				}
 			}
 
@@ -75,11 +85,11 @@ namespace Zeiss.PiWeb.Volume.Block
 			for( x = 0; x < BlockVolume.N; x++, p += BlockVolume.N )
 			{
 				vecv = Vector512.Create<double>( result.Slice( p, BlockVolume.N ) );
-				for( y = 0, u = 0; y < BlockVolume.N; y++, u += BlockVolume.N )
+				for( y = 0; y < BlockVolume.N; y++ )
 				{
 					//u = y * N;
 					//p = z * NN + x * N;
-					values[ y * BlockVolume.N2 + x * BlockVolume.N + z ] = Vector512.Sum( Vector512.Multiply( vecv, Vector512.Create<double>( pU.Slice( u, BlockVolume.N ) ) ) );
+					values[ y * BlockVolume.N2 + x * BlockVolume.N + z ] = Vector512.Sum( Vector512.Multiply( vecv, pU[ y ] ) );
 				}
 			}
 
@@ -88,11 +98,11 @@ namespace Zeiss.PiWeb.Volume.Block
 			for( x = 0; x < BlockVolume.N; x++, p += BlockVolume.N )
 			{
 				vecv = Vector512.Create<double>( values.Slice( p, BlockVolume.N ) );
-				for( z = 0, u = 0; z < BlockVolume.N; z++, u += BlockVolume.N )
+				for( z = 0; z < BlockVolume.N; z++ )
 				{
 					//u = z * N;
 					//p = y * NN + x * N;
-					result[ z * BlockVolume.N2 + y * BlockVolume.N + x ] = Vector512.Sum( Vector512.Multiply( vecv, Vector512.Create<double>( pU.Slice( u, BlockVolume.N ) ) ) );
+					result[ z * BlockVolume.N2 + y * BlockVolume.N + x ] = Vector512.Sum( Vector512.Multiply( vecv, pU[ z ] ) );
 				}
 			}
 		}
