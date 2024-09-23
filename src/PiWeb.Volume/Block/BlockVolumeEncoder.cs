@@ -204,7 +204,7 @@ internal static class BlockVolumeEncoder
 
 				//4. Discretization
 				for( var i = 0; i < BlockVolume.N3; i++ )
-					resultBlock[ i ] = (short)Math.Clamp( short.MinValue, short.MaxValue, Math.Round( buffer[ i ] ) );
+					resultBlock[ i ] = (short)Math.Clamp( Math.Round( buffer[ i ] ), short.MinValue, short.MaxValue );
 
 				blockInfos[ blockIndex ] = BlockInfo.Create( resultBlock );
 
