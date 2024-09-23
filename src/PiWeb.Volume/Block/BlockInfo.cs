@@ -12,6 +12,7 @@ namespace Zeiss.PiWeb.Volume.Block;
 
 #region usings
 
+using System;
 using System.IO;
 
 #endregion
@@ -36,21 +37,13 @@ internal readonly record struct BlockInfo( ushort ValueCount, bool IsFirstValueS
 	/// <summary>
 	/// The length of the block in bytes.
 	/// </summary>
-	public ushort Length
-	{
-		get
+	public ushort Length =>
+		ValueCount switch
 		{
-			if( ValueCount == 0 )
-				return 0;
-
-			var result = FirstValueSize;
-			if( ValueCount == 1 )
-				return result;
-
-			var otherValuesSize = (byte)( AreOtherValuesShort ? 2 : 1 );
-			return (ushort)( result + ( ValueCount - 1 ) * otherValuesSize );
-		}
-	}
+			0 => 0,
+			1 => FirstValueSize,
+			_ => (ushort)( FirstValueSize + ( ValueCount - 1 ) * ( AreOtherValuesShort ? 2 : 1 ) )
+		};
 
 	/// <summary>
 	/// The size of the first value in bytes.
@@ -91,7 +84,7 @@ internal readonly record struct BlockInfo( ushort ValueCount, bool IsFirstValueS
 	/// <summary>
 	/// Creates a <see cref="BlockInfo"/> for the specified <paramref name="resultBlock"/>.
 	/// </summary>
-	public static BlockInfo Create( short[] resultBlock )
+	public static BlockInfo Create( ReadOnlySpan<short> resultBlock )
 	{
 		var count = 0;
 		var isFirstValueShort = resultBlock[ 0 ] is > sbyte.MaxValue or < sbyte.MinValue;

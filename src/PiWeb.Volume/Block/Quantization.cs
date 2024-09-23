@@ -34,16 +34,16 @@ internal static class Quantization
 	/// </summary>
 	public static double[] Read( BinaryReader reader, bool invert )
 	{
-		var data = reader.ReadBytes( BlockVolume.N3 * sizeof( double ) ).AsSpan();
-		var values = MemoryMarshal.Cast<byte, double>( data );
+		var values = new double[ BlockVolume.N3 ];
+		_ = reader.Read( MemoryMarshal.Cast<double, byte>( values.AsSpan() ) );
 
 		if( !invert )
-			return values.ToArray();
+			return values;
 
 		for( var i = 0; i < BlockVolume.N3; i++ )
 			values[ i ] = 1.0 / values[ i ];
 
-		return values.ToArray();
+		return values;
 	}
 
 	/// <summary>
@@ -140,18 +140,16 @@ internal static class Quantization
 	}
 
 	/// <summary>
-	/// Multiplies the <paramref name="quantization"/> with <paramref name="values"/> and stores the result in
-	/// <paramref name="result"/>.
+	/// Multiplies the <paramref name="quantization"/> with <paramref name="values"/>.
 	/// </summary>
-	public static void Apply( ReadOnlySpan<double> quantization, ReadOnlySpan<double> values, Span<double> result )
+	public static void Apply( ReadOnlySpan<double> quantization, Span<double> values )
 	{
-		for( var i = 0; i < BlockVolume.N3; i += 8 )
-		{
-			Vector512.Multiply(
-					Vector512.Create( values.Slice( i, 8 ) ),
-					Vector512.Create( quantization.Slice( i, 8 ) ) )
-				.CopyTo( result.Slice( i, 8 ) );
-		}
+		var quantizationVectors = MemoryMarshal.Cast<double, Vector512<double>>( quantization );
+		var valuesVectors = MemoryMarshal.Cast<double, Vector512<double>>( values );
+
+		for( var i = 0; i < BlockVolume.N2; i++ )
+			 valuesVectors[ i ] *= quantizationVectors[ i ];
+
 	}
 
 	#endregion

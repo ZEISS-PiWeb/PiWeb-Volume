@@ -189,22 +189,23 @@ internal static class BlockVolumeEncoder
 			() => ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
 			( blockIndex, _, buffer ) =>
 			{
-				var inputBlock = inputBlocks[ blockIndex ];
-				var resultBlock = resultBlocks[ blockIndex ];
+				var inputBlock = inputBlocks[ blockIndex ].AsSpan();
+				var resultBlock = resultBlocks[ blockIndex ].AsSpan();
+				var bufferSpan = buffer.AsSpan();
 
 				//1. Cosine transform
-				DiscreteCosineTransform.Transform( inputBlock, buffer );
+				DiscreteCosineTransform.Transform( inputBlock, bufferSpan );
 
 				//2. Quantization
 				for( var i = 0; i < BlockVolume.N3; i += BlockVolume.N )
-					Quantization.Apply( quantization, buffer, inputBlock );
+					Quantization.Apply( quantization, bufferSpan );
 
 				//3. ZigZag
-				ZigZag.Apply( inputBlock, buffer );
+				ZigZag.Apply( bufferSpan, inputBlock );
 
 				//4. Discretization
 				for( var i = 0; i < BlockVolume.N3; i++ )
-					resultBlock[ i ] = (short)Math.Clamp( Math.Round( buffer[ i ] ), short.MinValue, short.MaxValue );
+					resultBlock[ i ] = (short)Math.Clamp( Math.Round( inputBlock[ i ] ), short.MinValue, short.MaxValue );
 
 				blockInfos[ blockIndex ] = BlockInfo.Create( resultBlock );
 

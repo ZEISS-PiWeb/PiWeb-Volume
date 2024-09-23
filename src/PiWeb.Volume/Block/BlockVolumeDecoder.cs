@@ -98,9 +98,9 @@ internal static class BlockVolumeDecoder
 				if( blockPredicate?.Invoke( blockIndex ) == false )
 					return buffers;
 
-				var doubleBuffer1 = buffers.Item1.AsSpan();
-				var doubleBuffer2 = buffers.Item2.AsSpan();
-				var byteBuffer = buffers.Item3;
+				var doubleBuffer1 = buffers.Item1.AsSpan( 0, BlockVolume.N3 );
+				var doubleBuffer2 = buffers.Item2.AsSpan( 0, BlockVolume.N3 );
+				var byteBuffer = buffers.Item3.AsSpan( 0, BlockVolume.N3 );
 				var encodedBlockInfo = encodedBlockInfos[ index ];
 
 				//1. Dediscretization
@@ -110,14 +110,14 @@ internal static class BlockVolumeDecoder
 				ZigZag.Reverse( doubleBuffer1, doubleBuffer2 );
 
 				//3. Quantization
-				Quantization.Apply( quantization.AsSpan(), doubleBuffer2, doubleBuffer1 );
+				Quantization.Apply( quantization.AsSpan(), doubleBuffer2 );
 
 				//4. Cosine transform
-				DiscreteCosineTransform.Transform( doubleBuffer1, doubleBuffer2, true );
+				DiscreteCosineTransform.Transform( doubleBuffer2, doubleBuffer1, true );
 
 				//5. Discretization
 				for( var i = 0; i < BlockVolume.N3; i++ )
-					byteBuffer[ i ] = (byte)Math.Clamp( doubleBuffer2[ i ], byte.MinValue, byte.MaxValue );
+					byteBuffer[ i ] = (byte)Math.Clamp( doubleBuffer1[ i ], byte.MinValue, byte.MaxValue );
 
 				blockAction( byteBuffer, blockIndex );
 
@@ -133,7 +133,8 @@ internal static class BlockVolumeDecoder
 
 	private static void ReadBlock( ReadOnlySpan<byte> data, EncodedBlockInfo blockInfo, Span<double> result )
 	{
-		var encodedBlockData = data[ blockInfo.StartIndex.. ];
+		var length = blockInfo.Info.Length;
+		var encodedBlockData = data.Slice( blockInfo.StartIndex, length );
 
 		result.Clear();
 
@@ -147,15 +148,18 @@ internal static class BlockVolumeDecoder
 		if( blockInfo.Info.ValueCount == 1 )
 			return;
 
+		var firstValueSize = blockInfo.Info.FirstValueSize;
+		var otherValuesData = encodedBlockData.Slice( firstValueSize, length - firstValueSize );
+
 		if( blockInfo.Info.AreOtherValuesShort )
 		{
-			var values = MemoryMarshal.Cast<byte, short>( encodedBlockData[ blockInfo.Info.FirstValueSize.. ] );
+			var values = MemoryMarshal.Cast<byte, short>( otherValuesData );
 			for( ushort i = 1, vi = 0; i < blockInfo.Info.ValueCount; i++, vi++ )
 				result[ i ] = values[ vi ];
 		}
 		else
 		{
-			var values = MemoryMarshal.Cast<byte, sbyte>( encodedBlockData[ blockInfo.Info.FirstValueSize.. ] );
+			var values = MemoryMarshal.Cast<byte, sbyte>( otherValuesData );
 			for( ushort i = 1, vi = 0; i < blockInfo.Info.ValueCount; i++, vi++ )
 				result[ i ] = values[ vi ];
 		}
