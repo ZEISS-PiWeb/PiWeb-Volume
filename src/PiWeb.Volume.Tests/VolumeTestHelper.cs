@@ -58,9 +58,9 @@ public static class VolumeTestHelper
 		for( var y = 0; y < BlockVolume.N; y++ )
 		for( var x = 0; x < BlockVolume.N; x++ )
 		{
-			var value = DiscreteCosineTransform.U[ u * BlockVolume.N + x ] *
-				DiscreteCosineTransform.U[ v * BlockVolume.N + y ] *
-				DiscreteCosineTransform.U[ w * BlockVolume.N + z ];
+			var value = DiscreteCosineTransform.U[ u ][ x ] *
+				DiscreteCosineTransform.U[ v ][ y ] *
+				DiscreteCosineTransform.U[ w ][ z ];
 
 			min = Math.Min( min, value );
 			max = Math.Max( max, value );
