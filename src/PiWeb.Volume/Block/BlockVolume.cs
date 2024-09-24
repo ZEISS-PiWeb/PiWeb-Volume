@@ -23,7 +23,7 @@ using System.Threading;
 /// <summary>
 /// A Volume that is not compressed in slices, but in blocks. This is optimal for performance/memory tradeoff.
 /// </summary>
-internal class BlockVolume : CompressedVolume
+public class BlockVolume : CompressedVolume
 {
 	#region constants
 
@@ -38,12 +38,32 @@ internal class BlockVolume : CompressedVolume
 	/// <summary>
 	/// The id of the block volume encoder.
 	/// </summary>
-	internal const string EncoderID = "zeiss.block";
+	public const string EncoderID = "zeiss.block";
 
 	/// <summary>
 	///  The pixel format of the block volume encoder.
 	/// </summary>
-	internal const string PixelFormat = "gray8";
+	public const string PixelFormat = "gray8";
+
+	/// <summary>
+	/// Name of the quality option.
+	/// </summary>
+	public const string QualityName = "quality";
+
+	/// <summary>
+	/// Name of the quantization option.
+	/// </summary>
+	public const string QuantizationName = "quantization";
+
+	/// <summary>
+	/// Name of the quantization base option.
+	/// </summary>
+	public const string QuantizationBaseName = "quantizationBase";
+
+	/// <summary>
+	/// Name of the quantization gain option.
+	/// </summary>
+	public const string QuantizationGainName = "quantizationGain";
 
 	/// <summary>
 	/// File header to identify block volumes. Reads as JSVF.
