@@ -31,8 +31,13 @@ namespace Zeiss.PiWeb.Volume.Tests
 	{
 		#region properties
 
-		public static SampleFile[] AllSamples { get; } = Directory
+		public static SampleFile[] CompressedSamples { get; } = Directory
 			.GetFiles( Paths.TestData, "*.volx", SearchOption.AllDirectories )
+			.Select( f => new SampleFile( f ) )
+			.ToArray();
+
+		public static SampleFile[] UncompressedSamples { get; } = Directory
+			.GetFiles( Paths.TestData, "*.uint8_scv", SearchOption.AllDirectories )
 			.Select( f => new SampleFile( f ) )
 			.ToArray();
 
@@ -40,7 +45,7 @@ namespace Zeiss.PiWeb.Volume.Tests
 
 		#region methods
 
-		[Test, TestCaseSource( nameof( AllSamples ) )]
+		[Test, TestCaseSource( nameof( CompressedSamples ) )]
 		public void LoadSamplesTest( SampleFile file )
 		{
 			using var stream = File.OpenRead( file.Filename );
@@ -52,7 +57,7 @@ namespace Zeiss.PiWeb.Volume.Tests
 			Assert.That( compressedVolume.Metadata, Is.Not.Null );
 		}
 
-		[Test, TestCaseSource( nameof( AllSamples ) )]
+		[Test, TestCaseSource( nameof( CompressedSamples ) )]
 		public void DecompressSamplesTest( SampleFile file )
 		{
 			using var stream = File.OpenRead( file.Filename );
@@ -65,7 +70,27 @@ namespace Zeiss.PiWeb.Volume.Tests
 			Assert.That( decompressedVolume.Metadata, Is.Not.Null );
 		}
 
-		[Test, TestCaseSource( nameof( AllSamples ) )]
+		[Test, TestCaseSource( nameof( UncompressedSamples ) )]
+		public void CompressAndDecompressSamplesTest( SampleFile file )
+		{
+			using var stream = File.OpenRead( file.Filename );
+			var logger = new ConsoleLogger();
+
+			var options = new VolumeCompressionOptions( BlockVolume.EncoderID, BlockVolume.PixelFormat, new Dictionary<string, string>
+			{
+				{ BlockVolume.QualityName, "95" }
+			} );
+			var uncompressedVolume = VolumeTestHelper.LoadUncompressedVolume( file.Filename );
+			var compressedVolume = uncompressedVolume.Compress( options );
+			var decompressedVolume = compressedVolume.Decompress( logger: logger );
+
+			var noise = VolumeTestHelper.CalculateNoise( uncompressedVolume, decompressedVolume );
+
+			Assert.That( noise, Is.Not.Null );
+			Assert.That( noise.Value.Peak, Is.LessThanOrEqualTo( 16 ) );
+		}
+
+		[Test, TestCaseSource( nameof( CompressedSamples ) )]
 		public void CreatePreviewForCompressedVolumeTest( SampleFile file )
 		{
 			using var stream = File.OpenRead( file.Filename );
@@ -78,7 +103,7 @@ namespace Zeiss.PiWeb.Volume.Tests
 			Assert.That( preview.Metadata, Is.Not.Null );
 		}
 
-		[Test, TestCaseSource( nameof( AllSamples ) )]
+		[Test, TestCaseSource( nameof( CompressedSamples ) )]
 		public void CreatePreviewForDecompressedVolumeTest( SampleFile file )
 		{
 			using var stream = File.OpenRead( file.Filename );
@@ -92,7 +117,7 @@ namespace Zeiss.PiWeb.Volume.Tests
 			Assert.That( preview.Metadata, Is.Not.Null );
 		}
 
-		[Test, TestCaseSource( nameof( AllSamples ) )]
+		[Test, TestCaseSource( nameof( CompressedSamples ) )]
 		public void SaveSamplesTest( SampleFile file )
 		{
 			var tempPath = Path.GetTempFileName();
@@ -151,12 +176,11 @@ namespace Zeiss.PiWeb.Volume.Tests
 		public void CompareHighNoiseVolume( [Values( 25, 50, 75, 85, 90, 95, 100 )] int quality )
 		{
 			var original = VolumeTestHelper.CreateHighNoiseVolume();
-			var compressed = original.Compress( new VolumeCompressionOptions( BlockVolume.EncoderID, "gray8", new Dictionary<string, string>
+			var options = new VolumeCompressionOptions( BlockVolume.EncoderID, BlockVolume.PixelFormat, new Dictionary<string, string>
 			{
-				{
-					"quality", quality.ToString()
-				}
-			} ) );
+				{ BlockVolume.QualityName, quality.ToString() }
+			} );
+			var compressed = original.Compress( options );
 
 			var noise = VolumeTestHelper.CalculateNoise( original, compressed );
 
@@ -172,12 +196,11 @@ namespace Zeiss.PiWeb.Volume.Tests
 		public void CompareLowNoiseVolume( [Values( 25, 50, 75, 85, 90, 95, 100 )] int quality )
 		{
 			var original = VolumeTestHelper.CreateLowNoiseVolume();
-			var compressed = original.Compress( new VolumeCompressionOptions( BlockVolume.EncoderID, "gray8", new Dictionary<string, string>
+			var options = new VolumeCompressionOptions( BlockVolume.EncoderID, BlockVolume.PixelFormat, new Dictionary<string, string>
 			{
-				{
-					"quality", quality.ToString()
-				}
-			} ) );
+				{ BlockVolume.QualityName, quality.ToString() }
+			} );
+			var compressed = original.Compress( options );
 
 			var noise = VolumeTestHelper.CalculateNoise( original, compressed );
 

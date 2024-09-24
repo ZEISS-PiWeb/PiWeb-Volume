@@ -17,6 +17,7 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 	using System.Globalization;
 	using GalaSoft.MvvmLight;
 	using GalaSoft.MvvmLight.Messaging;
+	using Zeiss.PiWeb.Volume.Block;
 
 	#endregion
 
@@ -58,11 +59,11 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel
 
 		public VolumeCompressionOptions GetOptions()
 		{
-			return new VolumeCompressionOptions( "zeiss.block", "gray8", new Dictionary<string, string>
+			return new VolumeCompressionOptions( BlockVolume.EncoderID, BlockVolume.PixelFormat, new Dictionary<string, string>
 			{
-				{ "quality", Math.Max( 5, Math.Min( 100, Quality ) ).ToString(CultureInfo.InvariantCulture) },
-				{ "quantizationBase", Math.Max( 4, Math.Min( 24, QuantizationBase ) ).ToString(CultureInfo.InvariantCulture) },
-				{ "quantizationGain", Math.Max( 0.25, Math.Min( 4, QuantizationGain ) ).ToString(CultureInfo.InvariantCulture) }
+				{ BlockVolume.QualityName, Math.Max( 5, Math.Min( 100, Quality ) ).ToString( CultureInfo.InvariantCulture ) },
+				{ BlockVolume.QuantizationBaseName, Math.Max( 4, Math.Min( 24, QuantizationBase ) ).ToString( CultureInfo.InvariantCulture ) },
+				{ BlockVolume.QuantizationGainName, Math.Max( 0.25, Math.Min( 4, QuantizationGain ) ).ToString( CultureInfo.InvariantCulture ) }
 			}, 0 );
 		}
 

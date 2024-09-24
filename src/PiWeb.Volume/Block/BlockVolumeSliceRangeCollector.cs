@@ -57,6 +57,9 @@ internal class BlockVolumeSliceRangeCollector
 
 		map[ block ] = [new BlockSliceBuffer( definition, sliceBuffer )];
 
+		if( definition.Direction != Direction.Z && definition.RegionOfInterest.HasValue )
+			_VerticalRanges.Add( definition.RegionOfInterest.Value.V );
+
 		if( _VerticalRanges.Count == 0 && ( _SlicesX.Count > 0 || _SlicesY.Count > 0 ) )
 			_VerticalRanges.Add( new VolumeRange( 0, (ushort)( _Metadata.SizeZ - 1 ) ) );
 	}
