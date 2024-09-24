@@ -185,32 +185,44 @@ internal static class BlockVolumeEncoder
 		double[] quantization
 	)
 	{
+#if DEBUG
+		var buffer = ArrayPool<double>.Shared.Rent( BlockVolume.N3 );
+		for( var blockIndex = 0; blockIndex < inputBlocks.Length; blockIndex++ )
+		{
+#else
 		Parallel.For( 0, inputBlocks.Length,
 			() => ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
 			( blockIndex, _, buffer ) =>
 			{
-				var inputBlock = inputBlocks[ blockIndex ].AsSpan();
-				var resultBlock = resultBlocks[ blockIndex ].AsSpan();
-				var bufferSpan = buffer.AsSpan();
+#endif
 
-				//1. Cosine transform
-				DiscreteCosineTransform.Transform( inputBlock, bufferSpan );
+			var inputBlock = inputBlocks[ blockIndex ].AsSpan();
+			var resultBlock = resultBlocks[ blockIndex ].AsSpan();
+			var bufferSpan = buffer.AsSpan();
 
-				//2. Quantization
-				for( var i = 0; i < BlockVolume.N3; i += BlockVolume.N )
-					Quantization.Apply( quantization, bufferSpan );
+			//1. Cosine transform
+			DiscreteCosineTransform.Transform( inputBlock, bufferSpan );
 
-				//3. ZigZag
-				ZigZag.Apply( bufferSpan, inputBlock );
+			//2. Quantization
+			Quantization.Apply( quantization, bufferSpan );
 
-				//4. Discretization
-				for( var i = 0; i < BlockVolume.N3; i++ )
-					resultBlock[ i ] = (short)Math.Clamp( Math.Round( inputBlock[ i ] ), short.MinValue, short.MaxValue );
+			//3. ZigZag
+			ZigZag.Apply( bufferSpan, inputBlock );
 
-				blockInfos[ blockIndex ] = BlockInfo.Create( resultBlock );
+			//4. Discretization
+			for( var i = 0; i < BlockVolume.N3; i++ )
+				resultBlock[ i ] = (short)Math.Clamp( Math.Round( inputBlock[ i ] ), short.MinValue, short.MaxValue );
 
+			blockInfos[ blockIndex ] = BlockInfo.Create( resultBlock );
+
+#if DEBUG
+		}
+
+		ArrayPool<double>.Shared.Return( buffer );
+#else
 				return buffer;
 			}, buffer => ArrayPool<double>.Shared.Return( buffer ) );
+#endif
 	}
 
 	private static void CreateLayer( byte[][] layer, double[][] blocks, ushort blockIndexZ, BlockVolumeMetaData metadata )
