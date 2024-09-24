@@ -5,6 +5,7 @@ namespace Zeiss.PiWeb.Volume.Convert;
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Xml;
 
 #endregion
@@ -41,13 +42,36 @@ public static class Gom
 
 		rawFileName = ReadValue( document, "//volume/raw_data/raw_data_block" );
 
-		var result = new VolumeMetadata( sx, sy, sz, rx, ry, rz );
+		var coordinateSystem = ReadCoordinateSystem( document );
+		var result = new VolumeMetadata( sx, sy, sz, rx, ry, rz, coordinateSystem: coordinateSystem );
 
 		result.Properties.Add( Property.Create( MaximumValue, minValue ) );
 		result.Properties.Add( Property.Create( MinimumValue, maxValue ) );
 		result.Properties.Add( Property.Create( RawDataName, rawFileName ) );
 
 		return result;
+	}
+
+	private static CoordinateSystem? ReadCoordinateSystem( XmlDocument document )
+	{
+		var transformationMatrixParts = ReadValue( document, "//volume/volume_transformation" ).Split( ',' );
+		if( transformationMatrixParts.Length != 16 )
+			return default;
+
+		var values = new double[ 16 ];
+		for( var i = 0; i < 16; i++ )
+		{
+			if( !double.TryParse( transformationMatrixParts[ i ], NumberStyles.Float, CultureInfo.InvariantCulture, out values[ i ] ) )
+				return default;
+		}
+
+		return new CoordinateSystem
+		{
+			Axis1 = new Vector( values[ 0 ], values[ 4 ], values[ 8 ] ),
+			Axis2 = new Vector( values[ 1 ], values[ 5 ], values[ 9 ] ),
+			Axis3 = new Vector( values[ 2 ], values[ 6 ], values[ 10 ] ),
+			Origin = new Vector( values[ 3 ], values[ 7 ], values[ 11 ] )
+		};
 	}
 
 	private static DataType ReadDataType( XmlDocument document, string path )

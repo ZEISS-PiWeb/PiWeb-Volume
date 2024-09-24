@@ -43,6 +43,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <param name="positionX">The position x.</param>
 		/// <param name="positionY">The position y.</param>
 		/// <param name="positionZ">The position z.</param>
+		/// <param name="coordinateSystem">The transformation from CAD to volume.</param>
 		public VolumeMetadata(
 			ushort sizeX,
 			ushort sizeY,
@@ -52,7 +53,8 @@ namespace Zeiss.PiWeb.Volume
 			double resolutionZ,
 			ushort positionX = 0,
 			ushort positionY = 0,
-			ushort positionZ = 0 )
+			ushort positionZ = 0,
+			CoordinateSystem? coordinateSystem = default)
 		{
 			SizeX = sizeX;
 			SizeY = sizeY;
@@ -64,6 +66,8 @@ namespace Zeiss.PiWeb.Volume
 			PositionX = positionX;
 			PositionY = positionY;
 			PositionZ = positionZ;
+
+			CoordinateSystem = coordinateSystem ?? new CoordinateSystem();
 		}
 
 		#endregion
@@ -108,22 +112,27 @@ namespace Zeiss.PiWeb.Volume
 		/// <summary>
 		/// The size of a Voxel in X-Dimension (mm).
 		/// </summary>
-		public double ResolutionX { get; private set; }
+		public double ResolutionX { get; private set; } = 1.0;
 
 		/// <summary>
 		/// The size of a Voxel in Y-Dimension (mm).
 		/// </summary>
-		public double ResolutionY { get; private set; }
+		public double ResolutionY { get; private set; } = 1.0;
 
 		/// <summary>
 		/// The size of a Voxel in Z-Dimension (mm).
 		/// </summary>
-		public double ResolutionZ { get; private set; }
+		public double ResolutionZ { get; private set; } = 1.0;
 
 		/// <summary>
 		/// Gets or sets the metadata.
 		/// </summary>
 		public ICollection<Property> Properties { get; } = new List<Property>();
+
+		/// <summary>
+		/// Describes the transformation from CAD to volume.
+		/// </summary>
+		public CoordinateSystem CoordinateSystem { get; private set; } = new CoordinateSystem();
 
 		#endregion
 
@@ -225,6 +234,10 @@ namespace Zeiss.PiWeb.Volume
 				writer.WriteElementString( "PositionY", PositionY.ToString( CultureInfo.InvariantCulture ) );
 				writer.WriteElementString( "PositionZ", PositionZ.ToString( CultureInfo.InvariantCulture ) );
 
+				writer.WriteStartElement( "CoordinateSystem" );
+				CoordinateSystem.Serialize( writer );
+				writer.WriteEndElement();
+
 				if( Properties.Count > 0 )
 				{
 					foreach( var property in Properties )
@@ -294,6 +307,9 @@ namespace Zeiss.PiWeb.Volume
 						break;
 					case "PositionZ":
 						result.PositionZ = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						break;
+					case "CoordinateSystem":
+						result.CoordinateSystem = CoordinateSystem.Deserialize( reader );
 						break;
 				}
 			}
