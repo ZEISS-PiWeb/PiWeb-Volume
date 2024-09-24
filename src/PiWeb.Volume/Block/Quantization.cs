@@ -62,11 +62,11 @@ internal static class Quantization
 	{
 		if( options.EncoderOptions.TryGetQuantization( out var result ) )
 			return result;
-		if( !options.EncoderOptions.TryGetDouble( "quality", out var quality ) )
+		if( !options.EncoderOptions.TryGetDouble( BlockVolume.QualityName, out var quality ) )
 			quality = 75;
-		if( !options.EncoderOptions.TryGetDouble( "quantizationBase", out var quantizationBase ) )
+		if( !options.EncoderOptions.TryGetDouble( BlockVolume.QuantizationBaseName, out var quantizationBase ) )
 			quantizationBase = 12;
-		if( !options.EncoderOptions.TryGetDouble( "quantizationGain", out var quantizationGain ) )
+		if( !options.EncoderOptions.TryGetDouble( BlockVolume.QuantizationGainName, out var quantizationGain ) )
 			quantizationGain = 1;
 
 		return Calculate( quality, quantizationBase, quantizationGain );
@@ -75,7 +75,7 @@ internal static class Quantization
 	private static bool TryGetQuantization( this IReadOnlyDictionary<string, string> options, [NotNullWhen( true )] out double[]? result )
 	{
 		result = default;
-		if( !options.TryGetValue( "quantization", out var quantizationString ) )
+		if( !options.TryGetValue( BlockVolume.QuantizationName, out var quantizationString ) )
 			return false;
 
 		var parts = quantizationString.Split( ';' );
