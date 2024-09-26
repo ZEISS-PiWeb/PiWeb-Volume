@@ -17,6 +17,7 @@ using System;
 using System.Buffers;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -85,18 +86,29 @@ internal static class BlockVolumeDecoder
 		BlockPredicate? blockPredicate,
 		BlockAction blockAction )
 	{
+#if DEBUG
+		var buffers = ( ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
+			ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
+			ArrayPool<byte>.Shared.Rent( BlockVolume.N3 ) );
+		for( var index = 0; index < blockCountX * blockCountY; index++ )
+#else
 		Parallel.For( 0, blockCountX * blockCountY, () => (
 				ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
 				ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
 				ArrayPool<byte>.Shared.Rent( BlockVolume.N3 )
 			), ( index, _, buffers ) =>
+#endif
 			{
 				var blockIndexX = index % blockCountX;
 				var blockIndexY = index / blockCountX;
 				var blockIndex = new BlockIndex( (ushort)blockIndexX, (ushort)blockIndexY, blockIndexZ );
 
 				if( blockPredicate?.Invoke( blockIndex ) == false )
+#if DEBUG
+				continue;
+#else
 					return buffers;
+#endif
 
 				var doubleBuffer1 = buffers.Item1.AsSpan( 0, BlockVolume.N3 );
 				var doubleBuffer2 = buffers.Item2.AsSpan( 0, BlockVolume.N3 );
@@ -109,11 +121,13 @@ internal static class BlockVolumeDecoder
 				//2. ZigZag
 				ZigZag.Reverse( doubleBuffer1, doubleBuffer2 );
 
+				var nonEmptyVectors = FindNonEmptyVectors( doubleBuffer2 );
+
 				//3. Quantization
 				Quantization.Apply( quantization.AsSpan(), doubleBuffer2 );
 
 				//4. Cosine transform
-				DiscreteCosineTransform.Transform( doubleBuffer2, doubleBuffer1, true );
+				DiscreteCosineTransform.Transform( doubleBuffer2, doubleBuffer1, true, nonEmptyVectors );
 
 				//5. Discretization
 				for( var i = 0; i < BlockVolume.N3; i++ )
@@ -121,6 +135,13 @@ internal static class BlockVolumeDecoder
 
 				blockAction( byteBuffer, blockIndex );
 
+#if DEBUG
+		}
+
+		ArrayPool<double>.Shared.Return( buffers.Item1 );
+		ArrayPool<double>.Shared.Return( buffers.Item2 );
+		ArrayPool<byte>.Shared.Return( buffers.Item3 );
+#else
 				return buffers;
 			},
 			buffers =>
@@ -129,6 +150,21 @@ internal static class BlockVolumeDecoder
 				ArrayPool<double>.Shared.Return( buffers.Item2 );
 				ArrayPool<byte>.Shared.Return( buffers.Item3 );
 			} );
+#endif
+	}
+
+	private static ulong FindNonEmptyVectors( Span<double> values )
+	{
+		var vectors = MemoryMarshal.Cast<double, Vector512<double>>( values );
+		var result = 0UL;
+
+		for( ushort i = 0; i < BlockVolume.N2; i++ )
+		{
+			if( Vector512.Sum( Vector512.Abs( vectors[ i ] ) ) > 1e-12 )
+				result |= 1UL << i;
+		}
+
+		return result;
 	}
 
 	private static void ReadBlock( ReadOnlySpan<byte> data, EncodedBlockInfo blockInfo, Span<double> result )
