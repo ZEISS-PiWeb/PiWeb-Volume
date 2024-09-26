@@ -55,14 +55,13 @@ internal readonly record struct BlockInfo( ushort ValueCount, bool IsFirstValueS
 	#region methods
 
 	/// <summary>
-	/// Reads the <see cref="BlockInfo"/> from the specified <paramref name="reader"/>.
+	/// Reads the <see cref="BlockInfo"/> from the specified <paramref name="value"/>.
 	/// </summary>
-	public static BlockInfo Read( BinaryReader reader )
+	public static BlockInfo Create( ushort value )
 	{
-		var resultLength = reader.ReadUInt16();
-		var valueCount = resultLength & ValueCountMask;
-		var isFirstValueShort = ( resultLength & IsFirstValueShortMask ) >> IsFirstValueShortOffset;
-		var areOtherValuesShort = ( resultLength & AreOtherValuesShortMask ) >> AreOtherValuesShortOffset;
+		var valueCount = value & ValueCountMask;
+		var isFirstValueShort = ( value & IsFirstValueShortMask ) >> IsFirstValueShortOffset;
+		var areOtherValuesShort = ( value & AreOtherValuesShortMask ) >> AreOtherValuesShortOffset;
 
 		return new BlockInfo( (ushort)valueCount, isFirstValueShort > 0, areOtherValuesShort > 0 );
 	}
