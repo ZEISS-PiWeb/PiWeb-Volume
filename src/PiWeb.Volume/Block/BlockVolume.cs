@@ -190,8 +190,8 @@ public class BlockVolume : CompressedVolume
 		CancellationToken ct = default )
 	{
 		var sw = Stopwatch.StartNew();
-		var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, slice, buffer );
-		sliceRangeCollector.CollectSliceRanges( progress, ct );
+		var sliceCollector = new BlockVolumeSliceCollector( this, slice, buffer );
+		sliceCollector.CollectSlice( progress, ct );
 
 		logger?.Log( LogLevel.Info, $"Extracted '{slice}' in {sw.ElapsedMilliseconds} ms." );
 	}

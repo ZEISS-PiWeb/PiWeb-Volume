@@ -30,20 +30,12 @@ internal static class Quantization
 	#region methods
 
 	/// <summary>
-	/// Reads a quantization matrix from the specified <paramref name="reader"/>
+	/// Invert a quantization matrix.
 	/// </summary>
-	public static double[] Read( BinaryReader reader, bool invert )
+	public static void Invert( double[] quantization )
 	{
-		var values = new double[ BlockVolume.N3 ];
-		_ = reader.Read( MemoryMarshal.Cast<double, byte>( values.AsSpan() ) );
-
-		if( !invert )
-			return values;
-
 		for( var i = 0; i < BlockVolume.N3; i++ )
-			values[ i ] = 1.0 / values[ i ];
-
-		return values;
+			quantization[ i ] = 1.0 / quantization[ i ];
 	}
 
 	/// <summary>

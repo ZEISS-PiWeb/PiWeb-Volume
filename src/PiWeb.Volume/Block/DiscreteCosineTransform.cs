@@ -13,6 +13,7 @@ namespace Zeiss.PiWeb.Volume.Block;
 #region usings
 
 using System;
+using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
 
 #endregion
@@ -60,51 +61,53 @@ internal static class DiscreteCosineTransform
 		];
 	}
 
-	internal static void Transform( Span<double> values, Span<double> result, bool inverse = false )
+	internal static void Transform(
+		Span<double> values,
+		Span<double> result,
+		bool inverse = false,
+		ulong nonEmptyVectors = ulong.MaxValue )
 	{
 		var pU = inverse ? Ut.AsSpan() : U.AsSpan();
-		int p, x, y, z;
 
-		Vector512<double> vecv;
+		var inputVectors = MemoryMarshal.Cast<double, Vector512<double>>( values );
+		var resultVectors = MemoryMarshal.Cast<double, Vector512<double>>( result );
 
-		//Iterate x (n 0..N): values[ n, y, z ] * u[ n, x ] ;
-		for( z = 0, p = 0; z < BlockVolume.N; z++ )
-		for( y = 0; y < BlockVolume.N; y++, p += BlockVolume.N )
+		nonEmptyVectors = TransformDirection( inputVectors, result, pU, nonEmptyVectors );
+		nonEmptyVectors = TransformDirection( resultVectors, values, pU, nonEmptyVectors );
+		TransformDirection( inputVectors, result, pU, nonEmptyVectors );
+	}
+
+	private static ulong TransformDirection(
+		Span<Vector512<double>> inputVectors,
+		Span<double> result,
+		Span<Vector512<double>> coefficients,
+		ulong nonEmptyInputVectors )
+	{
+		result.Clear();
+
+		var nonEmptyResultVectors = 0UL;
+
+		for( ushort p = 0; p < BlockVolume.N2; p++ )
 		{
-			vecv = Vector512.Create<double>( values.Slice( p, BlockVolume.N ) );
-			for( x = 0; x < BlockVolume.N; x++ )
-			{
-				//u = x * N;
-				//p = z * NN + y * N;
-				result[ z * BlockVolume.N2 + x * BlockVolume.N + y ] = Vector512.Sum( Vector512.Multiply( vecv, pU[ x ] ) );
-			}
+			if( ( nonEmptyInputVectors & ( 1UL << p ) ) == 0 )
+				continue;
+
+			var input = inputVectors[ p ];
+
+			//This loop is unrolled for performance optimization
+			result[ 0 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 0 ] ) );
+			result[ 1 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 1 ] ) );
+			result[ 2 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 2 ] ) );
+			result[ 3 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 3 ] ) );
+			result[ 4 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 4 ] ) );
+			result[ 5 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 5 ] ) );
+			result[ 6 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 6 ] ) );
+			result[ 7 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 7 ] ) );
+
+			nonEmptyResultVectors |= 0x0101010101010101UL << ( p / BlockVolume.N );
 		}
 
-		//Iterate y (n 0..N): values[ x, n, z ] * u[ n, y ]
-		for( z = 0, p = 0; z < BlockVolume.N; z++ )
-		for( x = 0; x < BlockVolume.N; x++, p += BlockVolume.N )
-		{
-			vecv = Vector512.Create<double>( result.Slice( p, BlockVolume.N ) );
-			for( y = 0; y < BlockVolume.N; y++ )
-			{
-				//u = y * N;
-				//p = z * NN + x * N;
-				values[ y * BlockVolume.N2 + x * BlockVolume.N + z ] = Vector512.Sum( Vector512.Multiply( vecv, pU[ y ] ) );
-			}
-		}
-
-		//Iterate z (n 0..N): values[ x, y, n ] * u[ n, z ]
-		for( y = 0, p = 0; y < BlockVolume.N; y++ )
-		for( x = 0; x < BlockVolume.N; x++, p += BlockVolume.N )
-		{
-			vecv = Vector512.Create<double>( values.Slice( p, BlockVolume.N ) );
-			for( z = 0; z < BlockVolume.N; z++ )
-			{
-				//u = z * N;
-				//p = y * NN + x * N;
-				result[ z * BlockVolume.N2 + y * BlockVolume.N + x ] = Vector512.Sum( Vector512.Multiply( vecv, pU[ z ] ) );
-			}
-		}
+		return nonEmptyResultVectors;
 	}
 
 	#endregion
