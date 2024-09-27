@@ -98,69 +98,55 @@ internal static class BlockVolumeDecoder
 		BlockAction blockAction )
 	{
 #if DEBUG
-		var buffers = ( ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
-			ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
-			ArrayPool<byte>.Shared.Rent( BlockVolume.N3 ) );
+		var buffers = new DecodingBuffers();
 		for( var index = 0; index < blockCountX * blockCountY; index++ )
+		{
 #else
-		Parallel.For( 0, blockCountX * blockCountY, () => (
-				ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
-				ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
-				ArrayPool<byte>.Shared.Rent( BlockVolume.N3 )
-			), ( index, _, buffers ) =>
+		Parallel.For( 0, blockCountX * blockCountY, () => new DecodingBuffers(), ( index, _, buffers ) =>
+		{
 #endif
-			{
-				var blockIndexX = index % blockCountX;
-				var blockIndexY = index / blockCountX;
-				var blockIndex = new BlockIndex( (ushort)blockIndexX, (ushort)blockIndexY, blockIndexZ );
+			var blockIndexX = index % blockCountX;
+			var blockIndexY = index / blockCountX;
+			var blockIndex = new BlockIndex( (ushort)blockIndexX, (ushort)blockIndexY, blockIndexZ );
 
-				if( blockPredicate?.Invoke( blockIndex ) == false )
+			if( blockPredicate?.Invoke( blockIndex ) == false )
 #if DEBUG
 				continue;
 #else
-					return buffers;
+				return buffers;
 #endif
 
-				var doubleBuffer1 = buffers.Item1.AsSpan( 0, BlockVolume.N3 );
-				var doubleBuffer2 = buffers.Item2.AsSpan( 0, BlockVolume.N3 );
-				var byteBuffer = buffers.Item3.AsSpan( 0, BlockVolume.N3 );
-				var encodedBlockInfo = encodedBlockInfos[ index ];
+			var inputSpan = buffers.InputBuffer.AsSpan( 0, BlockVolume.N3 );
+			var outputSpan = buffers.OutputBuffer.AsSpan( 0, BlockVolume.N3 );
+			var resultSpan = buffers.ResultBuffer.AsSpan( 0, BlockVolume.N3 );
+			var encodedBlockInfo = encodedBlockInfos[ index ];
 
-				//1. Dediscretization
-				ReadBlock( encodedBlocks.AsSpan(), encodedBlockInfo, doubleBuffer1 );
+			//1. Dediscretization
+			ReadBlock( encodedBlocks.AsSpan(), encodedBlockInfo, inputSpan );
 
-				//2. ZigZag
-				ZigZag.Reverse( doubleBuffer1, doubleBuffer2 );
+			//2. ZigZag
+			ZigZag.Reverse( inputSpan, outputSpan );
 
-				var nonEmptyVectors = FindNonEmptyVectors( doubleBuffer2 );
+			var nonEmptyVectors = FindNonEmptyVectors( outputSpan );
 
-				//3. Quantization
-				Quantization.Apply( quantization.AsSpan(), doubleBuffer2 );
+			//3. Quantization
+			Quantization.Apply( quantization.AsSpan(), outputSpan );
 
-				//4. Cosine transform
-				DiscreteCosineTransform.Transform( doubleBuffer2, doubleBuffer1, true, nonEmptyVectors );
+			//4. Cosine transform
+			DiscreteCosineTransform.Transform( outputSpan, inputSpan, true, nonEmptyVectors );
 
-				//5. Discretization
-				for( var i = 0; i < BlockVolume.N3; i++ )
-					byteBuffer[ i ] = (byte)Math.Clamp( doubleBuffer1[ i ], byte.MinValue, byte.MaxValue );
+			//5. Discretization
+			for( var i = 0; i < BlockVolume.N3; i++ )
+				resultSpan[ i ] = (byte)Math.Clamp( inputSpan[ i ], byte.MinValue, byte.MaxValue );
 
-				blockAction( byteBuffer, blockIndex );
-
+			blockAction( resultSpan, blockIndex );
 #if DEBUG
 		}
 
-		ArrayPool<double>.Shared.Return( buffers.Item1 );
-		ArrayPool<double>.Shared.Return( buffers.Item2 );
-		ArrayPool<byte>.Shared.Return( buffers.Item3 );
+		buffers.Return();
 #else
-				return buffers;
-			},
-			buffers =>
-			{
-				ArrayPool<double>.Shared.Return( buffers.Item1 );
-				ArrayPool<double>.Shared.Return( buffers.Item2 );
-				ArrayPool<byte>.Shared.Return( buffers.Item3 );
-			} );
+			return buffers;
+		}, buffers => buffers.Return() );
 #endif
 	}
 
@@ -213,6 +199,20 @@ internal static class BlockVolumeDecoder
 	}
 
 	#endregion
+
+	private readonly struct DecodingBuffers()
+	{
+		public double[] InputBuffer { get; } = ArrayPool<double>.Shared.Rent( BlockVolume.N3 );
+		public double[] OutputBuffer { get; } = ArrayPool<double>.Shared.Rent( BlockVolume.N3 );
+		public byte[] ResultBuffer { get; } = ArrayPool<byte>.Shared.Rent( BlockVolume.N3 );
+
+		public void Return()
+		{
+			ArrayPool<double>.Shared.Return( InputBuffer );
+			ArrayPool<double>.Shared.Return( OutputBuffer );
+			ArrayPool<byte>.Shared.Return( ResultBuffer );
+		}
+	}
 
 	private readonly record struct EncodedBlockInfo( int StartIndex, BlockInfo Info );
 
