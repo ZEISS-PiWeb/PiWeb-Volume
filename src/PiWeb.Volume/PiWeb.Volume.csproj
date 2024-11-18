@@ -59,6 +59,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Zeiss.PiWeb.ColorScale" Version="1.0.0"/>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
     <None Include="..\..\docs\img\logo_128x128.png" Pack="true" PackagePath="logo_128x128.png" />
   </ItemGroup>
