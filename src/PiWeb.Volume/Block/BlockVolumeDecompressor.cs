@@ -79,12 +79,13 @@ internal class BlockVolumeDecompressor
 		for( var bz = 0; bz < sz; bz++ )
 		{
 			var gz = index.Z * BlockVolume.N + bz;
+			var oz = bz * BlockVolume.N2;
 			var sliceData = _Result[ gz ].AsSpan();
 
 			for( var by = 0; by < sy; by++ )
 			{
 				var gy = index.Y * BlockVolume.N + by;
-				block.Slice( bz * BlockVolume.N2 + by * BlockVolume.N, sx ).CopyTo( sliceData.Slice( gy * _SizeX + gx, sx ) );
+				block.Slice( oz + by * BlockVolume.N, sx ).CopyTo( sliceData.Slice( gy * _SizeX + gx, sx ) );
 			}
 		}
 	}

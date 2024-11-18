@@ -18,6 +18,7 @@ namespace Zeiss.PiWeb.Volume
 	using System.IO;
 	using System.Text;
 	using System.Xml;
+	using Zeiss.PiWeb.ColorScale;
 
 	#endregion
 
@@ -26,6 +27,24 @@ namespace Zeiss.PiWeb.Volume
 	/// </summary>
 	public sealed class VolumeMetadata
 	{
+		#region fields
+
+		private ushort _SizeX;
+		private ushort _SizeY;
+		private ushort _SizeZ;
+
+		private double _ResolutionX;
+		private double _ResolutionY;
+		private double _ResolutionZ;
+
+		private ushort _PositionX;
+		private ushort _PositionY;
+		private ushort _PositionZ;
+
+		private ColorScale? _ColorScale;
+
+		#endregion
+
 		#region constructors
 
 		private VolumeMetadata()
@@ -57,7 +76,6 @@ namespace Zeiss.PiWeb.Volume
 			SizeX = sizeX;
 			SizeY = sizeY;
 			SizeZ = sizeZ;
-
 			ResolutionX = resolutionX;
 			ResolutionY = resolutionY;
 			ResolutionZ = resolutionZ;
@@ -78,52 +96,57 @@ namespace Zeiss.PiWeb.Volume
 		/// <summary>
 		/// The number of Voxels in X-Dimension.
 		/// </summary>
-		public ushort PositionX { get; private set; }
+		public ushort PositionX { get => _PositionX; init => _PositionX = value; }
 
 		/// <summary>
 		/// The number of Voxels in Y-Dimension.
 		/// </summary>
-		public ushort PositionY { get; private set; }
+		public ushort PositionY { get => _PositionY; init => _PositionY = value; }
 
 		/// <summary>
 		/// The number of Voxels in Z-Dimension.
 		/// </summary>
-		public ushort PositionZ { get; private set; }
+		public ushort PositionZ { get => _PositionZ; init => _PositionZ = value; }
 
 		/// <summary>
 		/// The number of Voxels in X-Dimension.
 		/// </summary>
-		public ushort SizeX { get; private set; }
+		public ushort SizeX { get => _SizeX; init => _SizeX = value; }
 
 		/// <summary>
 		/// The number of Voxels in Y-Dimension.
 		/// </summary>
-		public ushort SizeY { get; private set; }
+		public ushort SizeY { get => _SizeY; init => _SizeY = value; }
 
 		/// <summary>
 		/// The number of Voxels in Z-Dimension.
 		/// </summary>
-		public ushort SizeZ { get; private set; }
+		public ushort SizeZ { get => _SizeZ; init => _SizeZ = value; }
 
 		/// <summary>
 		/// The size of a Voxel in X-Dimension (mm).
 		/// </summary>
-		public double ResolutionX { get; private set; }
+		public double ResolutionX { get => _ResolutionX; init => _ResolutionX = value; }
 
 		/// <summary>
 		/// The size of a Voxel in Y-Dimension (mm).
 		/// </summary>
-		public double ResolutionY { get; private set; }
+		public double ResolutionY { get => _ResolutionY; init => _ResolutionY = value; }
 
 		/// <summary>
 		/// The size of a Voxel in Z-Dimension (mm).
 		/// </summary>
-		public double ResolutionZ { get; private set; }
+		public double ResolutionZ { get => _ResolutionZ; init => _ResolutionZ = value; }
 
 		/// <summary>
 		/// Gets or sets the metadata.
 		/// </summary>
 		public ICollection<Property> Properties { get; } = new List<Property>();
+
+		/// <summary>
+		/// The color scale that should be used to colorize the grayscale values of the volume.
+		/// </summary>
+		public ColorScale? ColorScale { get => _ColorScale; init => _ColorScale = value; }
 
 		#endregion
 
@@ -235,6 +258,13 @@ namespace Zeiss.PiWeb.Volume
 					}
 				}
 
+				if( ColorScale is not null )
+				{
+					writer.WriteStartElement( "ColorScale" );
+					ColorScale.Write( writer );
+					writer.WriteEndElement();
+				}
+
 				writer.WriteEndElement();
 				writer.WriteEndDocument();
 			}
@@ -264,22 +294,22 @@ namespace Zeiss.PiWeb.Volume
 						result.FileVersion = new Version( reader.ReadString() );
 						break;
 					case "SizeX":
-						result.SizeX = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						result._SizeX = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 						break;
 					case "SizeY":
-						result.SizeY = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						result._SizeY = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 						break;
 					case "SizeZ":
-						result.SizeZ = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						result._SizeZ = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 						break;
 					case "ResolutionX":
-						result.ResolutionX = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						result._ResolutionX = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 						break;
 					case "ResolutionY":
-						result.ResolutionY = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						result._ResolutionY = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 						break;
 					case "ResolutionZ":
-						result.ResolutionZ = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						result._ResolutionZ = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 						break;
 					case "Property":
 						var property = Property.Deserialize( reader );
@@ -287,13 +317,16 @@ namespace Zeiss.PiWeb.Volume
 							result.Properties.Add( property );
 						break;
 					case "PositionX":
-						result.PositionX = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						result._PositionX = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 						break;
 					case "PositionY":
-						result.PositionY = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						result._PositionY = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 						break;
 					case "PositionZ":
-						result.PositionZ = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						result._PositionZ = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+						break;
+					case "ColorScale":
+						result._ColorScale = ColorScale.Read( reader );
 						break;
 				}
 			}

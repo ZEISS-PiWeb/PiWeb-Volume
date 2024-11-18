@@ -15,8 +15,8 @@ namespace Zeiss.PiWeb.Volume.Block;
 
 using System;
 using System.Buffers;
-using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -41,37 +41,49 @@ internal static class BlockVolumeDecoder
 		IProgress<VolumeSliceDefinition>? progress = null,
 		CancellationToken ct = default )
 	{
-		var reader = new BinaryReader( new MemoryStream( data ) );
-		var (_, sizeX, sizeY, sizeZ, quantization) = BlockVolumeMetaData.Read( reader );
+		var header = BlockVolumeMetaData.Create( data );
+		var (_, sizeX, sizeY, sizeZ, quantization) = header;
 		var (bcx, bcy, bcz) = BlockVolume.GetBlockCount( sizeX, sizeY, sizeZ );
 		var blockCount = bcx * bcy;
 		var encodedBlockInfos = new EncodedBlockInfo[ blockCount ];
+		var position = BlockVolumeMetaData.HeaderLength;
+		var dataSpan = data.AsSpan();
+
+		Quantization.Invert( quantization );
 
 		for( ushort biz = 0; biz < bcz; biz++ )
 		{
 			ct.ThrowIfCancellationRequested();
 
-			var layerLength = reader.ReadInt32();
+			var layerLength = MemoryMarshal.Read<int>( dataSpan.Slice( position, sizeof( int ) ) );
+			position += sizeof( int );
 			if( layerPredicate?.Invoke( biz ) is false )
 			{
-				reader.BaseStream.Seek( layerLength, SeekOrigin.Current );
+				position += layerLength;
 				continue;
 			}
 
-			ReadBlockInfos( reader, blockCount, encodedBlockInfos );
+			ReadLayer( dataSpan, position, blockCount, encodedBlockInfos );
 			DecodeLayer( data, encodedBlockInfos, bcx, bcy, biz, quantization, blockPredicate, blockAction );
 
 			progress?.Report( new VolumeSliceDefinition( Direction.Z, (ushort)( biz * BlockVolume.N ) ) );
+
+			position += layerLength;
 		}
 	}
 
-	private static void ReadBlockInfos( BinaryReader reader, int blockCount, EncodedBlockInfo[] encodedBlockInfos )
+	private static void ReadLayer( ReadOnlySpan<byte> dataSpan, int position, int blockCount, EncodedBlockInfo[] encodedBlockInfos )
 	{
 		for( var i = 0; i < blockCount; i++ )
 		{
-			var encodedBlockInfo = EncodedBlockInfo.Read( reader );
-			reader.BaseStream.Seek( encodedBlockInfo.Info.Length, SeekOrigin.Current );
+			var value = MemoryMarshal.Read<ushort>( dataSpan[ position.. ] );
+
+			position += sizeof( ushort );
+
+			var encodedBlockInfo = new EncodedBlockInfo( position, BlockInfo.Create( value ) );
 			encodedBlockInfos[ i ] = encodedBlockInfo;
+
+			position += encodedBlockInfo.Info.Length;
 		}
 	}
 
@@ -85,50 +97,71 @@ internal static class BlockVolumeDecoder
 		BlockPredicate? blockPredicate,
 		BlockAction blockAction )
 	{
-		Parallel.For( 0, blockCountX * blockCountY, () => (
-				ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
-				ArrayPool<double>.Shared.Rent( BlockVolume.N3 ),
-				ArrayPool<byte>.Shared.Rent( BlockVolume.N3 )
-			), ( index, _, buffers ) =>
-			{
-				var blockIndexX = index % blockCountX;
-				var blockIndexY = index / blockCountX;
-				var blockIndex = new BlockIndex( (ushort)blockIndexX, (ushort)blockIndexY, blockIndexZ );
+#if DEBUG
+		var buffers = new DecodingBuffers();
+		for( var index = 0; index < blockCountX * blockCountY; index++ )
+		{
+#else
+		Parallel.For( 0, blockCountX * blockCountY, () => new DecodingBuffers(), ( index, _, buffers ) =>
+		{
+#endif
+			var blockIndexX = index % blockCountX;
+			var blockIndexY = index / blockCountX;
+			var blockIndex = new BlockIndex( (ushort)blockIndexX, (ushort)blockIndexY, blockIndexZ );
 
-				if( blockPredicate?.Invoke( blockIndex ) == false )
-					return buffers;
-
-				var doubleBuffer1 = buffers.Item1.AsSpan( 0, BlockVolume.N3 );
-				var doubleBuffer2 = buffers.Item2.AsSpan( 0, BlockVolume.N3 );
-				var byteBuffer = buffers.Item3.AsSpan( 0, BlockVolume.N3 );
-				var encodedBlockInfo = encodedBlockInfos[ index ];
-
-				//1. Dediscretization
-				ReadBlock( encodedBlocks.AsSpan(), encodedBlockInfo, doubleBuffer1 );
-
-				//2. ZigZag
-				ZigZag.Reverse( doubleBuffer1, doubleBuffer2 );
-
-				//3. Quantization
-				Quantization.Apply( quantization.AsSpan(), doubleBuffer2 );
-
-				//4. Cosine transform
-				DiscreteCosineTransform.Transform( doubleBuffer2, doubleBuffer1, true );
-
-				//5. Discretization
-				for( var i = 0; i < BlockVolume.N3; i++ )
-					byteBuffer[ i ] = (byte)Math.Clamp( doubleBuffer1[ i ], byte.MinValue, byte.MaxValue );
-
-				blockAction( byteBuffer, blockIndex );
-
+			if( blockPredicate?.Invoke( blockIndex ) == false )
+#if DEBUG
+				continue;
+#else
 				return buffers;
-			},
-			buffers =>
-			{
-				ArrayPool<double>.Shared.Return( buffers.Item1 );
-				ArrayPool<double>.Shared.Return( buffers.Item2 );
-				ArrayPool<byte>.Shared.Return( buffers.Item3 );
-			} );
+#endif
+
+			var inputSpan = buffers.InputBuffer.AsSpan( 0, BlockVolume.N3 );
+			var outputSpan = buffers.OutputBuffer.AsSpan( 0, BlockVolume.N3 );
+			var resultSpan = buffers.ResultBuffer.AsSpan( 0, BlockVolume.N3 );
+			var encodedBlockInfo = encodedBlockInfos[ index ];
+
+			//1. Dediscretization
+			ReadBlock( encodedBlocks.AsSpan(), encodedBlockInfo, inputSpan );
+
+			//2. ZigZag
+			ZigZag.Reverse( inputSpan, outputSpan );
+
+			var nonEmptyVectors = FindNonEmptyVectors( outputSpan );
+
+			//3. Quantization
+			Quantization.Apply( quantization.AsSpan(), outputSpan );
+
+			//4. Cosine transform
+			DiscreteCosineTransform.Transform( outputSpan, inputSpan, true, nonEmptyVectors );
+
+			//5. Discretization
+			for( var i = 0; i < BlockVolume.N3; i++ )
+				resultSpan[ i ] = (byte)Math.Clamp( inputSpan[ i ], byte.MinValue, byte.MaxValue );
+
+			blockAction( resultSpan, blockIndex );
+#if DEBUG
+		}
+
+		buffers.Return();
+#else
+			return buffers;
+		}, buffers => buffers.Return() );
+#endif
+	}
+
+	private static ulong FindNonEmptyVectors( Span<double> values )
+	{
+		var vectors = MemoryMarshal.Cast<double, Vector512<double>>( values );
+		var result = 0UL;
+
+		for( ushort i = 0; i < BlockVolume.N2; i++ )
+		{
+			if( Vector512.Sum( Vector512.Abs( vectors[ i ] ) ) > 1e-12 )
+				result |= 1UL << i;
+		}
+
+		return result;
 	}
 
 	private static void ReadBlock( ReadOnlySpan<byte> data, EncodedBlockInfo blockInfo, Span<double> result )
@@ -167,23 +200,21 @@ internal static class BlockVolumeDecoder
 
 	#endregion
 
-	private readonly record struct EncodedBlockInfo( int StartIndex, BlockInfo Info )
+	private readonly struct DecodingBuffers()
 	{
-		#region methods
+		public double[] InputBuffer { get; } = ArrayPool<double>.Shared.Rent( BlockVolume.N3 );
+		public double[] OutputBuffer { get; } = ArrayPool<double>.Shared.Rent( BlockVolume.N3 );
+		public byte[] ResultBuffer { get; } = ArrayPool<byte>.Shared.Rent( BlockVolume.N3 );
 
-		/// <summary>
-		/// Reads the encoded block info from the specified <paramref name="reader"/>
-		/// </summary>
-		public static EncodedBlockInfo Read( BinaryReader reader )
+		public void Return()
 		{
-			var info = BlockInfo.Read( reader );
-			var startIndex = (int)reader.BaseStream.Position;
-
-			return new EncodedBlockInfo( startIndex, info );
+			ArrayPool<double>.Shared.Return( InputBuffer );
+			ArrayPool<double>.Shared.Return( OutputBuffer );
+			ArrayPool<byte>.Shared.Return( ResultBuffer );
 		}
-
-		#endregion
 	}
+
+	private readonly record struct EncodedBlockInfo( int StartIndex, BlockInfo Info );
 
 	internal delegate void BlockAction( ReadOnlySpan<byte> data, BlockIndex index );
 
