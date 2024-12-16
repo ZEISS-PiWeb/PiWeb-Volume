@@ -57,10 +57,7 @@ internal class BlockVolumeDecompressor
 	/// </summary>
 	internal VolumeSlice[] Decompress( IProgress<VolumeSliceDefinition>? progress = null, CancellationToken ct = default )
 	{
-		if( _Volume.CompressedData[ Direction.Z ] is not { } data )
-			throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
-
-		BlockVolumeDecoder.Decode( data, CopyBlockToResult, null, null, progress, ct );
+		BlockVolumeDecoder.Decode( _Volume, Direction.Z, CopyBlockToResult, null, null, progress, ct );
 
 		return _Result
 			.AsParallel()

@@ -66,12 +66,9 @@ internal class BlockVolumePreviewCreator
 
 	internal UncompressedVolume CreatePreview( IProgress<VolumeSliceDefinition>? progress, CancellationToken ct )
 	{
-		if( _Volume.CompressedData[ Direction.Z ] is not {} data )
-			throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
-
 		var result = VolumeSliceHelper.CreateSliceBuffer( _PreviewSizeX, _PreviewSizeY, _PreviewSizeZ );
 
-		BlockVolumeDecoder.Decode( data, ( block, index ) =>
+		BlockVolumeDecoder.Decode( _Volume, Direction.Z, ( block, index ) =>
 		{
 			for( var bz = 0; bz < BlockVolume.N; bz++ )
 			for( var by = 0; by < BlockVolume.N; by++ )

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 #endregion
@@ -81,19 +82,76 @@ public class BlockVolume : CompressedVolume
 
 	internal BlockVolume( VolumeMetadata metadata, VolumeCompressionOptions options, DirectionMap compressedData )
 		: base( metadata, options, compressedData )
-	{ }
+	{
+		if( compressedData[ Direction.Z ] is not { } data )
+			throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
+
+		Data = data;
+		BlockVolumeMetaData = BlockVolumeMetaData.Create( data );
+		InverseQuantization = Quantization.Invert( BlockVolumeMetaData.Quantization );
+		EncodedBlockInfos = ReadEncodedBlocks( data, BlockVolumeMetaData );
+	}
 
 	internal BlockVolume( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress )
-		: base( metadata, options, CreateDirectionMap( input, metadata, options, progress ) )
+		: this( metadata, options, CreateDirectionMap( input, metadata, options, progress ) )
 	{ }
 
 	internal BlockVolume( IReadOnlyList<VolumeSlice> slices, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress )
-		: base( metadata, options, CreateDirectionMap( slices, metadata, options, progress ) )
+		: this( metadata, options, CreateDirectionMap( slices, metadata, options, progress ) )
 	{ }
 
 	#endregion
 
+	#region properties
+
+	internal byte[] Data { get; }
+
+	internal BlockVolumeMetaData BlockVolumeMetaData { get; }
+
+	internal double[] InverseQuantization { get; }
+
+	internal EncodedBlockInfo[] EncodedBlockInfos { get; }
+
+	#endregion
+
 	#region methods
+
+	private static EncodedBlockInfo[] ReadEncodedBlocks( byte[] data, BlockVolumeMetaData metaData )
+	{
+		var (bcx, bcy, bcz) = metaData.GetBlockCount();
+
+		var result = new EncodedBlockInfo[ bcx * bcy * bcz ];
+		var layerBlockCount = bcx * bcy;
+		var position = BlockVolumeMetaData.HeaderLength;
+		var dataSpan = data.AsSpan();
+
+		for( ushort biz = 0; biz < bcz; biz++ )
+		{
+			var encodedBlockInfoLayer = result.AsSpan().Slice( bcx * bcy * biz, bcx * bcy );
+			var layerLength = MemoryMarshal.Read<int>( dataSpan.Slice( position, sizeof( int ) ) );
+			position += sizeof( int );
+
+			ReadLayer( dataSpan, position, layerBlockCount, encodedBlockInfoLayer );
+			position += layerLength;
+		}
+
+		return result;
+	}
+
+	private static void ReadLayer( ReadOnlySpan<byte> dataSpan, int position, int blockCount, Span<EncodedBlockInfo> encodedBlockInfos )
+	{
+		for( var i = 0; i < blockCount; i++ )
+		{
+			var value = MemoryMarshal.Read<ushort>( dataSpan[ position.. ] );
+
+			position += sizeof( ushort );
+
+			var encodedBlockInfo = new EncodedBlockInfo( position, BlockInfo.Create( value ) );
+			encodedBlockInfos[ i ] = encodedBlockInfo;
+
+			position += encodedBlockInfo.Info.Length;
+		}
+	}
 
 	private static DirectionMap CreateDirectionMap(
 		IReadOnlyList<VolumeSlice> slices,
@@ -133,28 +191,6 @@ public class BlockVolume : CompressedVolume
 		{
 			logger?.Log( LogLevel.Info, $"Decompressed block volume in {sw.ElapsedMilliseconds} ms." );
 		}
-	}
-
-	internal static (ushort X, ushort Y, ushort Z) GetBlockCount( BlockVolumeMetaData metaData )
-	{
-		return GetBlockCount( metaData.SizeX, metaData.SizeY, metaData.SizeZ );
-	}
-
-	internal static (ushort X, ushort Y, ushort Z) GetBlockCount( ushort sizeX, ushort sizeY, ushort sizeZ )
-	{
-		var bcz = sizeZ / N;
-		if( bcz * N < sizeZ )
-			bcz++;
-
-		var bcy = sizeY / N;
-		if( bcy * N < sizeY )
-			bcy++;
-
-		var bcx = sizeX / N;
-		if( bcx * N < sizeX )
-			bcx++;
-
-		return ( (ushort)bcx, (ushort)bcy, (ushort)bcz );
 	}
 
 	/// <inheritdoc />
@@ -229,4 +265,6 @@ public class BlockVolume : CompressedVolume
 	}
 
 	#endregion
+
+	internal readonly record struct EncodedBlockInfo( int StartIndex, BlockInfo Info );
 }
