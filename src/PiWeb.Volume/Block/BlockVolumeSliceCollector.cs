@@ -30,11 +30,13 @@ internal class BlockVolumeSliceCollector
 	private readonly ushort _SizeY;
 	private readonly ushort _SizeX;
 	private readonly byte[] _SliceBuffer;
-	private readonly VolumeRange _RangeX;
-	private readonly VolumeRange _RangeY;
-	private readonly VolumeRange _RangeZ;
+	private readonly VolumeRange? _RangeU;
+	private readonly VolumeRange? _RangeV;
 	private readonly ushort _Index;
 	private readonly BlockVolumeDecoder.BlockAction _BlockAction;
+	private readonly Direction _Direction;
+	private readonly ushort _BlockLayer;
+	private readonly BlockVolumeDecoder.BlockPredicate _BlockPredicate;
 
 	#endregion
 
@@ -44,71 +46,46 @@ internal class BlockVolumeSliceCollector
 	{
 		_Volume = volume;
 		_Index = definition.Index;
+		_Direction = definition.Direction;
 		_SliceBuffer = sliceBuffer;
 
 		_SizeZ = volume.Metadata.SizeZ;
 		_SizeY = volume.Metadata.SizeY;
 		_SizeX = volume.Metadata.SizeX;
 
-		var (bsx, bsy, bsz) = BlockVolume.GetBlockCount( _SizeX, _SizeY, _SizeZ );
-		var blockIndex = (ushort)( definition.Index / BlockVolume.N );
+		_BlockLayer = (ushort)( definition.Index / BlockVolume.N );
 
-		_RangeX = new VolumeRange( 0, (ushort)( bsx - 1 ) );
-		_RangeY = new VolumeRange( 0, (ushort)( bsy - 1 ) );
-		_RangeZ = new VolumeRange( 0, (ushort)( bsz - 1 ) );
+		if( definition.RegionOfInterest is { } region )
+		{
+			_RangeU = new VolumeRange(
+				(ushort)( region.U.Start / BlockVolume.N ),
+				(ushort)( region.U.End / BlockVolume.N ) );
+			_RangeV = new VolumeRange(
+				(ushort)( region.V.Start / BlockVolume.N ),
+				(ushort)( region.V.End / BlockVolume.N ) );
+		}
+
 
 		switch( definition.Direction )
 		{
 			case Direction.Z:
 			{
-				_RangeZ = new VolumeRange( blockIndex, blockIndex );
-				_BlockAction = ReadZSlice;
-				if( definition.RegionOfInterest is not { } region )
-					break;
-
-				_RangeX = new VolumeRange(
-					(ushort)( region.U.Start / BlockVolume.N ),
-					(ushort)( region.U.End / BlockVolume.N ) );
-				_RangeY = new VolumeRange(
-					(ushort)( region.V.Start / BlockVolume.N ),
-					(ushort)( region.V.End / BlockVolume.N ) );
-
+				_BlockPredicate = BlockPredicateZ;
+				_BlockAction = BlockActionZ;
 				break;
 			}
 
 			case Direction.Y:
 			{
-				_RangeY = new VolumeRange( blockIndex, blockIndex );
-				_BlockAction = ReadYSlice;
-
-				if( definition.RegionOfInterest is not { } region )
-					break;
-
-				_RangeX = new VolumeRange(
-					(ushort)( region.U.Start / BlockVolume.N ),
-					(ushort)( region.U.End / BlockVolume.N ) );
-				_RangeZ = new VolumeRange(
-					(ushort)( region.V.Start / BlockVolume.N ),
-					(ushort)( region.V.End / BlockVolume.N ) );
-
+				_BlockPredicate = BlockPredicateY;
+				_BlockAction = BlockActionY;
 				break;
 			}
 
 			case Direction.X:
 			{
-				_RangeX = new VolumeRange( blockIndex, blockIndex );
-				_BlockAction = ReadXSlice;
-
-				if( definition.RegionOfInterest is not { } region )
-					break;
-
-				_RangeY = new VolumeRange(
-					(ushort)( region.U.Start / BlockVolume.N ),
-					(ushort)( region.U.End / BlockVolume.N ) );
-				_RangeZ = new VolumeRange(
-					(ushort)( region.V.Start / BlockVolume.N ),
-					(ushort)( region.V.End / BlockVolume.N ) );
-
+				_BlockPredicate = BlockPredicateX;
+				_BlockAction = BlockActionX;
 				break;
 			}
 
@@ -123,24 +100,36 @@ internal class BlockVolumeSliceCollector
 
 	internal void CollectSlice( IProgress<VolumeSliceDefinition>? progress, CancellationToken ct )
 	{
-		if( _Volume.CompressedData[ Direction.Z ] is not { } data )
-			throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
-
-		BlockVolumeDecoder.Decode( data, _BlockAction, LayerPredicate, BlockPredicate, progress, ct );
+		BlockVolumeDecoder.Decode( _Volume, _Direction, _BlockAction, LayerPredicate, _BlockPredicate, progress, ct );
 	}
 
 	private bool LayerPredicate( ushort layerIndex )
 	{
-		return _RangeZ.Contains( layerIndex );
+		return _BlockLayer == layerIndex;
 	}
 
-	private bool BlockPredicate( BlockIndex blockIndex )
+	private bool BlockPredicateX( BlockIndex blockIndex )
 	{
-		//Z is already tested by the layer predicate
-		return _RangeX.Contains( blockIndex.X ) && _RangeY.Contains( blockIndex.Y );
+		return
+			( _RangeU is null || _RangeU.Value.Contains( blockIndex.Y ) ) &&
+			( _RangeV is null || _RangeV.Value.Contains( blockIndex.Z ) );
 	}
 
-	private void ReadZSlice( ReadOnlySpan<byte> block, BlockIndex index )
+	private bool BlockPredicateY( BlockIndex blockIndex )
+	{
+		return
+			( _RangeU is null || _RangeU.Value.Contains( blockIndex.X ) ) &&
+			( _RangeV is null || _RangeV.Value.Contains( blockIndex.Z ) );
+	}
+
+	private bool BlockPredicateZ( BlockIndex blockIndex )
+	{
+		return
+			( _RangeU is null || _RangeU.Value.Contains( blockIndex.X ) ) &&
+			( _RangeV is null || _RangeV.Value.Contains( blockIndex.Y ) );
+	}
+
+	private void BlockActionZ( ReadOnlySpan<byte> block, BlockIndex index )
 	{
 		var bz = _Index - index.Z * BlockVolume.N;
 		if( bz is < 0 or > BlockVolume.N )
@@ -165,7 +154,7 @@ internal class BlockVolumeSliceCollector
 		}
 	}
 
-	private void ReadYSlice( ReadOnlySpan<byte> block, BlockIndex index )
+	private void BlockActionY( ReadOnlySpan<byte> block, BlockIndex index )
 	{
 		var by = _Index - index.Y * BlockVolume.N;
 		if( by is < 0 or > BlockVolume.N )
@@ -189,7 +178,7 @@ internal class BlockVolumeSliceCollector
 		}
 	}
 
-	private void ReadXSlice( ReadOnlySpan<byte> block, BlockIndex index )
+	private void BlockActionX( ReadOnlySpan<byte> block, BlockIndex index )
 	{
 		var bx = _Index - index.X * BlockVolume.N;
 		if( bx is < 0 or > BlockVolume.N )

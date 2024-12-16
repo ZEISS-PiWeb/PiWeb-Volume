@@ -73,7 +73,7 @@ internal static class BlockVolumeEncoder
 	private static IEnumerable<byte[][]> EnumerateBlockLayersFromStream( Stream input, BlockVolumeMetaData metadata )
 	{
 		var z = 0;
-		var (_, _, layerCount) = BlockVolume.GetBlockCount( metadata );
+		var (_, _, layerCount) = metadata.GetBlockCount();
 		var layerBuffer = new byte[ BlockVolume.N ][];
 		var layerLength = metadata.SizeX * metadata.SizeY;
 
@@ -96,7 +96,7 @@ internal static class BlockVolumeEncoder
 	{
 		var z = 0;
 		var buffer = new byte[ BlockVolume.N ][];
-		var (_, _, layerCount) = BlockVolume.GetBlockCount( metadata );
+		var (_, _, layerCount) = metadata.GetBlockCount();
 
 		for( var layerIndex = 0; layerIndex < layerCount; layerIndex++ )
 		{
@@ -109,7 +109,7 @@ internal static class BlockVolumeEncoder
 
 	private static void Encode( IEnumerable<byte[][]> blockLayers, Stream output, BlockVolumeMetaData metadata, IProgress<VolumeSliceDefinition>? progress )
 	{
-		var (bcx, bcy, _) = BlockVolume.GetBlockCount( metadata );
+		var (bcx, bcy, _) = metadata.GetBlockCount();
 
 		var blockCount = bcx * bcy;
 		var inputBlocks = new double[ blockCount ][];
@@ -231,7 +231,7 @@ internal static class BlockVolumeEncoder
 		var sy = metadata.SizeY;
 		var sz = metadata.SizeZ;
 
-		var (bcx, bcy, _) = BlockVolume.GetBlockCount( metadata );
+		var (bcx, bcy, _) = metadata.GetBlockCount();
 
 		Parallel.For( 0, bcx * bcy, blockIndex =>
 		{
