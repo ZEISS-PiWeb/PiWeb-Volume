@@ -97,10 +97,7 @@ internal class BlockVolumeSliceRangeCollector
 
 	internal VolumeSliceCollection CollectSliceRanges( IProgress<VolumeSliceDefinition>? progress, CancellationToken ct )
 	{
-		if( _Volume.CompressedData[ Direction.Z ] is not { } data )
-			throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
-
-		BlockVolumeDecoder.Decode( data, BlockAction, LayerPredicate, BlockPredicate, progress, ct );
+		BlockVolumeDecoder.Decode( _Volume, Direction.Z, BlockAction, LayerPredicate, BlockPredicate, progress, ct );
 
 		return new VolumeSliceCollection(
 			_SlicesX.Values

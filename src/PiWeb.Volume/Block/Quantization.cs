@@ -32,10 +32,13 @@ internal static class Quantization
 	/// <summary>
 	/// Invert a quantization matrix.
 	/// </summary>
-	public static void Invert( double[] quantization )
+	public static double[] Invert( double[] quantization )
 	{
+		var result = new double[ quantization.Length ];
 		for( var i = 0; i < BlockVolume.N3; i++ )
-			quantization[ i ] = 1.0 / quantization[ i ];
+			result[ i ] = 1.0 / quantization[ i ];
+
+		return result;
 	}
 
 	/// <summary>

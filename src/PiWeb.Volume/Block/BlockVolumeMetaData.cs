@@ -70,6 +70,41 @@ public record BlockVolumeMetaData( uint Version, ushort SizeX, ushort SizeY, ush
 
 	#endregion
 
+	internal (ushort, ushort, ushort) GetBlockCount()
+	{
+		return ( GetBlockCount( Direction.X ),
+			GetBlockCount( Direction.Y ),
+			GetBlockCount( Direction.Z ) );
+	}
+
+	internal ushort GetBlockCount( Direction direction )
+	{
+		var size = direction switch
+		{
+			Direction.X => SizeX,
+			Direction.Y => SizeY,
+			Direction.Z => SizeZ,
+			_           => throw new ArgumentOutOfRangeException( nameof( direction ), direction, null )
+		};
+
+		var blocks = size / BlockVolume.N;
+		if( blocks * BlockVolume.N < size )
+			blocks++;
+
+		return (ushort)blocks;
+	}
+
+	internal (ushort, ushort) GetLayerBlockCount( Direction direction )
+	{
+		return direction switch
+		{
+			Direction.X => ( GetBlockCount( Direction.Y ), GetBlockCount( Direction.Z ) ),
+			Direction.Y => ( GetBlockCount( Direction.X ), GetBlockCount( Direction.Z ) ),
+			Direction.Z => ( GetBlockCount( Direction.X ), GetBlockCount( Direction.Y ) ),
+			_           => throw new ArgumentOutOfRangeException( nameof( direction ), direction, null )
+		};
+	}
+
 	/// <summary>
 	/// The number of bytes the header consists of.
 	/// </summary>
