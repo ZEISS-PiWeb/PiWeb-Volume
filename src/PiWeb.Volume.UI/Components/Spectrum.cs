@@ -28,10 +28,10 @@ namespace Zeiss.PiWeb.Volume.UI.Components
 		#region members
 
 		public static readonly DependencyProperty DataProperty = DependencyProperty.Register(
-			"Data", typeof( IReadOnlyCollection<SpectrumData> ), typeof( Spectrum ), new FrameworkPropertyMetadata( default( IReadOnlyCollection<SpectrumData> ), FrameworkPropertyMetadataOptions.AffectsRender ) );
+			"Data", typeof( IReadOnlyCollection<SpectrumData> ), typeof( Spectrum ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.AffectsRender ) );
 
 		public static readonly DependencyProperty LogarithmicScaleProperty = DependencyProperty.Register(
-			"LogarithmicScale", typeof( bool ), typeof( Spectrum ), new FrameworkPropertyMetadata( default( bool ), FrameworkPropertyMetadataOptions.AffectsRender ) );
+			"LogarithmicScale", typeof( bool ), typeof( Spectrum ), new FrameworkPropertyMetadata( false, FrameworkPropertyMetadataOptions.AffectsRender ) );
 
 		private int? _HighlightedIndex;
 

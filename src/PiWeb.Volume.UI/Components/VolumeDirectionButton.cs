@@ -29,7 +29,7 @@ namespace Zeiss.PiWeb.Volume.UI.Components
             "InnerPath", typeof( Geometry ), typeof( VolumeDirectionButton ), new PropertyMetadata( default( Geometry ) ) );
 
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
-            "IsSelected", typeof( bool ), typeof( VolumeDirectionButton ), new PropertyMetadata( default( bool ) ) );
+            "IsSelected", typeof( bool ), typeof( VolumeDirectionButton ), new PropertyMetadata( false ) );
 
         #endregion
 

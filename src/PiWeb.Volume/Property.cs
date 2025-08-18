@@ -369,7 +369,7 @@ namespace Zeiss.PiWeb.Volume
 			}
 			catch( Exception )
 			{
-				result = default;
+				result = TimeSpan.Zero;
 				return false;
 			}
 		}

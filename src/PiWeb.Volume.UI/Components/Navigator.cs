@@ -53,10 +53,10 @@ namespace Zeiss.PiWeb.Volume.UI.Components
             DependencyProperty.Register( "PanButton", typeof( MouseButton ), typeof( Navigator ), new PropertyMetadata( MouseButton.Right ) );
 
         public static readonly DependencyProperty HorizontalPanningProperty = DependencyProperty.Register(
-            "HorizontalPanning", typeof( double ), typeof( Navigator ), new PropertyMetadata( default( double ), OnHorizontalPanningChanged ) );
+            "HorizontalPanning", typeof( double ), typeof( Navigator ), new PropertyMetadata( 0, OnHorizontalPanningChanged ) );
 
         public static readonly DependencyProperty VerticalPanningProperty = DependencyProperty.Register(
-            "VerticalPanning", typeof( double ), typeof( Navigator ), new PropertyMetadata( default( double ), OnVerticelPanningChanged ) );
+            "VerticalPanning", typeof( double ), typeof( Navigator ), new PropertyMetadata( 0, OnVerticelPanningChanged ) );
 
         public static readonly DependencyProperty FitProperty = DependencyProperty.Register(
             "Fit", typeof( Rect ), typeof( Navigator ), new PropertyMetadata( Rect.Empty, OnFitChanged ) );
