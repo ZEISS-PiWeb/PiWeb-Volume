@@ -143,7 +143,7 @@ namespace Zeiss.PiWeb.Volume
 				if( oz % minification == 0 )
 				{
 					var sliceBuffer = VolumeArrayPool.Shared.Rent( sliceBufferSize );
-					stream.Read( sliceBuffer, 0, sliceBufferSize );
+					stream.ReadExactly( sliceBuffer, 0, sliceBufferSize );
 
 					var previewSlizeIndex = z;
 					result.Add( Task.Run( () =>

@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0-windows10.0.22621</TargetFramework>
-    <Platforms>x64</Platforms>
+    <TargetFramework>net9.0-windows10.0.22621</TargetFramework>
+    <Platforms>AnyCPU</Platforms>
     <LangVersion>latestmajor</LangVersion>
     <AssemblyName>PiWeb.Volume.UI</AssemblyName>
     <RootNamespace>Zeiss.PiWeb.Volume.UI</RootNamespace>
-    <Copyright>Copyright © 2020 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>
+    <Copyright>Copyright © 2025 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>
     <Company>Carl Zeiss Industrielle Messtechnik GmbH</Company>
     <Authors>$(Company)</Authors>
     <UseWPF>true</UseWPF>
@@ -15,22 +15,6 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Configurations>Debug;Release;Test;Pack</Configurations>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Pack|x64'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
