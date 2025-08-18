@@ -227,8 +227,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <exception cref="System.ArgumentNullException">writer</exception>
 		internal void Serialize( XmlWriter writer )
 		{
-			if( writer == null )
-				throw new ArgumentNullException( nameof( writer ) );
+			ArgumentNullException.ThrowIfNull( writer );
 
 			var value = GetStringValue();
 
@@ -252,8 +251,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <exception cref="System.NotSupportedException"></exception>
 		internal static Property? Deserialize( XmlReader reader )
 		{
-			if( reader == null )
-				throw new ArgumentNullException( nameof( reader ) );
+			ArgumentNullException.ThrowIfNull( reader );
 
 			var name = reader.GetAttribute( "Name" );
 			if( string.IsNullOrEmpty( name ) )

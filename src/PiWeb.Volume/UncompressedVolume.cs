@@ -165,8 +165,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <inheritdoc />
 		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
 		{
-			if( ranges == null )
-				throw new ArgumentNullException( nameof( ranges ) );
+			ArgumentNullException.ThrowIfNull( ranges );
 
 			var sw = Stopwatch.StartNew();
 

@@ -40,8 +40,7 @@ namespace Zeiss.PiWeb.Volume
 
 		internal FullVolumeWriter( VolumeMetadata metadata, Direction direction, IProgress<VolumeSliceDefinition>? progressNotifier = null, CancellationToken ct = default )
 		{
-			if( metadata == null )
-				throw new ArgumentNullException( nameof( metadata ) );
+			ArgumentNullException.ThrowIfNull( metadata );
 
 			_ProgressNotifier = progressNotifier;
 			_Ct = ct;
