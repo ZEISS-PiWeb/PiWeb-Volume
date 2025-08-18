@@ -27,45 +27,45 @@ namespace Zeiss.PiWeb.Volume.UI.Components
         #region members
 
         public static readonly DependencyProperty ZoomProperty =
-            DependencyProperty.Register( "Zoom", typeof( double ), typeof( Navigator ), new PropertyMetadata( 1.0, OnZoomChanged ) );
+            DependencyProperty.Register( nameof(Zoom), typeof( double ), typeof( Navigator ), new PropertyMetadata( 1.0, OnZoomChanged ) );
 
         public static readonly DependencyProperty MinZoomProperty =
-            DependencyProperty.Register( "MinZoom", typeof( double ), typeof( Navigator ), new PropertyMetadata( 0.1 ) );
+            DependencyProperty.Register( nameof(MinZoom), typeof( double ), typeof( Navigator ), new PropertyMetadata( 0.1 ) );
 
         public static readonly DependencyProperty MaxZoomProperty =
-            DependencyProperty.Register( "MaxZoom", typeof( double ), typeof( Navigator ), new PropertyMetadata( 7.5 ) );
+            DependencyProperty.Register( nameof(MaxZoom), typeof( double ), typeof( Navigator ), new PropertyMetadata( 7.5 ) );
 
         public static readonly DependencyProperty ZoomMarginProperty =
-            DependencyProperty.Register( "ZoomMargin", typeof( Thickness ), typeof( Navigator ), new PropertyMetadata( new Thickness( 15 ), OnZoomMarginChanged ) );
+            DependencyProperty.Register( nameof(ZoomMargin), typeof( Thickness ), typeof( Navigator ), new PropertyMetadata( new Thickness( 15 ), OnZoomMarginChanged ) );
 
         public static readonly DependencyProperty ZoomModifierKeyProperty =
-            DependencyProperty.Register( "ZoomModifierKey", typeof( ModifierKeys ), typeof( Navigator ), new PropertyMetadata( ModifierKeys.Control ) );
+            DependencyProperty.Register( nameof(ZoomModifierKey), typeof( ModifierKeys ), typeof( Navigator ), new PropertyMetadata( ModifierKeys.Control ) );
 
-        public static readonly DependencyProperty IsZoomEnabledProperty =
-            DependencyProperty.Register( "IsZoomEnabled", typeof( bool ), typeof( Navigator ),
-                                         new PropertyMetadata( false ) );
+		public static readonly DependencyProperty IsZoomEnabledProperty =
+			DependencyProperty.Register( nameof( IsZoomEnabled ), typeof( bool ), typeof( Navigator ),
+				new PropertyMetadata( false ) );
 
-        public static readonly DependencyProperty IsPanningEnabledProperty =
-            DependencyProperty.Register( "IsPanningEnabled", typeof( bool ), typeof( Navigator ),
-                                         new PropertyMetadata( false ) );
+		public static readonly DependencyProperty IsPanningEnabledProperty =
+			DependencyProperty.Register( nameof( IsPanningEnabled ), typeof( bool ), typeof( Navigator ),
+				new PropertyMetadata( false ) );
 
         public static readonly DependencyProperty PanButtonProperty =
-            DependencyProperty.Register( "PanButton", typeof( MouseButton ), typeof( Navigator ), new PropertyMetadata( MouseButton.Right ) );
+            DependencyProperty.Register( nameof(PanButton), typeof( MouseButton ), typeof( Navigator ), new PropertyMetadata( MouseButton.Right ) );
 
         public static readonly DependencyProperty HorizontalPanningProperty = DependencyProperty.Register(
-            "HorizontalPanning", typeof( double ), typeof( Navigator ), new PropertyMetadata( 0, OnHorizontalPanningChanged ) );
+            nameof(HorizontalPanning), typeof( double ), typeof( Navigator ), new PropertyMetadata( 0, OnHorizontalPanningChanged ) );
 
         public static readonly DependencyProperty VerticalPanningProperty = DependencyProperty.Register(
-            "VerticalPanning", typeof( double ), typeof( Navigator ), new PropertyMetadata( 0, OnVerticelPanningChanged ) );
+            nameof(VerticalPanning), typeof( double ), typeof( Navigator ), new PropertyMetadata( 0, OnVerticelPanningChanged ) );
 
         public static readonly DependencyProperty FitProperty = DependencyProperty.Register(
-            "Fit", typeof( Rect ), typeof( Navigator ), new PropertyMetadata( Rect.Empty, OnFitChanged ) );
+            nameof(Fit), typeof( Rect ), typeof( Navigator ), new PropertyMetadata( Rect.Empty, OnFitChanged ) );
 
-        public static readonly DependencyProperty HorizontalRangeProperty = DependencyProperty.Register(
-            "HorizontalRange", typeof( DoubleRange ), typeof( Navigator ), new PropertyMetadata( default( DoubleRange ) ) );
+		public static readonly DependencyProperty HorizontalRangeProperty = DependencyProperty.Register(
+			nameof( HorizontalRange ), typeof( DoubleRange ), typeof( Navigator ), new PropertyMetadata( default( DoubleRange ) ) );
 
-        public static readonly DependencyProperty VerticalRangeProperty = DependencyProperty.Register(
-            "VerticalRange", typeof( DoubleRange ), typeof( Navigator ), new PropertyMetadata( default( DoubleRange ) ) );
+		public static readonly DependencyProperty VerticalRangeProperty = DependencyProperty.Register(
+			nameof( VerticalRange ), typeof( DoubleRange ), typeof( Navigator ), new PropertyMetadata( default( DoubleRange ) ) );
 
 
         public static readonly ICommand ZoomToContentSizeCommand = new RelayCommand<Navigator>( ExecuteZoomToContentSize );

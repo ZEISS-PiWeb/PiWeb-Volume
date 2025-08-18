@@ -23,14 +23,14 @@ namespace Zeiss.PiWeb.Volume.UI.Effects
 	{
 		#region members
 
-		public static readonly DependencyProperty InputProperty = RegisterPixelShaderSamplerProperty( "Input", typeof( DeltaEffect ), 0 );
-		public static readonly DependencyProperty LeftProperty = RegisterPixelShaderSamplerProperty( "Left", typeof( DeltaEffect ), 1 );
-		public static readonly DependencyProperty RightProperty = RegisterPixelShaderSamplerProperty( "Right", typeof( DeltaEffect ), 2 );
-		public static readonly DependencyProperty MinColorProperty = DependencyProperty.Register( "MinColor", typeof( Color ), typeof( DeltaEffect ), new UIPropertyMetadata( Color.FromArgb( 255, 0, 128, 0 ), PixelShaderConstantCallback( 1 ) ) );
-		public static readonly DependencyProperty MidColorProperty = DependencyProperty.Register( "MidColor", typeof( Color ), typeof( DeltaEffect ), new UIPropertyMetadata( Color.FromArgb( 255, 255, 255, 0 ), PixelShaderConstantCallback( 2 ) ) );
-		public static readonly DependencyProperty MaxColorProperty = DependencyProperty.Register( "MaxColor", typeof( Color ), typeof( DeltaEffect ), new UIPropertyMetadata( Color.FromArgb( 255, 255, 0, 0 ), PixelShaderConstantCallback( 3 ) ) );
-		public static readonly DependencyProperty MinProperty = DependencyProperty.Register( "Min", typeof( double ), typeof( DeltaEffect ), new UIPropertyMetadata( 0.02D, PixelShaderConstantCallback( 4 ) ) );
-		public static readonly DependencyProperty MaxProperty = DependencyProperty.Register( "Max", typeof( double ), typeof( DeltaEffect ), new UIPropertyMetadata( 0.05D, PixelShaderConstantCallback( 5 ) ) );
+		public static readonly DependencyProperty InputProperty = RegisterPixelShaderSamplerProperty( nameof( Input ), typeof( DeltaEffect ), 0 );
+		public static readonly DependencyProperty LeftProperty = RegisterPixelShaderSamplerProperty( nameof( Left ), typeof( DeltaEffect ), 1 );
+		public static readonly DependencyProperty RightProperty = RegisterPixelShaderSamplerProperty( nameof( Right ), typeof( DeltaEffect ), 2 );
+		public static readonly DependencyProperty MinColorProperty = DependencyProperty.Register( nameof( MinColor ), typeof( Color ), typeof( DeltaEffect ), new UIPropertyMetadata( Color.FromArgb( 255, 0, 128, 0 ), PixelShaderConstantCallback( 1 ) ) );
+		public static readonly DependencyProperty MidColorProperty = DependencyProperty.Register( nameof( MidColor ), typeof( Color ), typeof( DeltaEffect ), new UIPropertyMetadata( Color.FromArgb( 255, 255, 255, 0 ), PixelShaderConstantCallback( 2 ) ) );
+		public static readonly DependencyProperty MaxColorProperty = DependencyProperty.Register( nameof( MaxColor ), typeof( Color ), typeof( DeltaEffect ), new UIPropertyMetadata( Color.FromArgb( 255, 255, 0, 0 ), PixelShaderConstantCallback( 3 ) ) );
+		public static readonly DependencyProperty MinProperty = DependencyProperty.Register( nameof( Min ), typeof( double ), typeof( DeltaEffect ), new UIPropertyMetadata( 0.02D, PixelShaderConstantCallback( 4 ) ) );
+		public static readonly DependencyProperty MaxProperty = DependencyProperty.Register( nameof( Max ), typeof( double ), typeof( DeltaEffect ), new UIPropertyMetadata( 0.05D, PixelShaderConstantCallback( 5 ) ) );
 
 		#endregion
 

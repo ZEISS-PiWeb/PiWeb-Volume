@@ -23,9 +23,9 @@ namespace Zeiss.PiWeb.Volume.UI.Effects
 	{
 		#region members
 
-		public static readonly DependencyProperty InputProperty = RegisterPixelShaderSamplerProperty( "Input", typeof( ContrastEffect ), 0 );
-		public static readonly DependencyProperty LowProperty = DependencyProperty.Register( "Low", typeof( double ), typeof( ContrastEffect ), new UIPropertyMetadata( 0.0, PixelShaderConstantCallback( 0 ) ) );
-		public static readonly DependencyProperty HighProperty = DependencyProperty.Register( "High", typeof( double ), typeof( ContrastEffect ), new UIPropertyMetadata( 1.0, PixelShaderConstantCallback( 1 ) ) );
+		public static readonly DependencyProperty InputProperty = RegisterPixelShaderSamplerProperty( nameof( Input ), typeof( ContrastEffect ), 0 );
+		public static readonly DependencyProperty LowProperty = DependencyProperty.Register( nameof( Low ), typeof( double ), typeof( ContrastEffect ), new UIPropertyMetadata( 0.0, PixelShaderConstantCallback( 0 ) ) );
+		public static readonly DependencyProperty HighProperty = DependencyProperty.Register( nameof( High ), typeof( double ), typeof( ContrastEffect ), new UIPropertyMetadata( 1.0, PixelShaderConstantCallback( 1 ) ) );
 
 		#endregion
 
