@@ -78,9 +78,9 @@ internal static class DiscreteCosineTransform
 	}
 
 	private static ulong TransformDirection(
-		Span<Vector512<double>> inputVectors,
+		ReadOnlySpan<Vector512<double>> inputVectors,
 		Span<double> result,
-		Span<Vector512<double>> coefficients,
+		ReadOnlySpan<Vector512<double>> coefficients,
 		ulong nonEmptyInputVectors )
 	{
 		result.Clear();
@@ -95,14 +95,14 @@ internal static class DiscreteCosineTransform
 			var input = inputVectors[ p ];
 
 			//This loop is unrolled for performance optimization
-			result[ 0 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 0 ] ) );
-			result[ 1 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 1 ] ) );
-			result[ 2 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 2 ] ) );
-			result[ 3 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 3 ] ) );
-			result[ 4 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 4 ] ) );
-			result[ 5 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 5 ] ) );
-			result[ 6 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 6 ] ) );
-			result[ 7 * BlockVolume.N2 + p ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 7 ] ) );
+			result[ 0 * BlockVolume.N2 + p ] = Vector512.Sum( input * coefficients[ 0 ] );
+			result[ 1 * BlockVolume.N2 + p ] = Vector512.Sum( input * coefficients[ 1 ] );
+			result[ 2 * BlockVolume.N2 + p ] = Vector512.Sum( input * coefficients[ 2 ] );
+			result[ 3 * BlockVolume.N2 + p ] = Vector512.Sum( input * coefficients[ 3 ] );
+			result[ 4 * BlockVolume.N2 + p ] = Vector512.Sum( input * coefficients[ 4 ] );
+			result[ 5 * BlockVolume.N2 + p ] = Vector512.Sum( input * coefficients[ 5 ] );
+			result[ 6 * BlockVolume.N2 + p ] = Vector512.Sum( input * coefficients[ 6 ] );
+			result[ 7 * BlockVolume.N2 + p ] = Vector512.Sum( input * coefficients[ 7 ] );
 
 			nonEmptyResultVectors |= 0x0101010101010101UL << ( p / BlockVolume.N );
 		}

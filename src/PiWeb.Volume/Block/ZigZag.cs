@@ -57,7 +57,7 @@ internal static class ZigZag
 	/// <summary>
 	/// Reorders the buffer so the lower frequencies come first.
 	/// </summary>
-	public static void Apply( Span<double> values, Span<double> result )
+	public static void Apply( ReadOnlySpan<double> values, Span<double> result )
 	{
 		for( var i = 0; i < BlockVolume.N3; i++ )
 			result[ i ] = values[ Values[ i ] ];
@@ -66,7 +66,7 @@ internal static class ZigZag
 	/// <summary>
 	/// Reverses the order performed by the <see cref="Apply"/> method.
 	/// </summary>
-	public static void Reverse( Span<double> values, Span<double> result )
+	public static void Reverse( ReadOnlySpan<double> values, Span<double> result )
 	{
 		for( var i = 0; i < BlockVolume.N3; i++ )
 			result[ Values[ i ] ] = values[ i ];
