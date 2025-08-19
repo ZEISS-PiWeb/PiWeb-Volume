@@ -8,20 +8,19 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.Interfaces
-{
-	#region usings
+namespace Zeiss.PiWeb.Volume.UI.Interfaces;
 
-	using System.Windows;
+#region usings
+
+using System.Windows;
+
+#endregion
+
+public interface IMessageService
+{
+	#region methods
+
+	void ShowMessage( MessageBoxImage image, string message );
 
 	#endregion
-
-	public interface IMessageService
-	{
-		#region methods
-
-		void ShowMessage( MessageBoxImage image, string message );
-
-		#endregion
-	}
 }

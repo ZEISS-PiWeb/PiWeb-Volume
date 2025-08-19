@@ -8,26 +8,25 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume
-{
-	#region usings
+namespace Zeiss.PiWeb.Volume;
 
-	using System;
+#region usings
+
+using System;
+
+#endregion
+
+/// <summary>
+/// Exception that is used when the volume is initialized with invalid slice data.
+/// </summary>
+public sealed class VolumeIntegrityException : Exception
+{
+	#region constructors
+
+	/// <inheritdoc />
+	internal VolumeIntegrityException( string message )
+		: base( message )
+	{ }
 
 	#endregion
-
-	/// <summary>
-	/// Exception that is used when the volume is initialized with invalid slice data.
-	/// </summary>
-	public sealed class VolumeIntegrityException : Exception
-	{
-		#region constructors
-
-		/// <inheritdoc />
-		internal VolumeIntegrityException( string message )
-			: base( message )
-		{ }
-
-		#endregion
-	}
 }

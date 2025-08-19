@@ -1,12 +1,11 @@
 using System.Windows;
 
-namespace Zeiss.PiWeb.Volume.Compare.View
+namespace Zeiss.PiWeb.Volume.Compare.View;
+
+public partial class MainView : Window
 {
-	public partial class MainView : Window
+	public MainView()
 	{
-		public MainView()
-		{
-			InitializeComponent();
-		}
+		InitializeComponent();
 	}
 }

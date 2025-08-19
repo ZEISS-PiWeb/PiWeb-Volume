@@ -8,83 +8,82 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.Effects
+namespace Zeiss.PiWeb.Volume.UI.Effects;
+
+#region usings
+
+using System;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Effects;
+
+#endregion
+
+public class GrayscaleEffect : ShaderEffect
 {
-    #region usings
+	#region members
 
-    using System;
-    using System.Windows;
-    using System.Windows.Media;
-    using System.Windows.Media.Effects;
+	public static readonly DependencyProperty InputProperty = RegisterPixelShaderSamplerProperty( nameof( Input ), typeof( GrayscaleEffect ), 0 );
+	public static readonly DependencyProperty RProperty = DependencyProperty.Register( nameof( R ), typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 0.299, PixelShaderConstantCallback( 0 ) ) );
+	public static readonly DependencyProperty GProperty = DependencyProperty.Register( nameof( G ), typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 0.587, PixelShaderConstantCallback( 1 ) ) );
+	public static readonly DependencyProperty BProperty = DependencyProperty.Register( nameof( B ), typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 0.144, PixelShaderConstantCallback( 2 ) ) );
+	public static readonly DependencyProperty OpacityProperty = DependencyProperty.Register( nameof( Opacity ), typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 1D, PixelShaderConstantCallback( 3 ) ) );
 
-    #endregion
+	#endregion
 
-    public class GrayscaleEffect : ShaderEffect
-    {
-        #region members
+	#region constructors
 
-        public static readonly DependencyProperty InputProperty = RegisterPixelShaderSamplerProperty( nameof( Input ), typeof( GrayscaleEffect ), 0 );
-		public static readonly DependencyProperty RProperty = DependencyProperty.Register( nameof( R ), typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 0.299, PixelShaderConstantCallback( 0 ) ) );
-		public static readonly DependencyProperty GProperty = DependencyProperty.Register( nameof( G ), typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 0.587, PixelShaderConstantCallback( 1 ) ) );
-		public static readonly DependencyProperty BProperty = DependencyProperty.Register( nameof( B ), typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 0.144, PixelShaderConstantCallback( 2 ) ) );
-		public static readonly DependencyProperty OpacityProperty = DependencyProperty.Register( nameof( Opacity ), typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 1D, PixelShaderConstantCallback( 3 ) ) );
+	public GrayscaleEffect()
+	{
+		try
+		{
+			PixelShader = new PixelShader { UriSource = new Uri( "pack://application:,,,/PiWeb.Volume.UI;component/Effects/GrayscaleEffect.ps" ) };
+		}
+		catch( Exception )
+		{
+			// ignored
+		}
 
-        #endregion
+		UpdateShaderValue( InputProperty );
+		UpdateShaderValue( RProperty );
+		UpdateShaderValue( GProperty );
+		UpdateShaderValue( BProperty );
+		UpdateShaderValue( OpacityProperty );
+	}
 
-        #region constructors
+	#endregion
 
-        public GrayscaleEffect()
-        {
-            try
-            {
-                PixelShader = new PixelShader { UriSource = new Uri( "pack://application:,,,/PiWeb.Volume.UI;component/Effects/GrayscaleEffect.ps" ) };
-            }
-            catch( Exception )
-            {
-                // ignored
-            }
+	#region properties
 
-            UpdateShaderValue( InputProperty );
-            UpdateShaderValue( RProperty );
-            UpdateShaderValue( GProperty );
-            UpdateShaderValue( BProperty );
-            UpdateShaderValue( OpacityProperty );
-        }
+	public Brush Input
+	{
+		get => ( Brush ) GetValue( InputProperty );
+		set => SetValue( InputProperty, value );
+	}
 
-        #endregion
+	public double R
+	{
+		get => ( double ) GetValue( RProperty );
+		set => SetValue( RProperty, value );
+	}
 
-        #region properties
+	public double G
+	{
+		get => ( double ) GetValue( GProperty );
+		set => SetValue( GProperty, value );
+	}
 
-        public Brush Input
-        {
-            get => ( Brush ) GetValue( InputProperty );
-            set => SetValue( InputProperty, value );
-        }
+	public double B
+	{
+		get => ( double ) GetValue( BProperty );
+		set => SetValue( BProperty, value );
+	}
 
-        public double R
-        {
-            get => ( double ) GetValue( RProperty );
-            set => SetValue( RProperty, value );
-        }
+	public double Opacity
+	{
+		get => ( double ) GetValue( OpacityProperty );
+		set => SetValue( OpacityProperty, value );
+	}
 
-        public double G
-        {
-            get => ( double ) GetValue( GProperty );
-            set => SetValue( GProperty, value );
-        }
-
-        public double B
-        {
-            get => ( double ) GetValue( BProperty );
-            set => SetValue( BProperty, value );
-        }
-
-        public double Opacity
-        {
-            get => ( double ) GetValue( OpacityProperty );
-            set => SetValue( OpacityProperty, value );
-        }
-
-        #endregion
-    }
+	#endregion
 }

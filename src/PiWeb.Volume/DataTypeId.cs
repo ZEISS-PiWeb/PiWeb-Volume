@@ -8,36 +8,35 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume
+namespace Zeiss.PiWeb.Volume;
+
+/// <summary>
+/// Determines the datatype of a <see cref="Property"/> instance an.
+/// </summary>
+public enum DataTypeId
 {
 	/// <summary>
-	/// Determines the datatype of a <see cref="Property"/> instance an.
+	/// Natural number
 	/// </summary>
-	public enum DataTypeId
-	{
-		/// <summary>
-		/// Natural number
-		/// </summary>
-		Integer = 1,
+	Integer = 1,
 
-		/// <summary>
-		/// Floating point number
-		/// </summary>
-		Double = 2,
+	/// <summary>
+	/// Floating point number
+	/// </summary>
+	Double = 2,
 
-		/// <summary>
-		/// String
-		/// </summary>
-		String = 4,
+	/// <summary>
+	/// String
+	/// </summary>
+	String = 4,
 
-		/// <summary>
-		/// Timestamp
-		/// </summary>
-		DateTime = 16,
+	/// <summary>
+	/// Timestamp
+	/// </summary>
+	DateTime = 16,
 
-		/// <summary>
-		/// Timespan
-		/// </summary>
-		TimeSpan = 32,
-	}
+	/// <summary>
+	/// Timespan
+	/// </summary>
+	TimeSpan = 32,
 }

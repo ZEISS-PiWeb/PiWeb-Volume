@@ -8,33 +8,32 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.View
-{
-	#region usings
+namespace Zeiss.PiWeb.Volume.UI.View;
 
-	using System.Windows;
+#region usings
+
+using System.Windows;
+
+#endregion
+
+public partial class LoadOptionsView
+{
+	#region constructors
+
+	public LoadOptionsView()
+	{
+		InitializeComponent();
+	}
 
 	#endregion
 
-	public partial class LoadOptionsView
+	#region methods
+
+	private void OkButton_Click( object sender, RoutedEventArgs e )
 	{
-		#region constructors
-
-		public LoadOptionsView()
-		{
-			InitializeComponent();
-		}
-
-		#endregion
-
-		#region methods
-
-		private void OkButton_Click( object sender, RoutedEventArgs e )
-		{
-			DialogResult = true;
-			Close();
-		}
-
-		#endregion
+		DialogResult = true;
+		Close();
 	}
+
+	#endregion
 }

@@ -8,31 +8,30 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume
+namespace Zeiss.PiWeb.Volume;
+
+/// <summary>
+/// Log level
+/// </summary>
+public enum LogLevel
 {
 	/// <summary>
-	/// Log level
+	/// Debug information
 	/// </summary>
-	public enum LogLevel
-	{
-		/// <summary>
-		/// Debug information
-		/// </summary>
-		Debug,
+	Debug,
 
-		/// <summary>
-		/// Common information
-		/// </summary>
-		Info,
+	/// <summary>
+	/// Common information
+	/// </summary>
+	Info,
 
-		/// <summary>
-		/// Warnings
-		/// </summary>
-		Warning,
+	/// <summary>
+	/// Warnings
+	/// </summary>
+	Warning,
 
-		/// <summary>
-		/// Errors
-		/// </summary>
-		Error
-	}
+	/// <summary>
+	/// Errors
+	/// </summary>
+	Error
 }
