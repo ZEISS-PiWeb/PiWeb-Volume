@@ -8,27 +8,26 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.Viewer.ViewModel
-{
-	#region usings
+namespace Zeiss.PiWeb.Volume.Viewer.ViewModel;
 
-	using Zeiss.PiWeb.Volume.UI.Interfaces;
-	using Zeiss.PiWeb.Volume.UI.ViewModel;
+#region usings
+
+using Zeiss.PiWeb.Volume.UI.Interfaces;
+using Zeiss.PiWeb.Volume.UI.ViewModel;
+
+#endregion
+
+public class MainViewModel : VolumeManagementViewModel
+{
+	#region constructors
+
+	public MainViewModel(
+		IFileService fileService,
+		IMessageService messageService,
+		IViewService viewService )
+		: base( fileService, messageService, viewService )
+	{
+	}
 
 	#endregion
-
-	public class MainViewModel : VolumeManagementViewModel
-	{
-		#region constructors
-
-		public MainViewModel(
-			IFileService fileService,
-			IMessageService messageService,
-			IViewService viewService )
-			: base( fileService, messageService, viewService )
-		{
-		}
-
-		#endregion
-	}
 }

@@ -8,36 +8,35 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.View
-{
-	#region usings
+namespace Zeiss.PiWeb.Volume.UI.View;
 
-	using System.Windows;
+#region usings
+
+using System.Windows;
+
+#endregion
+
+/// <summary>
+/// Interaction logic for CodecView.xaml
+/// </summary>
+public partial class CodecView : Window
+{
+	#region constructors
+
+	public CodecView()
+	{
+		InitializeComponent();
+	}
 
 	#endregion
 
-	/// <summary>
-	/// Interaction logic for CodecView.xaml
-	/// </summary>
-	public partial class CodecView : Window
+	#region methods
+
+	private void OkButton_Clicked( object sender, RoutedEventArgs e )
 	{
-		#region constructors
-
-		public CodecView()
-		{
-			InitializeComponent();
-		}
-
-		#endregion
-
-		#region methods
-
-		private void OkButton_Clicked( object sender, RoutedEventArgs e )
-		{
-			DialogResult = true;
-			Close();
-		}
-
-		#endregion
+		DialogResult = true;
+		Close();
 	}
+
+	#endregion
 }

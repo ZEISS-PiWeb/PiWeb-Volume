@@ -8,16 +8,15 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.Interfaces
+namespace Zeiss.PiWeb.Volume.UI.Interfaces;
+
+public interface IFileService
 {
-	public interface IFileService
-	{
-		#region methods
+	#region methods
 
-		bool SelectOpenFileName( out string fileName );
+	bool SelectOpenFileName( out string fileName );
 
-		bool SelectSaveFileName( out string fileName );
+	bool SelectSaveFileName( out string fileName );
 
-		#endregion
-	}
+	#endregion
 }

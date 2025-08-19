@@ -8,221 +8,220 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.Components
+namespace Zeiss.PiWeb.Volume.UI.Components;
+
+#region usings
+
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using Zeiss.PiWeb.Volume.UI.Model;
+
+#endregion
+
+public class Ruler : Control
 {
-    #region usings
+	#region members
 
-    using System;
-    using System.Globalization;
-    using System.Linq;
-    using System.Windows;
-    using System.Windows.Controls;
-    using System.Windows.Media;
-    using Zeiss.PiWeb.Volume.UI.Model;
+	public static readonly DependencyProperty ValueRangeProperty =
+		DependencyProperty.Register( nameof( ValueRange ), typeof( DoubleRange? ), typeof( Ruler ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.AffectsRender )
+		);
 
-    #endregion
+	public static readonly DependencyProperty StrokeThicknessProperty =
+		DependencyProperty.Register( nameof( StrokeThickness ), typeof( double ), typeof( Ruler ), new FrameworkPropertyMetadata( 1.0, FrameworkPropertyMetadataOptions.AffectsRender )
+		);
 
-    public class Ruler : Control
-    {
-        #region members
+	public static readonly DependencyProperty StrokeProperty =
+		DependencyProperty.Register( nameof( Stroke ), typeof( Brush ), typeof( Ruler ), new FrameworkPropertyMetadata( Brushes.Black, FrameworkPropertyMetadataOptions.AffectsRender ) );
 
-		public static readonly DependencyProperty ValueRangeProperty =
-			DependencyProperty.Register( nameof( ValueRange ), typeof( DoubleRange? ), typeof( Ruler ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.AffectsRender )
-			);
+	public static readonly DependencyProperty InvertProperty =
+		DependencyProperty.Register( nameof( Invert ), typeof( bool ), typeof( Ruler ), new FrameworkPropertyMetadata( false, FrameworkPropertyMetadataOptions.AffectsRender )
+		);
 
-		public static readonly DependencyProperty StrokeThicknessProperty =
-			DependencyProperty.Register( nameof( StrokeThickness ), typeof( double ), typeof( Ruler ), new FrameworkPropertyMetadata( 1.0, FrameworkPropertyMetadataOptions.AffectsRender )
-			);
-
-		public static readonly DependencyProperty StrokeProperty =
-			DependencyProperty.Register( nameof( Stroke ), typeof( Brush ), typeof( Ruler ), new FrameworkPropertyMetadata( Brushes.Black, FrameworkPropertyMetadataOptions.AffectsRender ) );
-
-		public static readonly DependencyProperty InvertProperty =
-			DependencyProperty.Register( nameof( Invert ), typeof( bool ), typeof( Ruler ), new FrameworkPropertyMetadata( false, FrameworkPropertyMetadataOptions.AffectsRender )
-			);
-
-		public static readonly DependencyProperty HighlightBrushProperty =
-			DependencyProperty.Register( nameof( HighlightBrush ), typeof( Brush ), typeof( Ruler ), new FrameworkPropertyMetadata( Brushes.White, FrameworkPropertyMetadataOptions.AffectsRender )
-			);
+	public static readonly DependencyProperty HighlightBrushProperty =
+		DependencyProperty.Register( nameof( HighlightBrush ), typeof( Brush ), typeof( Ruler ), new FrameworkPropertyMetadata( Brushes.White, FrameworkPropertyMetadataOptions.AffectsRender )
+		);
 
 
-		public static readonly DependencyProperty HighlightedRangeProperty =
-			DependencyProperty.Register( nameof( HighlightedRange ), typeof( DoubleRange? ), typeof( Ruler ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.AffectsRender )
-			);
+	public static readonly DependencyProperty HighlightedRangeProperty =
+		DependencyProperty.Register( nameof( HighlightedRange ), typeof( DoubleRange? ), typeof( Ruler ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.AffectsRender )
+		);
 
-		public static readonly DependencyProperty OrientationProperty =
-			DependencyProperty.Register( nameof( Orientation ), typeof( Orientation ), typeof( Ruler ), new FrameworkPropertyMetadata( Orientation.Horizontal, FrameworkPropertyMetadataOptions.AffectsRender )
-			);
+	public static readonly DependencyProperty OrientationProperty =
+		DependencyProperty.Register( nameof( Orientation ), typeof( Orientation ), typeof( Ruler ), new FrameworkPropertyMetadata( Orientation.Horizontal, FrameworkPropertyMetadataOptions.AffectsRender )
+		);
 
-        #endregion
+	#endregion
 
-        #region properties
+	#region properties
 
-        public DoubleRange? ValueRange
-        {
-            get => ( DoubleRange? ) GetValue( ValueRangeProperty );
-            set => SetCurrentValue( ValueRangeProperty, value );
-        }
-
-
-        public double StrokeThickness
-        {
-            get => ( double ) GetValue( StrokeThicknessProperty );
-            set => SetCurrentValue( StrokeThicknessProperty, value );
-        }
+	public DoubleRange? ValueRange
+	{
+		get => ( DoubleRange? ) GetValue( ValueRangeProperty );
+		set => SetCurrentValue( ValueRangeProperty, value );
+	}
 
 
-        public Brush Stroke
-        {
-            get => ( Brush ) GetValue( StrokeProperty );
-            set => SetCurrentValue( StrokeProperty, value );
-        }
+	public double StrokeThickness
+	{
+		get => ( double ) GetValue( StrokeThicknessProperty );
+		set => SetCurrentValue( StrokeThicknessProperty, value );
+	}
 
 
-        public bool Invert
-        {
-            get => ( bool ) GetValue( InvertProperty );
-            set => SetCurrentValue( InvertProperty, value );
-        }
+	public Brush Stroke
+	{
+		get => ( Brush ) GetValue( StrokeProperty );
+		set => SetCurrentValue( StrokeProperty, value );
+	}
 
 
-        public Brush HighlightBrush
-        {
-            get => ( Brush ) GetValue( HighlightBrushProperty );
-            set => SetCurrentValue( HighlightBrushProperty, value );
-        }
+	public bool Invert
+	{
+		get => ( bool ) GetValue( InvertProperty );
+		set => SetCurrentValue( InvertProperty, value );
+	}
 
-        public DoubleRange? HighlightedRange
-        {
-            get => ( DoubleRange? ) GetValue( HighlightedRangeProperty );
-            set => SetCurrentValue( HighlightedRangeProperty, value );
-        }
 
-        public Orientation Orientation
-        {
-            get => ( Orientation ) GetValue( OrientationProperty );
-            set => SetCurrentValue( OrientationProperty, value );
-        }
+	public Brush HighlightBrush
+	{
+		get => ( Brush ) GetValue( HighlightBrushProperty );
+		set => SetCurrentValue( HighlightBrushProperty, value );
+	}
 
-        #endregion
+	public DoubleRange? HighlightedRange
+	{
+		get => ( DoubleRange? ) GetValue( HighlightedRangeProperty );
+		set => SetCurrentValue( HighlightedRangeProperty, value );
+	}
 
-        #region methods
+	public Orientation Orientation
+	{
+		get => ( Orientation ) GetValue( OrientationProperty );
+		set => SetCurrentValue( OrientationProperty, value );
+	}
 
-        private static double CalculateStep( double valueRangeSize, double drawingRangeSize )
-        {
-            var step = 1.0;
-            var pxperstep = drawingRangeSize / valueRangeSize * step;
+	#endregion
 
-            while( pxperstep < 5.0 || pxperstep > 10 )
-            {
-                if( pxperstep < 5.0 ) step *= 2;
-                else if( pxperstep > 10.0 ) step /= 2;
+	#region methods
 
-                pxperstep = drawingRangeSize / valueRangeSize * step;
-            }
+	private static double CalculateStep( double valueRangeSize, double drawingRangeSize )
+	{
+		var step = 1.0;
+		var pxperstep = drawingRangeSize / valueRangeSize * step;
 
-            return step;
-        }
+		while( pxperstep < 5.0 || pxperstep > 10 )
+		{
+			if( pxperstep < 5.0 ) step *= 2;
+			else if( pxperstep > 10.0 ) step /= 2;
 
-        protected override void OnRender( DrawingContext ctx )
-        {
-            if( ActualWidth <= 0 || ActualHeight <= 0 )
-                return;
+			pxperstep = drawingRangeSize / valueRangeSize * step;
+		}
 
-            if( ValueRange is null || ValueRange.Value.Size <= 0 )
-                return;
+		return step;
+	}
 
-            var pen = new Pen( Stroke, StrokeThickness );
+	protected override void OnRender( DrawingContext ctx )
+	{
+		if( ActualWidth <= 0 || ActualHeight <= 0 )
+			return;
 
-            ctx.PushGuidelineSet( new GuidelineSet( new[] { pen.Thickness / 2 }, new[] { pen.Thickness / 2 } ) );
+		if( ValueRange is null || ValueRange.Value.Size <= 0 )
+			return;
 
-            var valueRange = Invert
-	            ? new DoubleRange( ValueRange.Value.Stop, ValueRange.Value.Start )
-	            : new DoubleRange( ValueRange.Value.Start, ValueRange.Value.Stop );
+		var pen = new Pen( Stroke, StrokeThickness );
 
-            var w = ActualWidth;
-            var h = ActualHeight;
+		ctx.PushGuidelineSet( new GuidelineSet( new[] { pen.Thickness / 2 }, new[] { pen.Thickness / 2 } ) );
 
-            if( Orientation == Orientation.Vertical )
-            {
-                var rotation = new RotateTransform( 90 );
-                var translation = new TranslateTransform( 0.0, -ActualWidth );
+		var valueRange = Invert
+			? new DoubleRange( ValueRange.Value.Stop, ValueRange.Value.Start )
+			: new DoubleRange( ValueRange.Value.Start, ValueRange.Value.Stop );
 
-                ctx.PushTransform( rotation );
-                ctx.PushTransform( translation );
+		var w = ActualWidth;
+		var h = ActualHeight;
 
-                w = ActualHeight;
-                h = ActualWidth;
-            }
+		if( Orientation == Orientation.Vertical )
+		{
+			var rotation = new RotateTransform( 90 );
+			var translation = new TranslateTransform( 0.0, -ActualWidth );
 
-            DrawRuler( ctx, w, h, pen, valueRange );
+			ctx.PushTransform( rotation );
+			ctx.PushTransform( translation );
 
-            if( Orientation == Orientation.Vertical )
-            {
-                ctx.Pop();
-                ctx.Pop();
-            }
+			w = ActualHeight;
+			h = ActualWidth;
+		}
 
-            ctx.Pop();
-        }
+		DrawRuler( ctx, w, h, pen, valueRange );
 
-        private void DrawRuler( DrawingContext ctx, double w, double h, Pen pen, DoubleRange valueRange )
-        {
-	        ctx.DrawRectangle( Background, null, new Rect( 0, 0, w, h ) );
-	        ctx.DrawLine( pen, new Point( 0, h ), new Point( w, h ) );
+		if( Orientation == Orientation.Vertical )
+		{
+			ctx.Pop();
+			ctx.Pop();
+		}
 
-	        var step = CalculateStep( valueRange.Size, w );
-	        var drawingRange = new DoubleRange( 0, w );
+		ctx.Pop();
+	}
 
-	        DrawHighlight( ctx, h, valueRange, drawingRange );
+	private void DrawRuler( DrawingContext ctx, double w, double h, Pen pen, DoubleRange valueRange )
+	{
+		ctx.DrawRectangle( Background, null, new Rect( 0, 0, w, h ) );
+		ctx.DrawLine( pen, new Point( 0, h ), new Point( w, h ) );
 
-	        var sign = valueRange.Start > valueRange.Stop ? -1.0 : 1.0;
+		var step = CalculateStep( valueRange.Size, w );
+		var drawingRange = new DoubleRange( 0, w );
 
-	        for( var i = 0; i < ( int ) ( valueRange.Size / step ); i++ )
-	        {
-		        var firstValue = Math.Floor( valueRange.Start / step ) * step;
-		        var value = firstValue + sign * ( step + i * step );
+		DrawHighlight( ctx, h, valueRange, drawingRange );
 
-		        var x = Math.Floor( DoubleRange.Transform( value, valueRange, drawingRange ) );
+		var sign = valueRange.Start > valueRange.Stop ? -1.0 : 1.0;
 
-		        if( Math.Abs( value % ( 10 * step ) ) < 1e-9 )
-		        {
-			        DrawText( ctx, value, x, w );
-			        ctx.DrawLine( pen, new Point( x, 0 ), new Point( x, h ) );
-		        }
-		        else
-		        {
-			        ctx.DrawLine( pen, new Point( x, h * 0.75 ), new Point( x, h ) );
-		        }
-	        }
-        }
+		for( var i = 0; i < ( int ) ( valueRange.Size / step ); i++ )
+		{
+			var firstValue = Math.Floor( valueRange.Start / step ) * step;
+			var value = firstValue + sign * ( step + i * step );
 
-        private void DrawHighlight( DrawingContext ctx, double h, DoubleRange valueRange, DoubleRange drawingRange )
-        {
-	        if( !HighlightedRange.HasValue || HighlightedRange.Value.Size <= 0 )
-		        return;
+			var x = Math.Floor( DoubleRange.Transform( value, valueRange, drawingRange ) );
 
-	        var highlightedRange = HighlightedRange.Value;
-	        var highlightedValueRange = new DoubleRange( DoubleRange.Clip( valueRange, highlightedRange.Start ), DoubleRange.Clip( valueRange, highlightedRange.Stop ) );
+			if( Math.Abs( value % ( 10 * step ) ) < 1e-9 )
+			{
+				DrawText( ctx, value, x, w );
+				ctx.DrawLine( pen, new Point( x, 0 ), new Point( x, h ) );
+			}
+			else
+			{
+				ctx.DrawLine( pen, new Point( x, h * 0.75 ), new Point( x, h ) );
+			}
+		}
+	}
 
-	        var highlightedDrawingRange = new DoubleRange(
-		        Math.Floor( DoubleRange.Transform( highlightedValueRange.Start, valueRange, drawingRange ) ), Math.Floor( DoubleRange.Transform( highlightedValueRange.Stop, valueRange, drawingRange ) ) );
+	private void DrawHighlight( DrawingContext ctx, double h, DoubleRange valueRange, DoubleRange drawingRange )
+	{
+		if( !HighlightedRange.HasValue || HighlightedRange.Value.Size <= 0 )
+			return;
 
-	        if( Invert )
-		        highlightedDrawingRange.Invert();
+		var highlightedRange = HighlightedRange.Value;
+		var highlightedValueRange = new DoubleRange( DoubleRange.Clip( valueRange, highlightedRange.Start ), DoubleRange.Clip( valueRange, highlightedRange.Stop ) );
 
-	        ctx.DrawRectangle( HighlightBrush, null, new Rect( highlightedDrawingRange.Lower, 0, highlightedDrawingRange.Size, h ) );
-        }
+		var highlightedDrawingRange = new DoubleRange(
+			Math.Floor( DoubleRange.Transform( highlightedValueRange.Start, valueRange, drawingRange ) ), Math.Floor( DoubleRange.Transform( highlightedValueRange.Stop, valueRange, drawingRange ) ) );
 
-        private void DrawText( DrawingContext ctx, double value, double x, double w )
-        {
-	        var text = value.ToString( "0.###", CultureInfo.CurrentCulture );
-	        var formattedText = new FormattedText( text, CultureInfo.CurrentCulture, FlowDirection, FontFamily.GetTypefaces().First(), FontSize, Foreground, 96 );
+		if( Invert )
+			highlightedDrawingRange.Invert();
 
-	        if( x + 3 + formattedText.Width < w )
-		        ctx.DrawText( formattedText, new Point( x + 3, 0 ) );
-        }
+		ctx.DrawRectangle( HighlightBrush, null, new Rect( highlightedDrawingRange.Lower, 0, highlightedDrawingRange.Size, h ) );
+	}
 
-        #endregion
-    }
+	private void DrawText( DrawingContext ctx, double value, double x, double w )
+	{
+		var text = value.ToString( "0.###", CultureInfo.CurrentCulture );
+		var formattedText = new FormattedText( text, CultureInfo.CurrentCulture, FlowDirection, FontFamily.GetTypefaces().First(), FontSize, Foreground, 96 );
+
+		if( x + 3 + formattedText.Width < w )
+			ctx.DrawText( formattedText, new Point( x + 3, 0 ) );
+	}
+
+	#endregion
 }

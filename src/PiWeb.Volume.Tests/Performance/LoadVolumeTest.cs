@@ -8,48 +8,47 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.Tests.Performance
-{
-	#region usings
+namespace Zeiss.PiWeb.Volume.Tests.Performance;
 
-	using System.IO;
-	using BenchmarkDotNet.Attributes;
-	using BenchmarkDotNet.Running;
-	using NUnit.Framework;
+#region usings
+
+using System.IO;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
+using NUnit.Framework;
+
+#endregion
+
+[InProcess, IterationCount(5), WarmupCount(1)]
+[MemoryDiagnoser]
+public class LoadVolumeTest
+{
+	#region members
+
+	private static readonly string SamplePath = Path.Combine( Paths.TestData, "seatbelt_button.volx" );
+	private byte[] _VolumeData;
 
 	#endregion
 
-	[InProcess, IterationCount(5), WarmupCount(1)]
-	[MemoryDiagnoser]
-	public class LoadVolumeTest
+	#region methods
+
+	[GlobalSetup]
+	public void Setup()
 	{
-		#region members
-
-		private static readonly string SamplePath = Path.Combine( Paths.TestData, "seatbelt_button.volx" );
-		private byte[] _VolumeData;
-
-		#endregion
-
-		#region methods
-
-		[GlobalSetup]
-		public void Setup()
-		{
-			_VolumeData = File.ReadAllBytes( SamplePath );
-		}
-
-		[Benchmark]
-		public Volume LoadVolume()
-		{
-			return Volume.Load( new MemoryStream( _VolumeData ) );
-		}
-
-		[Test]
-		public void RunLoadVolumeTest()
-		{
-			BenchmarkRunner.Run<LoadVolumeTest>();
-		}
-
-		#endregion
+		_VolumeData = File.ReadAllBytes( SamplePath );
 	}
+
+	[Benchmark]
+	public Volume LoadVolume()
+	{
+		return Volume.Load( new MemoryStream( _VolumeData ) );
+	}
+
+	[Test]
+	public void RunLoadVolumeTest()
+	{
+		BenchmarkRunner.Run<LoadVolumeTest>();
+	}
+
+	#endregion
 }

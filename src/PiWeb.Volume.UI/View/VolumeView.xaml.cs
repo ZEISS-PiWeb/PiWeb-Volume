@@ -8,23 +8,22 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.View
+namespace Zeiss.PiWeb.Volume.UI.View;
+
+#region usings
+
+using System.Windows.Controls;
+
+#endregion
+
+public partial class VolumeView : UserControl
 {
-    #region usings
+	#region constructors
 
-    using System.Windows.Controls;
+	public VolumeView()
+	{
+		InitializeComponent();
+	}
 
-    #endregion
-
-    public partial class VolumeView : UserControl
-    {
-        #region constructors
-
-        public VolumeView()
-        {
-            InitializeComponent();
-        }
-
-        #endregion
-    }
+	#endregion
 }

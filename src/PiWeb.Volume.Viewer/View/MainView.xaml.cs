@@ -8,20 +8,19 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.Viewer.View
+namespace Zeiss.PiWeb.Volume.Viewer.View;
+
+/// <summary>
+/// Interaction logic for MainView.xaml
+/// </summary>
+public partial class MainView
 {
-    /// <summary>
-    /// Interaction logic for MainView.xaml
-    /// </summary>
-    public partial class MainView
-    {
-        #region constructors
+	#region constructors
 
-        public MainView()
-        {
-            InitializeComponent();
-        }
+	public MainView()
+	{
+		InitializeComponent();
+	}
 
-        #endregion
-    }
+	#endregion
 }

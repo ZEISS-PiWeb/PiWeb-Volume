@@ -8,28 +8,27 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume
-{
-	#region usings
+namespace Zeiss.PiWeb.Volume;
 
-	using System;
+#region usings
+
+using System;
+
+#endregion
+
+/// <summary>
+/// This is a simple logging class that writes log messages to
+/// <see cref="Console.Out"/>.
+/// </summary>
+public class ConsoleLogger : ILogger
+{
+	#region interface ILogger
+
+	/// <inheritdoc />
+	public void Log( LogLevel level, string message )
+	{
+		Console.Out.WriteLine( $"[{level}] {message}" );
+	}
 
 	#endregion
-
-	/// <summary>
-	/// This is a simple logging class that writes log messages to
-	/// <see cref="Console.Out"/>.
-	/// </summary>
-	public class ConsoleLogger : ILogger
-	{
-		#region interface ILogger
-
-		/// <inheritdoc />
-		public void Log( LogLevel level, string message )
-		{
-			Console.Out.WriteLine( $"[{level}] {message}" );
-		}
-
-		#endregion
-	}
 }

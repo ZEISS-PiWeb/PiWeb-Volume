@@ -8,67 +8,66 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.Effects
-{
-	#region usings
+namespace Zeiss.PiWeb.Volume.UI.Effects;
 
-	using System;
-	using System.Windows;
-	using System.Windows.Media;
-	using System.Windows.Media.Effects;
+#region usings
+
+using System;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Effects;
+
+#endregion
+
+public class ContrastEffect : ShaderEffect
+{
+	#region members
+
+	public static readonly DependencyProperty InputProperty = RegisterPixelShaderSamplerProperty( nameof( Input ), typeof( ContrastEffect ), 0 );
+	public static readonly DependencyProperty LowProperty = DependencyProperty.Register( nameof( Low ), typeof( double ), typeof( ContrastEffect ), new UIPropertyMetadata( 0.0, PixelShaderConstantCallback( 0 ) ) );
+	public static readonly DependencyProperty HighProperty = DependencyProperty.Register( nameof( High ), typeof( double ), typeof( ContrastEffect ), new UIPropertyMetadata( 1.0, PixelShaderConstantCallback( 1 ) ) );
 
 	#endregion
 
-	public class ContrastEffect : ShaderEffect
+	#region constructors
+
+	public ContrastEffect()
 	{
-		#region members
-
-		public static readonly DependencyProperty InputProperty = RegisterPixelShaderSamplerProperty( nameof( Input ), typeof( ContrastEffect ), 0 );
-		public static readonly DependencyProperty LowProperty = DependencyProperty.Register( nameof( Low ), typeof( double ), typeof( ContrastEffect ), new UIPropertyMetadata( 0.0, PixelShaderConstantCallback( 0 ) ) );
-		public static readonly DependencyProperty HighProperty = DependencyProperty.Register( nameof( High ), typeof( double ), typeof( ContrastEffect ), new UIPropertyMetadata( 1.0, PixelShaderConstantCallback( 1 ) ) );
-
-		#endregion
-
-		#region constructors
-
-		public ContrastEffect()
+		try
 		{
-			try
-			{
-				PixelShader = new PixelShader { UriSource = new Uri( "pack://application:,,,/PiWeb.Volume.UI;component/Effects/ContrastEffect.ps" ) };
-			}
-			catch( Exception )
-			{
-				// ignored
-			}
-
-			UpdateShaderValue( InputProperty );
-			UpdateShaderValue( LowProperty );
-			UpdateShaderValue( HighProperty );
+			PixelShader = new PixelShader { UriSource = new Uri( "pack://application:,,,/PiWeb.Volume.UI;component/Effects/ContrastEffect.ps" ) };
+		}
+		catch( Exception )
+		{
+			// ignored
 		}
 
-		#endregion
-
-		#region properties
-
-		public Brush Input
-		{
-			get => ( ( Brush ) ( GetValue( InputProperty ) ) );
-			set => SetValue( InputProperty, value );
-		}
-
-		public double Low
-		{
-			get => ( ( double ) ( GetValue( LowProperty ) ) );
-			set => SetValue( LowProperty, value );
-		}
-
-		public double High
-		{
-			get => ( ( double ) ( GetValue( HighProperty ) ) );
-			set => SetValue( HighProperty, value );
-		}
-
-		#endregion
+		UpdateShaderValue( InputProperty );
+		UpdateShaderValue( LowProperty );
+		UpdateShaderValue( HighProperty );
 	}
+
+	#endregion
+
+	#region properties
+
+	public Brush Input
+	{
+		get => ( ( Brush ) ( GetValue( InputProperty ) ) );
+		set => SetValue( InputProperty, value );
+	}
+
+	public double Low
+	{
+		get => ( ( double ) ( GetValue( LowProperty ) ) );
+		set => SetValue( LowProperty, value );
+	}
+
+	public double High
+	{
+		get => ( ( double ) ( GetValue( HighProperty ) ) );
+		set => SetValue( HighProperty, value );
+	}
+
+	#endregion
 }

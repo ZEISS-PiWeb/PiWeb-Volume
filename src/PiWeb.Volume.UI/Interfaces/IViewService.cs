@@ -8,20 +8,19 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.Interfaces
-{
-	#region usings
+namespace Zeiss.PiWeb.Volume.UI.Interfaces;
 
-	using GalaSoft.MvvmLight;
+#region usings
+
+using GalaSoft.MvvmLight;
+
+#endregion
+
+public interface IViewService
+{
+	#region methods
+
+	public bool? RequestView( ViewModelBase viewModel );
 
 	#endregion
-
-	public interface IViewService
-	{
-		#region methods
-
-		public bool? RequestView( ViewModelBase viewModel );
-
-		#endregion
-	}
 }

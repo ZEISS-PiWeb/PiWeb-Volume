@@ -8,32 +8,31 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.Model
-{
-	#region usings
+namespace Zeiss.PiWeb.Volume.UI.Model;
 
-	using System;
+#region usings
+
+using System;
+
+#endregion
+
+public class VolumeProgressEventArgs : EventArgs
+{
+	#region constructors
+
+	public VolumeProgressEventArgs( double progress, string message )
+	{
+		Progress = progress;
+		Message = message;
+	}
 
 	#endregion
 
-	public class VolumeProgressEventArgs : EventArgs
-	{
-		#region constructors
+	#region properties
 
-		public VolumeProgressEventArgs( double progress, string message )
-		{
-			Progress = progress;
-			Message = message;
-		}
+	public double Progress { get; }
 
-		#endregion
+	public string Message { get; }
 
-		#region properties
-
-		public double Progress { get; }
-
-		public string Message { get; }
-
-		#endregion
-	}
+	#endregion
 }

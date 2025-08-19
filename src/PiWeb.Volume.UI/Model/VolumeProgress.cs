@@ -8,46 +8,45 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.Model
-{
-	#region usings
+namespace Zeiss.PiWeb.Volume.UI.Model;
 
-	using System;
+#region usings
+
+using System;
+
+#endregion
+
+public class VolumeProgress : IProgress<VolumeSliceDefinition>
+{
+	#region members
+
+	private readonly Volume _Volume;
 
 	#endregion
 
-	public class VolumeProgress : IProgress<VolumeSliceDefinition>
+	#region constructors
+
+	public VolumeProgress( Volume volume )
 	{
-		#region members
-
-		private readonly Volume _Volume;
-
-		#endregion
-
-		#region constructors
-
-		public VolumeProgress( Volume volume )
-		{
-			_Volume = volume;
-		}
-
-		#endregion
-
-		#region events
-
-		public event EventHandler<VolumeProgressEventArgs> ProgressChanged;
-
-		#endregion
-
-		#region interface IProgress<VolumeSliceDefinition>
-
-		public void Report( VolumeSliceDefinition value )
-		{
-			var target = _Volume.Metadata.GetSize( value.Direction );
-
-			ProgressChanged?.Invoke( this, new VolumeProgressEventArgs( ( double ) value.Index / target, $"Loaded slice {value.Index} of {target}" ) );
-		}
-
-		#endregion
+		_Volume = volume;
 	}
+
+	#endregion
+
+	#region events
+
+	public event EventHandler<VolumeProgressEventArgs> ProgressChanged;
+
+	#endregion
+
+	#region interface IProgress<VolumeSliceDefinition>
+
+	public void Report( VolumeSliceDefinition value )
+	{
+		var target = _Volume.Metadata.GetSize( value.Direction );
+
+		ProgressChanged?.Invoke( this, new VolumeProgressEventArgs( ( double ) value.Index / target, $"Loaded slice {value.Index} of {target}" ) );
+	}
+
+	#endregion
 }
