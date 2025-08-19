@@ -29,7 +29,7 @@ public class BooleanToVisibilityConverter : IValueConverter
 
 	#region interface IValueConverter
 
-	public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
+	public object? Convert( object? value, Type targetType, object? parameter, CultureInfo culture )
 	{
 		if( !( value is bool boolValue ) )
 			return Visibility.Collapsed;
@@ -40,7 +40,7 @@ public class BooleanToVisibilityConverter : IValueConverter
 		return boolValue ? Visibility.Visible : Visibility.Collapsed;
 	}
 
-	public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
+	public object? ConvertBack( object? value, Type targetType, object? parameter, CultureInfo culture )
 	{
 		throw new NotImplementedException();
 	}

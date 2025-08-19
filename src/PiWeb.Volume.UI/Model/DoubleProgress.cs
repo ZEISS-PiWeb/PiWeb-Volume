@@ -20,7 +20,7 @@ public class DoubleProgress : IProgress<double>
 {
 	#region events
 
-	public event EventHandler<VolumeProgressEventArgs> ProgressChanged;
+	public event EventHandler<VolumeProgressEventArgs>? ProgressChanged;
 
 	#endregion
 

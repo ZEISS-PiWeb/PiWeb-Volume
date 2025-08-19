@@ -24,7 +24,7 @@ public class BlockVolumeSliceRangeCollectorTest
 {
 	#region members
 
-	private CompressedVolume _Volume;
+	private CompressedVolume _Volume = null!;
 
 	//The volume is compressed and has compression artifacts. This is the estimated PSNR for the test volume.
 	private const int Tolerance = 16;

@@ -53,10 +53,10 @@ public class Navigator : ScrollViewer
 		DependencyProperty.Register( nameof(PanButton), typeof( MouseButton ), typeof( Navigator ), new PropertyMetadata( MouseButton.Right ) );
 
 	public static readonly DependencyProperty HorizontalPanningProperty = DependencyProperty.Register(
-		nameof(HorizontalPanning), typeof( double ), typeof( Navigator ), new PropertyMetadata( 0, OnHorizontalPanningChanged ) );
+		nameof(HorizontalPanning), typeof( double ), typeof( Navigator ), new PropertyMetadata( 0.0, OnHorizontalPanningChanged ) );
 
 	public static readonly DependencyProperty VerticalPanningProperty = DependencyProperty.Register(
-		nameof(VerticalPanning), typeof( double ), typeof( Navigator ), new PropertyMetadata( 0, OnVerticelPanningChanged ) );
+		nameof(VerticalPanning), typeof( double ), typeof( Navigator ), new PropertyMetadata( 0.0, OnVerticelPanningChanged ) );
 
 	public static readonly DependencyProperty FitProperty = DependencyProperty.Register(
 		nameof(Fit), typeof( Rect ), typeof( Navigator ), new PropertyMetadata( Rect.Empty, OnFitChanged ) );
@@ -182,7 +182,7 @@ public class Navigator : ScrollViewer
 		ScrollAndZoomIntoView( Fit );
 	}
 
-	private void OnContentSizeChanged( object sender, SizeChangedEventArgs e )
+	private void OnContentSizeChanged( object? sender, SizeChangedEventArgs e )
 	{
 		if( sender is FrameworkElement content )
 			content.SizeChanged -= OnContentSizeChanged;

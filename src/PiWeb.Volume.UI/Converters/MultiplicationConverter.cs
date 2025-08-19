@@ -28,7 +28,7 @@ public class MultiplicationConverter : IValueConverter
 
 	#region interface IValueConverter
 
-	public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
+	public object? Convert( object? value, Type targetType, object? parameter, CultureInfo culture )
 	{
 		if( value is double doubleValue )
 			return doubleValue * Factor;
@@ -42,7 +42,7 @@ public class MultiplicationConverter : IValueConverter
 		return value;
 	}
 
-	public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
+	public object? ConvertBack( object? value, Type targetType, object? parameter, CultureInfo culture )
 	{
 		if( value is double doubleValue )
 			return doubleValue / Factor;

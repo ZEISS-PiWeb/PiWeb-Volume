@@ -34,9 +34,9 @@ public class VolumeManagementViewModel : ViewModelBase
 	private readonly IViewService _ViewService;
 	private readonly ILogger _Logger = new ConsoleLogger();
 
-	private VolumeViewModel _VolumeViewModel;
-	private string _FileName;
-	private string _ProgressMessage;
+	private VolumeViewModel? _VolumeViewModel;
+	private string? _FileName;
+	private string? _ProgressMessage;
 	private double _Progress;
 	private bool _IsLoading;
 
@@ -58,7 +58,7 @@ public class VolumeManagementViewModel : ViewModelBase
 
 	#region events
 
-	public event EventHandler<EventArgs> VolumeChanged;
+	public event EventHandler<EventArgs>? VolumeChanged;
 
 	#endregion
 
@@ -76,7 +76,7 @@ public class VolumeManagementViewModel : ViewModelBase
 
 	#region properties
 
-	public VolumeViewModel VolumeViewModel
+	public VolumeViewModel? VolumeViewModel
 	{
 		get => _VolumeViewModel;
 		set
@@ -95,13 +95,13 @@ public class VolumeManagementViewModel : ViewModelBase
 		set => Set( ref _Progress, value );
 	}
 
-	public string ProgressMessage
+	public string? ProgressMessage
 	{
 		get => _ProgressMessage;
 		set => Set( ref _ProgressMessage, value );
 	}
 
-	public string FileName
+	public string? FileName
 	{
 		get => _FileName;
 		set => Set( ref _FileName, value );
@@ -142,6 +142,9 @@ public class VolumeManagementViewModel : ViewModelBase
 		if( _ViewService.RequestView( codecViewModel ) != true )
 			return;
 
+		if( VolumeViewModel is null )
+			return;
+
 		var options = codecViewModel.GetOptions();
 
 		IsLoading = true;
@@ -166,6 +169,9 @@ public class VolumeManagementViewModel : ViewModelBase
 
 	private async Task SaveCalypsoVolume( Stream stream )
 	{
+		if( VolumeViewModel is null )
+			return;
+
 		IsLoading = true;
 
 		var volume = VolumeViewModel.Volume;
@@ -253,6 +259,9 @@ public class VolumeManagementViewModel : ViewModelBase
 
 		try
 		{
+			if( fileName is null )
+				return;
+
 			switch( Path.GetExtension( fileName ).ToLowerInvariant() )
 			{
 				case ".volx":
@@ -309,7 +318,7 @@ public class VolumeManagementViewModel : ViewModelBase
 		if( _ViewService.RequestView( loadOptionsViewModel ) != true )
 			return;
 
-		await using var vgi = File.OpenRead( FileName );
+		await using var vgi = File.OpenRead( filename );
 		await using var data = File.OpenRead( uint16File );
 
 		var progress = new DoubleProgress();
@@ -335,7 +344,7 @@ public class VolumeManagementViewModel : ViewModelBase
 
 	private async Task LoadGomVolume( string filename )
 	{
-		await using var gomStream = File.OpenRead( FileName );
+		await using var gomStream = File.OpenRead( filename );
 
 		var metadata = Gom.ParseMetadata( gomStream, out var min, out var max, out var dataFile, out var rawDataType );
 		var (minval, maxval) = rawDataType switch
@@ -343,6 +352,7 @@ public class VolumeManagementViewModel : ViewModelBase
 			Gom.DataType.Int16  => ( short.MinValue, short.MaxValue ),
 			Gom.DataType.UInt16 => ( ushort.MinValue, ushort.MaxValue ),
 			Gom.DataType.Single => ( -1.0f, 1.0f ),
+			_                   => ( -1.0f, 1.0f ),
 		};
 
 		var dataPath = Path.Combine( Path.GetDirectoryName( filename )!, dataFile );
@@ -461,7 +471,7 @@ public class VolumeManagementViewModel : ViewModelBase
 		IsLoading = false;
 	}
 
-	private void OnProgressChanged( object sender, VolumeProgressEventArgs e )
+	private void OnProgressChanged( object? sender, VolumeProgressEventArgs e )
 	{
 		Progress = e.Progress;
 		ProgressMessage = e.Message;

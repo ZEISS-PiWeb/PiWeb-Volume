@@ -28,7 +28,7 @@ public class IsNotNullConverter : IValueConverter
 
 	#region interface IValueConverter
 
-	public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
+	public object? Convert( object? value, Type targetType, object? parameter, CultureInfo culture )
 	{
 		var result = value is null;
 		if( !Invert )
@@ -37,7 +37,7 @@ public class IsNotNullConverter : IValueConverter
 		return result;
 	}
 
-	public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
+	public object? ConvertBack( object? value, Type targetType, object? parameter, CultureInfo culture )
 	{
 		throw new NotImplementedException();
 	}

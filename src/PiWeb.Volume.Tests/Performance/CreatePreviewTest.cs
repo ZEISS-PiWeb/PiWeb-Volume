@@ -13,8 +13,8 @@ public class CreatePreviewTest
 
 	private static readonly string SamplePath = Path.Combine( Paths.TestData, "seatbelt_button.volx" );
 
-	private CompressedVolume _SampleCompressedVolume;
-	private UncompressedVolume _SampleDecompressedVolume;
+	private CompressedVolume _SampleCompressedVolume = null!;
+	private UncompressedVolume _SampleDecompressedVolume = null!;
 
 	#endregion
 

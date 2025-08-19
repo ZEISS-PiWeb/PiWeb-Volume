@@ -26,7 +26,7 @@ public class LoadVolumeTest
 	#region members
 
 	private static readonly string SamplePath = Path.Combine( Paths.TestData, "seatbelt_button.volx" );
-	private byte[] _VolumeData;
+	private byte[] _VolumeData = null!;
 
 	#endregion
 

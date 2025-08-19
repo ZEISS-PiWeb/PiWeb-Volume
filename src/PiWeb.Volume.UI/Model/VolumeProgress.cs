@@ -35,7 +35,7 @@ public class VolumeProgress : IProgress<VolumeSliceDefinition>
 
 	#region events
 
-	public event EventHandler<VolumeProgressEventArgs> ProgressChanged;
+	public event EventHandler<VolumeProgressEventArgs>? ProgressChanged;
 
 	#endregion
 
