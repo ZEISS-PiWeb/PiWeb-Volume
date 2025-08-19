@@ -13,8 +13,6 @@ namespace Zeiss.PiWeb.Volume.Viewer
 	#region usings
 
 	using System.Windows;
-	using Unity;
-	using Zeiss.PiWeb.Volume.UI.Interfaces;
 	using Zeiss.PiWeb.Volume.UI.Services;
 	using Zeiss.PiWeb.Volume.Viewer.View;
 	using Zeiss.PiWeb.Volume.Viewer.ViewModel;
@@ -32,13 +30,8 @@ namespace Zeiss.PiWeb.Volume.Viewer
 		{
 			base.OnStartup( e );
 
-			IUnityContainer container = new UnityContainer();
+			var mainWindowViewModel = new MainViewModel( new FileService(), new MessageService(), new ViewService() );
 
-			container.RegisterType<IFileService, FileService>();
-			container.RegisterType<IMessageService, MessageService>();
-			container.RegisterType<IViewService, ViewService>();
-
-			var mainWindowViewModel = container.Resolve<MainViewModel>();
 			var window = new MainView { DataContext = mainWindowViewModel };
 			window.Show();
 		}
