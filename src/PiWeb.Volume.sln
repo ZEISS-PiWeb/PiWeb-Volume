@@ -61,6 +61,7 @@ Global
 		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Release|x64.ActiveCfg = Release|x64
 		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Test|x64.ActiveCfg = Test|x64
 		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Test|x64.Build.0 = Test|x64
+		{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

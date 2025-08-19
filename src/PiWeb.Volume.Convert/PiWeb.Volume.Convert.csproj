@@ -1,16 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Platforms>x64</Platforms>
+    <TargetFramework>net9.0</TargetFramework>
+    <Platform>AnyCPU</Platform>
     <LangVersion>latestmajor</LangVersion>
     <AssemblyName>PiWeb.Volume.Convert</AssemblyName>
     <RootNamespace>Zeiss.PiWeb.Volume.Convert</RootNamespace>
-    <Copyright>Copyright © 2020 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>
+    <Copyright>Copyright © 2025 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>
     <Company>Carl Zeiss Industrielle Messtechnik GmbH</Company>
     <Authors>$(Company)</Authors>
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IsPackable>false</IsPackable>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -27,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Buffers" Version="4.5.1" />
+    <PackageReference Include="System.Buffers" Version="4.6.1" />
   </ItemGroup>
 
 </Project>
