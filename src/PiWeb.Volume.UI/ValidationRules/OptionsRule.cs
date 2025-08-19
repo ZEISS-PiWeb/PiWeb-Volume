@@ -33,7 +33,7 @@ public class OptionsRule : ValidationRule
 
 		foreach( var option in options )
 		{
-			var keyvalue = option.Split( new[] { '=' }, StringSplitOptions.RemoveEmptyEntries );
+			var keyvalue = option.Split( ['='], StringSplitOptions.RemoveEmptyEntries );
 			if( keyvalue.Length != 2 )
 				return new ValidationResult( false, "Please specify your options separated by ';' in the scheme 'key=value'." );
 		}

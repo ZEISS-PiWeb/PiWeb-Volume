@@ -35,7 +35,7 @@ internal class StreamWrapper
 	internal StreamWrapper( Stream stream )
 	{
 		_Stream = stream ?? throw new ArgumentNullException();
-		_Buffer = Array.Empty<byte>();
+		_Buffer = [];
 		Interop = new InteropStream
 		{
 			Read = Read,

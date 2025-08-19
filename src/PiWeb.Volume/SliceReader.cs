@@ -59,7 +59,7 @@ internal class SliceReader
 		_SizeY = metadata.SizeY;
 		_SizeZ = metadata.SizeZ;
 
-		_Buffer = Array.Empty<byte>();
+		_Buffer = [];
 
 		Interop = new InteropSliceReader
 		{
@@ -108,7 +108,7 @@ internal class SliceReader
 			var input = _Slices[ z ].Data;
 			var output = _Buffer;
 			int inputIndex = _CurrentSlice;
-			int outputIndex = z * width;
+			var outputIndex = z * width;
 
 			for( var y = 0; y < _SizeY; y++ )
 			{

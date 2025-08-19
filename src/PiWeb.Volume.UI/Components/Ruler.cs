@@ -134,7 +134,7 @@ public class Ruler : Control
 
 		var pen = new Pen( Stroke, StrokeThickness );
 
-		ctx.PushGuidelineSet( new GuidelineSet( new[] { pen.Thickness / 2 }, new[] { pen.Thickness / 2 } ) );
+		ctx.PushGuidelineSet( new GuidelineSet( [pen.Thickness / 2], [pen.Thickness / 2] ) );
 
 		var valueRange = Invert
 			? new DoubleRange( ValueRange.Value.Stop, ValueRange.Value.Start )

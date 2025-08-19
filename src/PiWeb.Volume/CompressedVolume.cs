@@ -209,7 +209,7 @@ public class CompressedVolume : Volume
 			{
 				using var input = new MemoryStream( compressedData, false );
 				var inputWrapper = new StreamWrapper( input );
-				var rangeReader = new VolumeSliceRangeCollector( Metadata, range.Direction, new[] { range }, progress, ct );
+				var rangeReader = new VolumeSliceRangeCollector( Metadata, range.Direction, [range], progress, ct );
 
 				var error = NativeMethods.DecompressSlices( inputWrapper.Interop, rangeReader.Interop, range.First, range.Length );
 				if( error != VolumeError.Success )
@@ -224,7 +224,7 @@ public class CompressedVolume : Volume
 			using( var input = new MemoryStream( compressedDataZ, false ) )
 			{
 				var inputWrapper = new StreamWrapper( input );
-				var rangeReader = new VolumeSliceRangeCollector( Metadata, Direction.Z, new[] { range }, progress, ct );
+				var rangeReader = new VolumeSliceRangeCollector( Metadata, Direction.Z, [range], progress, ct );
 
 				var error = NativeMethods.DecompressVolume( inputWrapper.Interop, rangeReader.Interop );
 				if( error != VolumeError.Success )
