@@ -12,6 +12,7 @@ namespace Zeiss.PiWeb.Volume.UI.Services;
 
 #region usings
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Win32;
 using Zeiss.PiWeb.Volume.UI.Interfaces;
 
@@ -29,7 +30,8 @@ public class FileService : IFileService
 
 	#region interface IFileService
 
-	public bool SelectOpenFileName( out string fileName )
+	/// <inheritdoc />
+	public bool SelectOpenFileName( [NotNullWhen( true )] out string? fileName )
 	{
 		fileName = null;
 
@@ -48,7 +50,8 @@ public class FileService : IFileService
 		return true;
 	}
 
-	public bool SelectSaveFileName( out string fileName )
+	/// <inheritdoc />
+	public bool SelectSaveFileName( [NotNullWhen( true )] out string? fileName )
 	{
 		fileName = null;
 

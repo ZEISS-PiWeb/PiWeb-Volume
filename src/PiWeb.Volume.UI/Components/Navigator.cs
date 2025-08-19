@@ -182,7 +182,7 @@ public class Navigator : ScrollViewer
 		ScrollAndZoomIntoView( Fit );
 	}
 
-	private void OnContentSizeChanged( object sender, SizeChangedEventArgs e )
+	private void OnContentSizeChanged( object? sender, SizeChangedEventArgs e )
 	{
 		if( sender is FrameworkElement content )
 			content.SizeChanged -= OnContentSizeChanged;

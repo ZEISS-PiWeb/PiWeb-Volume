@@ -29,7 +29,7 @@ public partial class LoadOptionsView
 
 	#region methods
 
-	private void OkButton_Click( object sender, RoutedEventArgs e )
+	private void OkButton_Click( object? sender, RoutedEventArgs e )
 	{
 		DialogResult = true;
 		Close();

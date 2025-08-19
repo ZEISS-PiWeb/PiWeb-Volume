@@ -30,22 +30,22 @@ public class VolumeViewModel : ViewModelBase
 {
 	#region members
 
-	private readonly Volume _Preview;
+	private readonly Volume? _Preview;
 	private readonly ILogger _Logger;
 	private readonly Dispatcher _Dispatcher;
 
-	private byte[] _SliceBuffer;
+	private byte[] _SliceBuffer = [];
 
 	private int _SelectedLayerIndex;
 	private int _MaxLayer;
 	private int _MaxPreviewLayer;
 
 	private Direction _Direction;
-	private WriteableBitmap _SelectedLayerImage;
-	private WriteableBitmap _PreviewLayerImage;
+	private WriteableBitmap? _SelectedLayerImage;
+	private WriteableBitmap? _PreviewLayerImage;
 
 	private bool _ShowPreview;
-	private IDisposable _Subcription;
+	private IDisposable? _Subcription;
 	private DoubleRange _HorizontalRange;
 	private DoubleRange _VerticalRange;
 
@@ -56,7 +56,7 @@ public class VolumeViewModel : ViewModelBase
 
 	#region constructors
 
-	public VolumeViewModel( Volume model, Volume preview, ushort minification, ILogger logger )
+	public VolumeViewModel( Volume model, Volume? preview, ushort minification, ILogger logger )
 	{
 		Volume = model;
 		Minification = minification;
@@ -77,8 +77,8 @@ public class VolumeViewModel : ViewModelBase
 
 	#region events
 
-	public event EventHandler<EventArgs> PreviewLayerChanged;
-	public event EventHandler<EventArgs> LayerChanged;
+	public event EventHandler<EventArgs>? PreviewLayerChanged;
+	public event EventHandler<EventArgs>? LayerChanged;
 
 	#endregion
 
@@ -124,19 +124,19 @@ public class VolumeViewModel : ViewModelBase
 		}
 	}
 
-	public WriteableBitmap SelectedLayerImage
+	public WriteableBitmap? SelectedLayerImage
 	{
 		get => _SelectedLayerImage;
 		set => Set( ref _SelectedLayerImage, value );
 	}
 
-	public WriteableBitmap PreviewLayerImage
+	public WriteableBitmap? PreviewLayerImage
 	{
 		get => _PreviewLayerImage;
 		set => Set( ref _PreviewLayerImage, value );
 	}
 
-	public WriteableBitmap AvailableLayerImage => ShowPreview ? PreviewLayerImage : SelectedLayerImage;
+	public WriteableBitmap? AvailableLayerImage => ShowPreview ? PreviewLayerImage : SelectedLayerImage;
 
 	public Layer SelectedLayer
 	{
@@ -281,9 +281,9 @@ public class VolumeViewModel : ViewModelBase
 		return new Layer( _SliceBuffer, width, height, sliceIndex );
 	}
 
-	private static void WriteImage( WriteableBitmap bitmap, Layer layer )
+	private static void WriteImage( WriteableBitmap? bitmap, Layer layer )
 	{
-		bitmap.WritePixels( new Int32Rect( 0, 0, layer.Width, layer.Height ), layer.Data, layer.Width, 0 );
+		bitmap?.WritePixels( new Int32Rect( 0, 0, layer.Width, layer.Height ), layer.Data, layer.Width, 0 );
 	}
 
 	#endregion

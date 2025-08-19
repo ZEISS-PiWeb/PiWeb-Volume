@@ -24,7 +24,7 @@ public class DictionaryToStringConverter : IValueConverter
 {
 	#region interface IValueConverter
 
-	public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
+	public object? Convert( object? value, Type targetType, object? parameter, CultureInfo culture )
 	{
 		if( value is IDictionary dictionary )
 			return string.Join( ";", dictionary.Keys.OfType<object>().Select( key => $"-{key}={dictionary[ key ]}" ) );
@@ -32,7 +32,7 @@ public class DictionaryToStringConverter : IValueConverter
 		return string.Empty;
 	}
 
-	public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
+	public object? ConvertBack( object? value, Type targetType, object? parameter, CultureInfo culture )
 	{
 		throw new NotImplementedException();
 	}

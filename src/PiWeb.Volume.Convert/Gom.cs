@@ -53,14 +53,13 @@ public static class Gom
 	private static DataType ReadDataType( XmlDocument document, string path )
 	{
 		var node = ReadValue( document, path );
-		switch( node )
+		return node switch
 		{
-			case "uint16": return DataType.UInt16;
-			case "int16": return DataType.Int16;
-			case "float32": return DataType.Single;
-			default:
-				throw new FormatException( $"Unsupported data type {node}" );
-		}
+			"uint16"  => DataType.UInt16,
+			"int16"   => DataType.Int16,
+			"float32" => DataType.Single,
+			_         => throw new FormatException( $"Unsupported data type {node}" )
+		};
 	}
 
 	private static ushort ReadUshort( XmlDocument document, string path )

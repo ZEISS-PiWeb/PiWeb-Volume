@@ -24,12 +24,12 @@ public class MergeConverter : IMultiValueConverter
 {
 	#region interface IMultiValueConverter
 
-	public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
+	public object? Convert( object[]? values, Type targetType, object parameter, CultureInfo culture )
 	{
 		if( values is null || values.Length == 0 )
 			return null;
 
-		var reference = values.FirstOrDefault( v => v != null && v != DependencyProperty.UnsetValue );
+		var reference = values.FirstOrDefault( v => v != DependencyProperty.UnsetValue );
 
 		if( values.Any( v => !Equals( v, reference ) ) )
 			return reference is IConvertible convertibleReference
@@ -42,19 +42,21 @@ public class MergeConverter : IMultiValueConverter
 		return reference;
 	}
 
-	public object[] ConvertBack( object value, Type[] targetTypes, object parameter, CultureInfo culture )
+	public object?[] ConvertBack( object value, Type[] targetTypes, object parameter, CultureInfo culture )
 	{
 		if( value is IConvertible convertible )
+		{
 			return Enumerable.Repeat( 0, targetTypes.Length )
 				.Select( i => SafeChangeType( convertible, targetTypes[ i ], culture ) )
 				.ToArray();
+		}
 
 		return Enumerable.Repeat( 0, targetTypes.Length )
-			.Select( i => value )
+			.Select( _ => value )
 			.ToArray();
 	}
 
-	private static object SafeChangeType( IConvertible value, Type targetType, IFormatProvider formatProvider )
+	private static object? SafeChangeType( IConvertible? value, Type? targetType, IFormatProvider formatProvider )
 	{
 		if( value is null || targetType is null )
 			return null;

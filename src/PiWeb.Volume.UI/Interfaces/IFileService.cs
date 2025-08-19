@@ -10,13 +10,15 @@
 
 namespace Zeiss.PiWeb.Volume.UI.Interfaces;
 
+using System.Diagnostics.CodeAnalysis;
+
 public interface IFileService
 {
 	#region methods
 
-	bool SelectOpenFileName( out string fileName );
+	bool SelectOpenFileName( [NotNullWhen( true )] out string? fileName );
 
-	bool SelectSaveFileName( out string fileName );
+	bool SelectSaveFileName( [NotNullWhen( true )] out string? fileName );
 
 	#endregion
 }

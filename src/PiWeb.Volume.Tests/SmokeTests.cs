@@ -80,14 +80,14 @@ public class SmokeTests
 		{
 			{ BlockVolume.QualityName, "95" }
 		} );
-		var uncompressedVolume = VolumeTestHelper.LoadUncompressedVolume( file.Filename );
+		var uncompressedVolume = (UncompressedVolume)VolumeTestHelper.LoadUncompressedVolume( file.Filename );
 		var compressedVolume = uncompressedVolume.Compress( options );
 		var decompressedVolume = compressedVolume.Decompress( logger: logger );
 
 		var noise = VolumeTestHelper.CalculateNoise( uncompressedVolume, decompressedVolume );
 
 		Assert.That( noise, Is.Not.Null );
-		Assert.That( noise.Value.Peak, Is.LessThanOrEqualTo( 16 ) );
+		Assert.That( noise?.Peak, Is.LessThanOrEqualTo( 16 ) );
 	}
 
 	[Test, TestCaseSource( nameof( CompressedSamples ) )]
@@ -186,10 +186,10 @@ public class SmokeTests
 
 		Assert.That( noise, Is.Not.Null );
 
-		Console.WriteLine( @$"Quality {quality} peak: {noise.Value.Peak}" );
-		Console.WriteLine( @$"Quality {quality} average: {noise.Value.Average}" );
-		Console.WriteLine( @$"Quality {quality} mean: {noise.Value.Mean}" );
-		Console.WriteLine( @$"Quality {quality} q95: {noise.Value.Q95}" );
+		Console.WriteLine( @$"Quality {quality} peak: {noise?.Peak}" );
+		Console.WriteLine( @$"Quality {quality} average: {noise?.Average}" );
+		Console.WriteLine( @$"Quality {quality} mean: {noise?.Mean}" );
+		Console.WriteLine( @$"Quality {quality} q95: {noise?.Q95}" );
 	}
 
 	[Test, Explicit]
@@ -206,10 +206,10 @@ public class SmokeTests
 
 		Assert.That( noise, Is.Not.Null );
 
-		Console.WriteLine( @$"Quality {quality} peak: {noise.Value.Peak}" );
-		Console.WriteLine( @$"Quality {quality} average: {noise.Value.Average}" );
-		Console.WriteLine( @$"Quality {quality} mean: {noise.Value.Mean}" );
-		Console.WriteLine( @$"Quality {quality} q95: {noise.Value.Q95}" );
+		Console.WriteLine( @$"Quality {quality} peak: {noise?.Peak}" );
+		Console.WriteLine( @$"Quality {quality} average: {noise?.Average}" );
+		Console.WriteLine( @$"Quality {quality} mean: {noise?.Mean}" );
+		Console.WriteLine( @$"Quality {quality} q95: {noise?.Q95}" );
 	}
 
 

@@ -13,7 +13,7 @@ public class DecompressVolumeTest
 
 	private static readonly string SamplePath = Path.Combine( Paths.TestData, "seatbelt_button.volx" );
 
-	private CompressedVolume _SampleCompressedVolume;
+	private CompressedVolume _SampleCompressedVolume = null!;
 
 	#endregion
 

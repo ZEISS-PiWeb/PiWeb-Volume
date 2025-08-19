@@ -20,17 +20,17 @@ public class OptionsConverter : IValueConverter
 {
 	#region interface IValueConverter
 
-	public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
+	public object? Convert( object? value, Type targetType, object? parameter, CultureInfo culture )
 	{
-		if( !( value is Dictionary<string, string> options ) )
+		if( value is not Dictionary<string, string> options )
 			return null;
 
 		return string.Join( ";", options.Select( o => $"{o.Key}={o.Value}" ) );
 	}
 
-	public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
+	public object? ConvertBack( object? value, Type targetType, object? parameter, CultureInfo culture )
 	{
-		if( !( value is string str ) )
+		if( value is not string str )
 			return null;
 
 		var options = str.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries );

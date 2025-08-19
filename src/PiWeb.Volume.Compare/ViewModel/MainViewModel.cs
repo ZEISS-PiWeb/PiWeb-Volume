@@ -35,16 +35,15 @@ public class MainViewModel : ViewModelBase
 	private double _VerticalPanning;
 	private double _Zoom = 1;
 
-	private IDisposable _LayerChangedSubscription;
+	private IDisposable? _LayerChangedSubscription;
+	private IDisposable? _CreateSpectrumSubscription;
 
-	private SpectrumData[] _LeftSpectrum;
-	private SpectrumData[] _RightSpectrum;
-	private SpectrumData[] _DeltaSpectrum;
+	private SpectrumData[]? _LeftSpectrum;
+	private SpectrumData[]? _RightSpectrum;
+	private SpectrumData[]? _DeltaSpectrum;
 
 	private int _DeltaMin = 1;
 	private int _DeltaMax = 10;
-
-	private IDisposable _CreateSpectrumSubscription;
 
 	private double _ContrastLow;
 	private double _ContrastHigh = 256;
@@ -77,19 +76,19 @@ public class MainViewModel : ViewModelBase
 		set => Set( ref _BitmapScalingMode, value );
 	}
 
-	public SpectrumData[] LeftSpectrum
+	public SpectrumData[]? LeftSpectrum
 	{
 		get => _LeftSpectrum;
 		set => Set( ref _LeftSpectrum, value );
 	}
 
-	public SpectrumData[] RightSpectrum
+	public SpectrumData[]? RightSpectrum
 	{
 		get => _RightSpectrum;
 		set => Set( ref _RightSpectrum, value );
 	}
 
-	public SpectrumData[] DeltaSpectrum
+	public SpectrumData[]? DeltaSpectrum
 	{
 		get => _DeltaSpectrum;
 		set => Set( ref _DeltaSpectrum, value );
@@ -145,7 +144,7 @@ public class MainViewModel : ViewModelBase
 
 	#region methods
 
-	private void OnVolumeChanged( object sender, EventArgs e )
+	private void OnVolumeChanged( object? sender, EventArgs e )
 	{
 		if( sender == LeftVolume && LeftVolume.VolumeViewModel != null && RightVolume.VolumeViewModel != null )
 			LeftVolume.VolumeViewModel.SelectedLayerIndex = RightVolume.VolumeViewModel.SelectedLayerIndex;
@@ -157,7 +156,7 @@ public class MainViewModel : ViewModelBase
 
 		_LayerChangedSubscription = new[] { LeftVolume.VolumeViewModel, RightVolume.VolumeViewModel }
 			.Where( v => v != null )
-			.Select( v => Observable.FromEventPattern<EventArgs>( v, nameof(VolumeViewModel.LayerChanged) ) )
+			.Select( v => Observable.FromEventPattern<EventArgs>( v!, nameof(VolumeViewModel.LayerChanged) ) )
 			.Merge()
 			.Sample( TimeSpan.FromMilliseconds( 50 ) )
 			.Subscribe( _ => OnLayerChanged() );

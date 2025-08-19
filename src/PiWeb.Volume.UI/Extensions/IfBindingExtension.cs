@@ -70,27 +70,27 @@ public class IfBindingExtension : Binding
 	/// <summary>
 	/// Gets or sets the value that is used for compare conditions.
 	/// </summary>
-	public object Value { get; set; }
+	public object? Value { get; set; }
 
 	/// <summary>
 	/// Gets or sets a value that is used if the given condition is true.
 	/// </summary>
-	public object Then { get; set; } = true;
+	public object? Then { get; set; } = true;
 
 	/// <summary>
 	/// Gets or sets a value that is used if the given condition is false.
 	/// </summary>
-	public object Else { get; set; } = false;
+	public object? Else { get; set; } = false;
 
 	/// <summary>
 	/// Gets or sets an optional Converter.
 	/// </summary>
-	public new IValueConverter Converter { get; set; }
+	public new IValueConverter? Converter { get; set; }
 
 	/// <summary>
 	/// Gets or sets an optional ConverterParameter.
 	/// </summary>
-	public new object ConverterParameter { get; set; }
+	public new object? ConverterParameter { get; set; }
 
 	/// <summary>
 	/// Gets or sets a value indicating whether to use <see cref="Visibility.Hidden"/> as false value for visibilites.
@@ -107,7 +107,7 @@ public class IfBindingExtension : Binding
 
 	#endregion
 
-	public static object AutoConvertValue( object value, Type targetType, bool hideIfNotVisible = false )
+	public static object? AutoConvertValue( object? value, Type targetType, bool hideIfNotVisible = false )
 	{
 		if( value != null && targetType != typeof( string ) && !targetType.IsInstanceOfType( value ) )
 		{
@@ -160,7 +160,7 @@ public class IfBindingExtension : Binding
 
 		#region methods
 
-		private static int ToInt( object value, int defaultValue = 0 )
+		private static int ToInt( object? value, int defaultValue = 0 )
 		{
 			if( value is int i )
 				return i;
@@ -184,7 +184,7 @@ public class IfBindingExtension : Binding
 
 		#region interface IValueConverter
 
-		public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
+		public object? Convert( object? value, Type targetType, object? parameter, CultureInfo culture )
 		{
 			var ifBinding = parameter as IfBindingExtension ?? throw new ArgumentNullException( nameof( parameter ), @$"Expect parameter to be instance of ""{nameof( IfBindingExtension )}""" );
 
@@ -194,7 +194,7 @@ public class IfBindingExtension : Binding
 			return AutoConvertValue( Evaluate( value, ifBinding ), targetType, ifBinding.HideIfNotVisible );
 		}
 
-		private object Evaluate( object value, IfBindingExtension ifBinding )
+		private object? Evaluate( object? value, IfBindingExtension ifBinding )
 		{
 			if( ifBinding.Is == ConditionType.Convertable )
 			{
@@ -204,7 +204,7 @@ public class IfBindingExtension : Binding
 			return EvaluateCondition( value, ifBinding ) ? ifBinding.Then : ifBinding.Else;
 		}
 
-		private static bool EvaluateCondition( object value, IfBindingExtension ifBinding )
+		private static bool EvaluateCondition( object? value, IfBindingExtension ifBinding )
 		{
 			return ifBinding.Is switch
 			{
@@ -230,8 +230,8 @@ public class IfBindingExtension : Binding
 				ConditionType.One              => Equals( ToInt( value ), 1 ),
 				ConditionType.Positive         => ToInt( value ) >= 0,
 				ConditionType.Negative         => ToInt( value ) < 0,
-				ConditionType.EnumFlagSet      => ( (Enum)value ).HasFlag( (Enum)ifBinding.Value ),
-				ConditionType.EnumFlagNotSet   => !( (Enum)value ).HasFlag( (Enum)ifBinding.Value ),
+				ConditionType.EnumFlagSet      => ( (Enum)value! ).HasFlag( (Enum)ifBinding.Value! ),
+				ConditionType.EnumFlagNotSet   => !( (Enum)value! ).HasFlag( (Enum)ifBinding.Value! ),
 				ConditionType.Containing       => ( value as IEnumerable )?.Cast<object>().Contains( ifBinding.Value ) ?? false,
 				ConditionType.NotContaining    => !( ( value as IEnumerable )?.Cast<object>().Contains( ifBinding.Value ) ?? true ),
 				ConditionType.ContainedIn      => ( ifBinding.Value as IEnumerable )?.Cast<object>().Contains( value ) ?? false,
@@ -240,7 +240,7 @@ public class IfBindingExtension : Binding
 			};
 		}
 
-		public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
+		public object? ConvertBack( object? value, Type targetType, object? parameter, CultureInfo culture )
 		{
 			var ifBinding = parameter as IfBindingExtension ?? throw new ArgumentNullException( nameof( parameter ), @$"Expect parameter to be instance of ""{nameof( IfBindingExtension )}""" );
 
@@ -257,7 +257,7 @@ public class IfBindingExtension : Binding
 				};
 			}
 
-			if( ifBinding.Converter != null )
+			if( ifBinding?.Converter != null )
 				value = ifBinding.Converter.ConvertBack( value, targetType, ifBinding.ConverterParameter, culture );
 
 			return value;

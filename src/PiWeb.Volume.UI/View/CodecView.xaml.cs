@@ -32,7 +32,7 @@ public partial class CodecView : Window
 
 	#region methods
 
-	private void OkButton_Clicked( object sender, RoutedEventArgs e )
+	private void OkButton_Clicked( object? sender, RoutedEventArgs e )
 	{
 		DialogResult = true;
 		Close();

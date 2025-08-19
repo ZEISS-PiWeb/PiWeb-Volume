@@ -175,7 +175,7 @@ public static class ConvertVolume
 			{
 				progress?.Report( (double)z / sz );
 
-				uint16Stream.Read( buffer, 0, sx * sy * 2 );
+				uint16Stream.ReadExactly( buffer, 0, sx * sy * 2 );
 				var layer = data[ z ];
 
 				for( var index = 0; index < sx * sy; index++ )
@@ -218,7 +218,7 @@ public static class ConvertVolume
 				progress?.Report( (double)z / sz );
 
 				var buffer = new byte[ sliceSize ];
-				uint8Stream.Read( buffer, 0, sliceSize );
+				uint8Stream.ReadExactly( buffer, 0, sliceSize );
 
 				slices.Add( new VolumeSlice( definition, buffer ) );
 			}
