@@ -3,6 +3,7 @@ namespace Zeiss.PiWeb.Volume.Convert;
 #region usings
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Xml;
@@ -41,13 +42,14 @@ public static class Gom
 
 		rawFileName = ReadValue( document, "//volume/raw_data/raw_data_block" );
 
-		var result = new VolumeMetadata( sx, sy, sz, rx, ry, rz );
+		var properties = new List<Property>
+		{
+			Property.Create( MaximumValue, minValue ),
+			Property.Create( MinimumValue, maxValue ),
+			Property.Create( RawDataName, rawFileName )
+		};
 
-		result.Properties.Add( Property.Create( MaximumValue, minValue ) );
-		result.Properties.Add( Property.Create( MinimumValue, maxValue ) );
-		result.Properties.Add( Property.Create( RawDataName, rawFileName ) );
-
-		return result;
+		return new VolumeMetadata( sx, sy, sz, rx, ry, rz, properties: properties );
 	}
 
 	private static DataType ReadDataType( XmlDocument document, string path )

@@ -66,7 +66,7 @@ internal class Vgi
 			if( string.IsNullOrEmpty( line ) )
 				continue;
 
-			var parts = line.Split( new[] { '=' }, StringSplitOptions.RemoveEmptyEntries );
+			var parts = line.Split( ['='], StringSplitOptions.RemoveEmptyEntries );
 			if( parts.Length != 2 )
 				continue;
 

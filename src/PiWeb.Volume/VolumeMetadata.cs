@@ -27,24 +27,6 @@ using Zeiss.PiWeb.ColorScale;
 /// </summary>
 public sealed class VolumeMetadata
 {
-	#region fields
-
-	private ushort _SizeX;
-	private ushort _SizeY;
-	private ushort _SizeZ;
-
-	private double _ResolutionX;
-	private double _ResolutionY;
-	private double _ResolutionZ;
-
-	private ushort _PositionX;
-	private ushort _PositionY;
-	private ushort _PositionZ;
-
-	private ColorScale? _ColorScale;
-
-	#endregion
-
 	#region constructors
 
 	private VolumeMetadata()
@@ -62,6 +44,7 @@ public sealed class VolumeMetadata
 	/// <param name="positionX">The position x.</param>
 	/// <param name="positionY">The position y.</param>
 	/// <param name="positionZ">The position z.</param>
+	/// <param name="properties">Optional properties for this volume.</param>
 	public VolumeMetadata(
 		ushort sizeX,
 		ushort sizeY,
@@ -71,17 +54,22 @@ public sealed class VolumeMetadata
 		double resolutionZ,
 		ushort positionX = 0,
 		ushort positionY = 0,
-		ushort positionZ = 0 )
+		ushort positionZ = 0,
+		IReadOnlyList<Property>? properties = null )
 	{
 		SizeX = sizeX;
 		SizeY = sizeY;
 		SizeZ = sizeZ;
+
 		ResolutionX = resolutionX;
 		ResolutionY = resolutionY;
 		ResolutionZ = resolutionZ;
+
 		PositionX = positionX;
 		PositionY = positionY;
 		PositionZ = positionZ;
+
+		Properties = properties ?? [];
 	}
 
 	#endregion
@@ -96,57 +84,57 @@ public sealed class VolumeMetadata
 	/// <summary>
 	/// The number of Voxels in X-Dimension.
 	/// </summary>
-	public ushort PositionX { get => _PositionX; init => _PositionX = value; }
+	public ushort PositionX { get; init; }
 
 	/// <summary>
 	/// The number of Voxels in Y-Dimension.
 	/// </summary>
-	public ushort PositionY { get => _PositionY; init => _PositionY = value; }
+	public ushort PositionY { get; init; }
 
 	/// <summary>
 	/// The number of Voxels in Z-Dimension.
 	/// </summary>
-	public ushort PositionZ { get => _PositionZ; init => _PositionZ = value; }
+	public ushort PositionZ { get; init; }
 
 	/// <summary>
 	/// The number of Voxels in X-Dimension.
 	/// </summary>
-	public ushort SizeX { get => _SizeX; init => _SizeX = value; }
+	public ushort SizeX { get; init; }
 
 	/// <summary>
 	/// The number of Voxels in Y-Dimension.
 	/// </summary>
-	public ushort SizeY { get => _SizeY; init => _SizeY = value; }
+	public ushort SizeY { get; init; }
 
 	/// <summary>
 	/// The number of Voxels in Z-Dimension.
 	/// </summary>
-	public ushort SizeZ { get => _SizeZ; init => _SizeZ = value; }
+	public ushort SizeZ { get; init; }
 
 	/// <summary>
 	/// The size of a Voxel in X-Dimension (mm).
 	/// </summary>
-	public double ResolutionX { get => _ResolutionX; init => _ResolutionX = value; }
+	public double ResolutionX { get; init; }
 
 	/// <summary>
 	/// The size of a Voxel in Y-Dimension (mm).
 	/// </summary>
-	public double ResolutionY { get => _ResolutionY; init => _ResolutionY = value; }
+	public double ResolutionY { get; init; }
 
 	/// <summary>
 	/// The size of a Voxel in Z-Dimension (mm).
 	/// </summary>
-	public double ResolutionZ { get => _ResolutionZ; init => _ResolutionZ = value; }
+	public double ResolutionZ { get; init; }
 
 	/// <summary>
 	/// Gets or sets the metadata.
 	/// </summary>
-	public ICollection<Property> Properties { get; } = new List<Property>();
+	public IReadOnlyList<Property> Properties { get; } = [];
 
 	/// <summary>
 	/// The color scale that should be used to colorize the grayscale values of the volume.
 	/// </summary>
-	public ColorScale? ColorScale { get => _ColorScale; init => _ColorScale = value; }
+	public ColorScale? ColorScale { get; init; }
 
 	#endregion
 
@@ -199,14 +187,13 @@ public sealed class VolumeMetadata
 	/// <param name="direction"></param>
 	public int GetSliceLength( Direction direction )
 	{
-		switch( direction )
+		return direction switch
 		{
-			case Direction.X: return SizeY * SizeZ;
-			case Direction.Y: return SizeX * SizeZ;
-			case Direction.Z: return SizeX * SizeY;
-			default:
-				throw new ArgumentOutOfRangeException( nameof( direction ), direction, null );
-		}
+			Direction.X => SizeY * SizeZ,
+			Direction.Y => SizeX * SizeZ,
+			Direction.Z => SizeX * SizeY,
+			_           => throw new ArgumentOutOfRangeException( nameof( direction ), direction, null )
+		};
 	}
 
 	/// <summary>
@@ -229,45 +216,44 @@ public sealed class VolumeMetadata
 			NewLineOnAttributes = false
 		};
 
-		using( var writer = XmlWriter.Create( stream, settings ) )
+		using var writer = XmlWriter.Create( stream, settings );
+
+		writer.WriteStartDocument( true );
+		writer.WriteStartElement( "VolumeMetadata" );
+
+		writer.WriteElementString( "FileVersion", FileVersion.ToString() );
+
+		writer.WriteElementString( "SizeX", SizeX.ToString( CultureInfo.InvariantCulture ) );
+		writer.WriteElementString( "SizeY", SizeY.ToString( CultureInfo.InvariantCulture ) );
+		writer.WriteElementString( "SizeZ", SizeZ.ToString( CultureInfo.InvariantCulture ) );
+
+		writer.WriteElementString( "ResolutionX", ResolutionX.ToString( CultureInfo.InvariantCulture ) );
+		writer.WriteElementString( "ResolutionY", ResolutionY.ToString( CultureInfo.InvariantCulture ) );
+		writer.WriteElementString( "ResolutionZ", ResolutionZ.ToString( CultureInfo.InvariantCulture ) );
+
+		writer.WriteElementString( "PositionX", PositionX.ToString( CultureInfo.InvariantCulture ) );
+		writer.WriteElementString( "PositionY", PositionY.ToString( CultureInfo.InvariantCulture ) );
+		writer.WriteElementString( "PositionZ", PositionZ.ToString( CultureInfo.InvariantCulture ) );
+
+		if( Properties.Count > 0 )
 		{
-			writer.WriteStartDocument( true );
-			writer.WriteStartElement( "VolumeMetadata" );
-
-			writer.WriteElementString( "FileVersion", FileVersion.ToString() );
-
-			writer.WriteElementString( "SizeX", SizeX.ToString( CultureInfo.InvariantCulture ) );
-			writer.WriteElementString( "SizeY", SizeY.ToString( CultureInfo.InvariantCulture ) );
-			writer.WriteElementString( "SizeZ", SizeZ.ToString( CultureInfo.InvariantCulture ) );
-
-			writer.WriteElementString( "ResolutionX", ResolutionX.ToString( CultureInfo.InvariantCulture ) );
-			writer.WriteElementString( "ResolutionY", ResolutionY.ToString( CultureInfo.InvariantCulture ) );
-			writer.WriteElementString( "ResolutionZ", ResolutionZ.ToString( CultureInfo.InvariantCulture ) );
-
-			writer.WriteElementString( "PositionX", PositionX.ToString( CultureInfo.InvariantCulture ) );
-			writer.WriteElementString( "PositionY", PositionY.ToString( CultureInfo.InvariantCulture ) );
-			writer.WriteElementString( "PositionZ", PositionZ.ToString( CultureInfo.InvariantCulture ) );
-
-			if( Properties.Count > 0 )
+			foreach( var property in Properties )
 			{
-				foreach( var property in Properties )
-				{
-					writer.WriteStartElement( "Property" );
-					property.Serialize( writer );
-					writer.WriteEndElement();
-				}
-			}
-
-			if( ColorScale is not null )
-			{
-				writer.WriteStartElement( "ColorScale" );
-				ColorScale.Write( writer );
+				writer.WriteStartElement( "Property" );
+				property.Serialize( writer );
 				writer.WriteEndElement();
 			}
-
-			writer.WriteEndElement();
-			writer.WriteEndDocument();
 		}
+
+		if( ColorScale is not null )
+		{
+			writer.WriteStartElement( "ColorScale" );
+			ColorScale.Write( writer );
+			writer.WriteEndElement();
+		}
+
+		writer.WriteEndElement();
+		writer.WriteEndDocument();
 	}
 
 	internal static VolumeMetadata Deserialize( Stream stream )
@@ -283,55 +269,66 @@ public sealed class VolumeMetadata
 
 		using var reader = XmlReader.Create( stream, settings );
 
-		var result = new VolumeMetadata();
 		reader.MoveToElement();
+
+		var fileVersion = Volume.FileVersion;
+
+		ColorScale? colorScale = null;
+
+		var properties = new List<Property>();
+		ushort sizeX = 0, sizeY = 0, sizeZ = 0;
+		ushort positionX = 0, positionY = 0, positionZ = 0;
+		double resolutionX = 0, resolutionY = 0, resolutionZ = 0;
 
 		while( reader.Read() )
 		{
 			switch( reader.Name )
 			{
 				case "FileVersion":
-					result.FileVersion = new Version( reader.ReadString() );
+					fileVersion = new Version( reader.ReadString() );
 					break;
 				case "SizeX":
-					result._SizeX = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+					sizeX = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 					break;
 				case "SizeY":
-					result._SizeY = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+					sizeY = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 					break;
 				case "SizeZ":
-					result._SizeZ = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+					sizeZ = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 					break;
 				case "ResolutionX":
-					result._ResolutionX = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+					resolutionX = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 					break;
 				case "ResolutionY":
-					result._ResolutionY = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+					resolutionY = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 					break;
 				case "ResolutionZ":
-					result._ResolutionZ = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+					resolutionZ = double.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 					break;
 				case "Property":
 					var property = Property.Deserialize( reader );
 					if( property is not null )
-						result.Properties.Add( property );
+						properties.Add( property );
 					break;
 				case "PositionX":
-					result._PositionX = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+					positionX = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 					break;
 				case "PositionY":
-					result._PositionY = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+					positionY = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 					break;
 				case "PositionZ":
-					result._PositionZ = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
+					positionZ = ushort.Parse( reader.ReadString(), CultureInfo.InvariantCulture );
 					break;
 				case "ColorScale":
-					result._ColorScale = ColorScale.Read( reader );
+					colorScale = ColorScale.Read( reader );
 					break;
 			}
 		}
 
-		return result;
+		return new VolumeMetadata( sizeX, sizeY, sizeZ, resolutionX, resolutionY, resolutionZ, positionX, positionY, positionZ, properties )
+		{
+			FileVersion = fileVersion,
+		};
 	}
 
 	/// <inheritdoc />

@@ -12,7 +12,6 @@ namespace Zeiss.PiWeb.Volume.Tests;
 
 #region usings
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 

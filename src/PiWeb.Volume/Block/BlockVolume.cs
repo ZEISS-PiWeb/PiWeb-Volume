@@ -237,7 +237,7 @@ public class BlockVolume : CompressedVolume
 	{
 		var sw = Stopwatch.StartNew();
 
-		var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, new[] { range } );
+		var sliceRangeCollector = new BlockVolumeSliceRangeCollector( this, [range] );
 		var data = sliceRangeCollector.CollectSliceRanges( progress, ct );
 
 		var result = data.GetSliceRange( range );

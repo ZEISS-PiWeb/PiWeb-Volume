@@ -13,8 +13,8 @@ namespace Zeiss.PiWeb.Volume.Convert;
 #region usings
 
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 #endregion
@@ -130,62 +130,69 @@ public class Scv
 
 	#region methods
 
-	public static implicit operator VolumeMetadata( Scv scv ) => scv.ToMetadata();
+	public static implicit operator VolumeMetadata( Scv scv )
+	{
+		return scv.ToMetadata();
+	}
 
 	public VolumeMetadata ToMetadata()
 	{
-		var result = new VolumeMetadata(
+		var properties = new List<Property>
+		{
+			Property.Create( "HeaderSize", HeaderLength ),
+			Property.Create( "MirrorZ", MirrorZ ),
+			Property.Create( "BitDepth", BitDepth ),
+			Property.Create( "MinBitDepth", MinBitDepth ),
+			Property.Create( "MaxBitDepth", MaxBitDepth ),
+			Property.Create( "ScannerPositionX", ScannerPositionX ),
+			Property.Create( "ScannerPositionY", ScannerPositionY ),
+			Property.Create( "ScannerPositionZ", ScannerPositionZ ),
+			Property.Create( "ScannerCurrent", ScannerCurrent ),
+			Property.Create( "ScannerVoltage", ScannerVoltage ),
+			Property.Create( "RtPositionX", RtPositionX ),
+			Property.Create( "RtPositionY", RtPositionY ),
+			Property.Create( "RtPositionZ", RtPositionZ ),
+			Property.Create( "DetectorTime", DetectorTime ),
+			Property.Create( "DetectorGain", DetectorGain ),
+			Property.Create( "DetectorPositionX", DetectorPositionX ),
+			Property.Create( "DetectorPositionY", DetectorPositionY ),
+			Property.Create( "DetectorPositionZ", DetectorPositionZ ),
+			Property.Create( "DetectorVoxelSizeX", DetectorVoxelSizeX ),
+			Property.Create( "DetectorVoxelSizeY", DetectorVoxelSizeY ),
+			Property.Create( "DetectorBitDepth", DetectorBitDepth ),
+			Property.Create( "DetectorWidth", DetectorWidth ),
+			Property.Create( "DetectorHeight", DetectorHeight ),
+			Property.Create( "DetectorImageWidth", DetectorImageWidth ),
+			Property.Create( "DetectorImageHeight", DetectorImageHeight ),
+			Property.Create( "Projections", Projections ),
+			Property.Create( "RoiX", RoiX ),
+			Property.Create( "RoiY", RoiY ),
+			Property.Create( "RoiWidth", RoiW ),
+			Property.Create( "RoiHeight", RoiH ),
+			Property.Create( "NoiseReductionFilter", NoiseReductionFilter ),
+			Property.Create( "VoxelReductionFactor", VoxelReductionFactor ),
+			Property.Create( "Amplification", Amplification ),
+			Property.Create( "BinningMode", BinningMode ),
+			Property.Create( "PreFilter", PreFilter ),
+			Property.Create( "Position.X", PositionX ),
+			Property.Create( "Position.Y", PositionY ),
+			Property.Create( "Position.Z", PositionZ ),
+			Property.Create( "MinReko", MinReko ),
+			Property.Create( "MaxReko", MaxReko ),
+			Property.Create( "Angle", Angle ),
+			Property.Create( "Merge", Merge )
+		};
+
+		return new VolumeMetadata(
 			(ushort)VolumeSizeX,
 			(ushort)VolumeSizeY,
 			(ushort)VolumeSizeZ,
+
 			ResolutionX,
 			ResolutionY,
-			ResolutionZ );
+			ResolutionZ,
 
-		result.Properties.Add( Property.Create( "HeaderSize", HeaderLength ) );
-		result.Properties.Add( Property.Create( "MirrorZ", MirrorZ ) );
-		result.Properties.Add( Property.Create( "BitDepth", BitDepth ) );
-		result.Properties.Add( Property.Create( "MinBitDepth", MinBitDepth ) );
-		result.Properties.Add( Property.Create( "MaxBitDepth", MaxBitDepth ) );
-		result.Properties.Add( Property.Create( "ScannerPositionX", ScannerPositionX ) );
-		result.Properties.Add( Property.Create( "ScannerPositionY", ScannerPositionY ) );
-		result.Properties.Add( Property.Create( "ScannerPositionZ", ScannerPositionZ ) );
-		result.Properties.Add( Property.Create( "ScannerCurrent", ScannerCurrent ) );
-		result.Properties.Add( Property.Create( "ScannerVoltage", ScannerVoltage ) );
-		result.Properties.Add( Property.Create( "RtPositionX", RtPositionX ) );
-		result.Properties.Add( Property.Create( "RtPositionY", RtPositionY ) );
-		result.Properties.Add( Property.Create( "RtPositionZ", RtPositionZ ) );
-		result.Properties.Add( Property.Create( "DetectorTime", DetectorTime ) );
-		result.Properties.Add( Property.Create( "DetectorGain", DetectorGain ) );
-		result.Properties.Add( Property.Create( "DetectorPositionX", DetectorPositionX ) );
-		result.Properties.Add( Property.Create( "DetectorPositionY", DetectorPositionY ) );
-		result.Properties.Add( Property.Create( "DetectorPositionZ", DetectorPositionZ ) );
-		result.Properties.Add( Property.Create( "DetectorVoxelSizeX", DetectorVoxelSizeX ) );
-		result.Properties.Add( Property.Create( "DetectorVoxelSizeY", DetectorVoxelSizeY ) );
-		result.Properties.Add( Property.Create( "DetectorBitDepth", DetectorBitDepth ) );
-		result.Properties.Add( Property.Create( "DetectorWidth", DetectorWidth ) );
-		result.Properties.Add( Property.Create( "DetectorHeight", DetectorHeight ) );
-		result.Properties.Add( Property.Create( "DetectorImageWidth", DetectorImageWidth ) );
-		result.Properties.Add( Property.Create( "DetectorImageHeight", DetectorImageHeight ) );
-		result.Properties.Add( Property.Create( "Projections", Projections ) );
-		result.Properties.Add( Property.Create( "RoiX", RoiX ) );
-		result.Properties.Add( Property.Create( "RoiY", RoiY ) );
-		result.Properties.Add( Property.Create( "RoiWidth", RoiW ) );
-		result.Properties.Add( Property.Create( "RoiHeight", RoiH ) );
-		result.Properties.Add( Property.Create( "NoiseReductionFilter", NoiseReductionFilter ) );
-		result.Properties.Add( Property.Create( "VoxelReductionFactor", VoxelReductionFactor ) );
-		result.Properties.Add( Property.Create( "Amplification", Amplification ) );
-		result.Properties.Add( Property.Create( "BinningMode", BinningMode ) );
-		result.Properties.Add( Property.Create( "PreFilter", PreFilter ) );
-		result.Properties.Add( Property.Create( "Position.X", PositionX ) );
-		result.Properties.Add( Property.Create( "Position.Y", PositionY ) );
-		result.Properties.Add( Property.Create( "Position.Z", PositionZ ) );
-		result.Properties.Add( Property.Create( "MinReko", MinReko ) );
-		result.Properties.Add( Property.Create( "MaxReko", MaxReko ) );
-		result.Properties.Add( Property.Create( "Angle", Angle ) );
-		result.Properties.Add( Property.Create( "Merge", Merge ) );
-
-		return result;
+			properties: properties );
 	}
 
 	public static Scv FromMetaData( VolumeMetadata metadata, int bitDepth )

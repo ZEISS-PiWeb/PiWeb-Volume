@@ -178,8 +178,8 @@ public class MainViewModel : ViewModelBase
 				return;
 
 			if( data.Left != null )
-				LeftSpectrum = new[] { data.Left };
-			RightSpectrum = new[] { data.Right };
+				LeftSpectrum = [data.Left];
+			RightSpectrum = [data.Right];
 			DeltaSpectrum = data.Delta;
 		} );
 	}

@@ -51,7 +51,7 @@ internal class SliceStreamReader
 		_SizeY = metadata.SizeY;
 		_SizeZ = metadata.SizeZ;
 
-		_Buffer = Array.Empty<byte>();
+		_Buffer = [];
 
 		Interop = new InteropSliceReader
 		{

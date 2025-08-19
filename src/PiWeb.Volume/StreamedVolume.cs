@@ -247,7 +247,7 @@ public sealed class StreamedVolume : Volume, IDisposable
 	public void Dispose()
 	{
 		if( !_LeaveOpen )
-			_Stream?.Dispose();
+			_Stream.Dispose();
 	}
 
 	#endregion

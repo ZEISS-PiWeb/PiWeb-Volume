@@ -33,12 +33,12 @@ public class OptionsConverter : IValueConverter
 		if( value is not string str )
 			return null;
 
-		var options = str.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries );
+		var options = str.Split( [';'], StringSplitOptions.RemoveEmptyEntries );
 		var result = new Dictionary<string, string>();
 
 		foreach( var option in options )
 		{
-			var keyvalue = option.Split( new[] { '=' }, StringSplitOptions.RemoveEmptyEntries );
+			var keyvalue = option.Split( ['='], StringSplitOptions.RemoveEmptyEntries );
 			if( keyvalue.Length != 2 )
 				return null;
 
