@@ -1,0 +1,55 @@
+<!--EXTERNAL_PROPERTIES: UseWpf-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <PropertyGroup>
+
+        <LangVersion>latestmajor</LangVersion>
+        <Platform>AnyCPU</Platform>
+        <TargetFramework>net9.0-windows10.0.22621</TargetFramework>
+        <RootNamespace Condition=" '$(RootNamespace)' == '' ">Zeiss.$(MSBuildProjectName)</RootNamespace>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
+        <Configurations>Debug;Release;Test;Pack</Configurations>
+
+        <AssemblyTitle>Zeiss.$(MSBuildProjectName)</AssemblyTitle>
+        <Product>Zeiss.PiWeb.Volume</Product>
+        <Company>Carl Zeiss Industrielle Messtechnik GmbH</Company>
+        <Copyright>Copyright © 2025 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>
+
+        <Authors>$(Company)</Authors>
+
+        <SelfContained>false</SelfContained>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+        <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+
+        <!-- Do not add target framework to output paths since we only build one flavor -->
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
+        <!-- Disable default resource generation - we use our own patterns -->
+        <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+
+        <!-- Prevent the error message: 'Ensure that this project has Microsoft.Bcl.Build installed and packages.config is located next to the project file.' -->
+        <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
+
+        <!-- Enable nullable reference types for all projects -->
+        <Nullable>enable</Nullable>
+
+        <!-- Treat all warnings as errors -->
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+        <!-- Enforce to only use NuGets with compatible frameworks -->
+        <WarningsAsErrors>$(WarningsAsErrors);NU1701;NU1702</WarningsAsErrors>
+
+    </PropertyGroup>
+
+    <!-- Default includes and resource generation -->
+    <ItemGroup>
+        <EmbeddedResource Include="**/*.resx" />
+
+        <EmbeddedResource Update="**/*.resx">
+            <DependentUpon Condition="Exists('$([System.String]::Copy(&quot;%(RelativeDir)%(FileName)&quot;).Replace(&quot;.de&quot;, &quot;&quot;)).cs')">$([System.String]::Copy('%(FileName)').Replace('.de', '')).cs</DependentUpon>
+            <SubType>Designer</SubType>
+        </EmbeddedResource>
+    </ItemGroup>
+
+</Project>

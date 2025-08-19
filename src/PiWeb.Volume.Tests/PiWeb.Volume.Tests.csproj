@@ -1,17 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Platform>AnyCPU</Platform>
-    <LangVersion>latestmajor</LangVersion>
-    <RootNamespace>Zeiss.PiWeb.Volume.Tests</RootNamespace>
     <IsPackable>false</IsPackable>
-    <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <Configurations>Debug;Release;Test;Pack</Configurations>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

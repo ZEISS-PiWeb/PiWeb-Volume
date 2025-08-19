@@ -1,19 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Platform>AnyCPU</Platform>
     <OutputType>WinExe</OutputType>
-    <AssemblyName>PiWeb.Volume.Viewer</AssemblyName>
-    <RootNamespace>Zeiss.PiWeb.Volume.Viewer</RootNamespace>
-    <TargetFramework>net9.0-windows10.0.22621</TargetFramework>
     <UseWPF>true</UseWPF>
     <IsPackable>false</IsPackable>
-    <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <Configurations>Debug;Release;Test;Pack</Configurations>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
