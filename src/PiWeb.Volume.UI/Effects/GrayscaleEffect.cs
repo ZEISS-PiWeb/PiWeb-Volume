@@ -23,11 +23,11 @@ namespace Zeiss.PiWeb.Volume.UI.Effects
     {
         #region members
 
-        public static readonly DependencyProperty InputProperty = RegisterPixelShaderSamplerProperty( "Input", typeof( GrayscaleEffect ), 0 );
-        public static readonly DependencyProperty RProperty = DependencyProperty.Register( "R", typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 0.299, PixelShaderConstantCallback( 0 ) ) );
-        public static readonly DependencyProperty GProperty = DependencyProperty.Register( "G", typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 0.587, PixelShaderConstantCallback( 1 ) ) );
-        public static readonly DependencyProperty BProperty = DependencyProperty.Register( "B", typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 0.144, PixelShaderConstantCallback( 2 ) ) );
-        public static readonly DependencyProperty OpacityProperty = DependencyProperty.Register( "Opacity", typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 1D, PixelShaderConstantCallback( 3 ) ) );
+        public static readonly DependencyProperty InputProperty = RegisterPixelShaderSamplerProperty( nameof( Input ), typeof( GrayscaleEffect ), 0 );
+		public static readonly DependencyProperty RProperty = DependencyProperty.Register( nameof( R ), typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 0.299, PixelShaderConstantCallback( 0 ) ) );
+		public static readonly DependencyProperty GProperty = DependencyProperty.Register( nameof( G ), typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 0.587, PixelShaderConstantCallback( 1 ) ) );
+		public static readonly DependencyProperty BProperty = DependencyProperty.Register( nameof( B ), typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 0.144, PixelShaderConstantCallback( 2 ) ) );
+		public static readonly DependencyProperty OpacityProperty = DependencyProperty.Register( nameof( Opacity ), typeof( double ), typeof( GrayscaleEffect ), new UIPropertyMetadata( 1D, PixelShaderConstantCallback( 3 ) ) );
 
         #endregion
 

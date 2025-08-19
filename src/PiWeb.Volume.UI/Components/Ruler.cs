@@ -26,33 +26,33 @@ namespace Zeiss.PiWeb.Volume.UI.Components
     {
         #region members
 
-        public static DependencyProperty ValueRangeProperty =
-            DependencyProperty.Register( "ValueRange", typeof( DoubleRange? ), typeof( Ruler ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.AffectsRender )
-            );
+		public static readonly DependencyProperty ValueRangeProperty =
+			DependencyProperty.Register( nameof( ValueRange ), typeof( DoubleRange? ), typeof( Ruler ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.AffectsRender )
+			);
 
-        public static DependencyProperty StrokeThicknessProperty =
-            DependencyProperty.Register( "StrokeThickness", typeof( double ), typeof( Ruler ), new FrameworkPropertyMetadata( 1.0, FrameworkPropertyMetadataOptions.AffectsRender )
-            );
+		public static readonly DependencyProperty StrokeThicknessProperty =
+			DependencyProperty.Register( nameof( StrokeThickness ), typeof( double ), typeof( Ruler ), new FrameworkPropertyMetadata( 1.0, FrameworkPropertyMetadataOptions.AffectsRender )
+			);
 
-        public static DependencyProperty StrokeProperty =
-            DependencyProperty.Register( "Stroke", typeof( Brush ), typeof( Ruler ), new FrameworkPropertyMetadata( Brushes.Black, FrameworkPropertyMetadataOptions.AffectsRender ) );
+		public static readonly DependencyProperty StrokeProperty =
+			DependencyProperty.Register( nameof( Stroke ), typeof( Brush ), typeof( Ruler ), new FrameworkPropertyMetadata( Brushes.Black, FrameworkPropertyMetadataOptions.AffectsRender ) );
 
-        public static DependencyProperty InvertProperty =
-            DependencyProperty.Register( "Invert", typeof( bool ), typeof( Ruler ), new FrameworkPropertyMetadata( false, FrameworkPropertyMetadataOptions.AffectsRender )
-            );
+		public static readonly DependencyProperty InvertProperty =
+			DependencyProperty.Register( nameof( Invert ), typeof( bool ), typeof( Ruler ), new FrameworkPropertyMetadata( false, FrameworkPropertyMetadataOptions.AffectsRender )
+			);
 
-        public static DependencyProperty HighlightBrushProperty =
-            DependencyProperty.Register( "HighlightBrush", typeof( Brush ), typeof( Ruler ), new FrameworkPropertyMetadata( Brushes.White, FrameworkPropertyMetadataOptions.AffectsRender )
-            );
+		public static readonly DependencyProperty HighlightBrushProperty =
+			DependencyProperty.Register( nameof( HighlightBrush ), typeof( Brush ), typeof( Ruler ), new FrameworkPropertyMetadata( Brushes.White, FrameworkPropertyMetadataOptions.AffectsRender )
+			);
 
 
-        public static DependencyProperty HighlightedRangeProperty =
-            DependencyProperty.Register( "HighlightedRange", typeof( DoubleRange? ), typeof( Ruler ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.AffectsRender )
-            );
+		public static readonly DependencyProperty HighlightedRangeProperty =
+			DependencyProperty.Register( nameof( HighlightedRange ), typeof( DoubleRange? ), typeof( Ruler ), new FrameworkPropertyMetadata( null, FrameworkPropertyMetadataOptions.AffectsRender )
+			);
 
-        public static DependencyProperty OrientationProperty =
-            DependencyProperty.Register( "Orientation", typeof( Orientation ), typeof( Ruler ), new FrameworkPropertyMetadata( Orientation.Horizontal, FrameworkPropertyMetadataOptions.AffectsRender )
-            );
+		public static readonly DependencyProperty OrientationProperty =
+			DependencyProperty.Register( nameof( Orientation ), typeof( Orientation ), typeof( Ruler ), new FrameworkPropertyMetadata( Orientation.Horizontal, FrameworkPropertyMetadataOptions.AffectsRender )
+			);
 
         #endregion
 

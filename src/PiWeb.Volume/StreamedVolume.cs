@@ -184,7 +184,7 @@ namespace Zeiss.PiWeb.Volume
 			for( var z = 0; z < sz; z++ )
 			{
 				ct.ThrowIfCancellationRequested();
-				_Stream.Read( buffer, 0, bufferSize );
+				_Stream.ReadExactly( buffer, 0, bufferSize );
 
 				for( var y = 0; y < sy; y++ )
 				{
@@ -205,7 +205,7 @@ namespace Zeiss.PiWeb.Volume
 			for( var z = 0; z < sz; z++ )
 			{
 				ct.ThrowIfCancellationRequested();
-				_Stream.Read( sliceBuffer, z * sx, sx );
+				_Stream.ReadExactly( sliceBuffer, z * sx, sx );
 				_Stream.Seek( sx * ( sy - 1 ), SeekOrigin.Current );
 			}
 		}
@@ -219,7 +219,7 @@ namespace Zeiss.PiWeb.Volume
 
 			ct.ThrowIfCancellationRequested();
 			_Stream.Seek( (long)index * sx * sy, SeekOrigin.Begin );
-			_Stream.Read( sliceBuffer, 0, bufferSize );
+			_Stream.ReadExactly( sliceBuffer, 0, bufferSize );
 		}
 
 		/// <summary>

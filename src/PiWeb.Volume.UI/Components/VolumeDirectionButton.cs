@@ -23,13 +23,13 @@ namespace Zeiss.PiWeb.Volume.UI.Components
         #region members
 
         public static readonly DependencyProperty OuterPathProperty = DependencyProperty.Register(
-            "OuterPath", typeof( Geometry ), typeof( VolumeDirectionButton ), new PropertyMetadata( default( Geometry ) ) );
+            nameof(OuterPath), typeof( Geometry ), typeof( VolumeDirectionButton ), new PropertyMetadata( default( Geometry ) ) );
 
         public static readonly DependencyProperty InnerPathProperty = DependencyProperty.Register(
-            "InnerPath", typeof( Geometry ), typeof( VolumeDirectionButton ), new PropertyMetadata( default( Geometry ) ) );
+            nameof(InnerPath), typeof( Geometry ), typeof( VolumeDirectionButton ), new PropertyMetadata( default( Geometry ) ) );
 
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
-            "IsSelected", typeof( bool ), typeof( VolumeDirectionButton ), new PropertyMetadata( default( bool ) ) );
+            nameof(IsSelected), typeof( bool ), typeof( VolumeDirectionButton ), new PropertyMetadata( false ) );
 
         #endregion
 

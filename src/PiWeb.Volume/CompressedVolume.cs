@@ -153,8 +153,7 @@ namespace Zeiss.PiWeb.Volume
 		/// <exception cref="NotSupportedException">The volume has no compressed data</exception>
 		public override VolumeSliceCollection GetSliceRanges( IReadOnlyCollection<VolumeSliceRangeDefinition> ranges, IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
 		{
-			if( ranges == null )
-				throw new ArgumentNullException( nameof( ranges ) );
+			ArgumentNullException.ThrowIfNull( ranges );
 
 			if( ranges.Count == 0 )
 				return new VolumeSliceCollection();
@@ -294,8 +293,7 @@ namespace Zeiss.PiWeb.Volume
 		/// </summary>
 		public void Save( Stream stream, ILogger? logger = null )
 		{
-			if( stream == null )
-				throw new ArgumentNullException( nameof( stream ) );
+			ArgumentNullException.ThrowIfNull( stream );
 
 			var sw = Stopwatch.StartNew();
 			try
