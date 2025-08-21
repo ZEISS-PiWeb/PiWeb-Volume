@@ -4,6 +4,7 @@
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
     <IsPackable>false</IsPackable>
+    <TargetFramework>net9.0-windows10.0.22621</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>

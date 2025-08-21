@@ -35,6 +35,5 @@ jobs:
       run: msbuild -restore -p:Configuration=Pack ${{ github.workspace }}\src\PiWeb.Volume.sln
     - name: Publish
       run: |
-        msbuild -t:pack -p:Configuration=Pack -p:Platform=x64 ${{ github.workspace }}\src\PiWeb.Volume\PiWeb.Volume.csproj 
+        msbuild -t:pack -p:Configuration=Pack -p:Platform=AnyCPU ${{ github.workspace }}\src\PiWeb.Volume\PiWeb.Volume.csproj 
         dotnet nuget push ${{ github.workspace }}\bin\Pack\*.nupkg --skip-duplicate --no-symbols true --api-key ${{secrets.NUGET_FEED_PAT}}
-        Remove-Item ${{ github.workspace }}\bin\Pack -Recurse
