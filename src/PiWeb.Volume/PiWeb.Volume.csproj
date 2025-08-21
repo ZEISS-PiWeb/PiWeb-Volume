@@ -1,25 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Platform>AnyCPU</Platform>
-    <LangVersion>latestmajor</LangVersion>
-    <AssemblyName>PiWeb.Volume</AssemblyName>
-    <RootNamespace>Zeiss.PiWeb.Volume</RootNamespace>
-    <Copyright>Copyright © 2025 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>
-    <Company>Carl Zeiss Industrielle Messtechnik GmbH</Company>
-    <Authors>$(Company)</Authors>
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
-    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <Configurations>Debug;Release;Test;Pack</Configurations>
-    <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -47,15 +32,6 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>Carl Zeiss PiWeb Volume</PackageTags>
   </PropertyGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Volume.de.resx">
-      <DependentUpon>Volume.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Volume.resx">
-      <DependentUpon>Volume.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Zeiss.PiWeb.ColorScale" Version="1.0.0"/>

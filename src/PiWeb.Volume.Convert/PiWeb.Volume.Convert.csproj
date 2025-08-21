@@ -1,25 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Platform>AnyCPU</Platform>
-    <LangVersion>latestmajor</LangVersion>
-    <AssemblyName>PiWeb.Volume.Convert</AssemblyName>
-    <RootNamespace>Zeiss.PiWeb.Volume.Convert</RootNamespace>
-    <Copyright>Copyright © 2025 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>
-    <Company>Carl Zeiss Industrielle Messtechnik GmbH</Company>
-    <Authors>$(Company)</Authors>
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <IsPackable>false</IsPackable>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
-    <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <Configurations>Debug;Release;Test;Pack</Configurations>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
