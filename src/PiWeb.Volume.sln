@@ -20,6 +20,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiWeb.Volume.UI", "PiWeb.Vo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PiWeb.Volume.Tests", "PiWeb.Volume.Tests\PiWeb.Volume.Tests.csproj", "{4A6F40F3-2B69-42AA-AF90-415D9AD94F23}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{86156BD6-86D6-4535-8F19-FC178097C3DA}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\build.yml = ..\.github\workflows\build.yml
+		..\.github\workflows\create-release.yml = ..\.github\workflows\create-release.yml
+		..\.github\workflows\foss-compliance-scan.yml = ..\.github\workflows\foss-compliance-scan.yml
+		..\.github\workflows\nuget-publish.yml = ..\.github\workflows\nuget-publish.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
