@@ -1,26 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Platforms>x64</Platforms>
-    <LangVersion>latestmajor</LangVersion>
-    <AssemblyName>PiWeb.Volume</AssemblyName>
-    <RootNamespace>Zeiss.PiWeb.Volume</RootNamespace>
-    <Copyright>Copyright © 2020 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>
-    <Company>Carl Zeiss Industrielle Messtechnik GmbH</Company>
-    <Authors>$(Company)</Authors>
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
-    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <Configurations>Debug;Release;Test;Pack</Configurations>
-    <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -39,7 +23,7 @@
       volumemetric data for visualization in PiWeb.
     </Description>
     <PackageId>Zeiss.PiWeb.Volume</PackageId>
-    <Version>3.3.3</Version>
+    <Version>3.4.0</Version>
     <PackageIcon>logo_128x128.png</PackageIcon>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/ZEISS-PiWeb/PiWeb-Volume</PackageProjectUrl>
@@ -48,15 +32,6 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>Carl Zeiss PiWeb Volume</PackageTags>
   </PropertyGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Volume.de.resx">
-      <DependentUpon>Volume.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Volume.resx">
-      <DependentUpon>Volume.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Zeiss.PiWeb.ColorScale" Version="1.0.0"/>

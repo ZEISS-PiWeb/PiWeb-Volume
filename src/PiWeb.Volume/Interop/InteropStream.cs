@@ -8,33 +8,32 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.Interop
-{
-	#region usings
+namespace Zeiss.PiWeb.Volume.Interop;
 
-	using System;
-	using System.IO;
-	using System.Runtime.InteropServices;
+#region usings
+
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
+
+#endregion
+
+internal delegate int Read( IntPtr ptr, int length );
+
+internal delegate int Write( IntPtr ptr, int length );
+
+internal delegate long Seek( long pos, SeekOrigin origin );
+
+[StructLayout( LayoutKind.Sequential )]
+internal class InteropStream
+{
+	#region members
+
+	public Read? Read;
+
+	public Write? Write;
+
+	public Seek? Seek;
 
 	#endregion
-
-	internal delegate int Read( IntPtr ptr, int length );
-
-	internal delegate int Write( IntPtr ptr, int length );
-
-	internal delegate long Seek( long pos, SeekOrigin origin );
-
-	[StructLayout( LayoutKind.Sequential )]
-	internal class InteropStream
-	{
-		#region members
-
-		public Read? Read;
-
-		public Write? Write;
-
-		public Seek? Seek;
-
-		#endregion
-	}
 }

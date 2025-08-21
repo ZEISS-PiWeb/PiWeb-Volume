@@ -8,40 +8,39 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.Converters
+namespace Zeiss.PiWeb.Volume.UI.Converters;
+
+#region usings
+
+using System;
+using System.Globalization;
+using System.Windows.Data;
+
+#endregion
+
+public class IsNotNullConverter : IValueConverter
 {
-    #region usings
+	#region properties
 
-    using System;
-    using System.Globalization;
-    using System.Windows.Data;
+	public bool Invert { get; set; }
 
-    #endregion
+	#endregion
 
-    public class IsNotNullConverter : IValueConverter
-    {
-        #region properties
+	#region interface IValueConverter
 
-        public bool Invert { get; set; }
+	public object? Convert( object? value, Type targetType, object? parameter, CultureInfo culture )
+	{
+		var result = value is null;
+		if( !Invert )
+			result = !result;
 
-        #endregion
+		return result;
+	}
 
-        #region interface IValueConverter
+	public object? ConvertBack( object? value, Type targetType, object? parameter, CultureInfo culture )
+	{
+		throw new NotImplementedException();
+	}
 
-        public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
-        {
-            var result = value is null;
-            if( !Invert )
-                result = !result;
-
-            return result;
-        }
-
-        public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-    }
+	#endregion
 }

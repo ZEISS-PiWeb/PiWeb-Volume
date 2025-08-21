@@ -252,15 +252,12 @@ public static class VolumeTestHelper
 		return new Noise( peak, mean, (double)sumNoise / totalCount, q95, noises );
 	}
 
-	public static UncompressedVolume LoadUncompressedVolume( string fileName )
+	public static Volume LoadUncompressedVolume( string fileName )
 	{
 		using var scv = File.OpenRead( fileName );
 		var bitDepthFromExtension = string.Equals( Path.GetExtension( fileName ), ".uint16_scv" ) ? 16 : 8;
 
-		return ConvertVolume.FromScv(
-			scv,
-			bitDepthFromExtension,
-			false, 0, 0, false ) as UncompressedVolume;
+		return ConvertVolume.FromScv( scv, bitDepthFromExtension, false, 0, 0, false );
 	}
 
 	#endregion

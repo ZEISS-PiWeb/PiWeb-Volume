@@ -8,39 +8,38 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.ValidationRules
+namespace Zeiss.PiWeb.Volume.UI.ValidationRules;
+
+#region usings
+
+using System;
+using System.Globalization;
+using System.Windows.Controls;
+
+#endregion
+
+public class OptionsRule : ValidationRule
 {
-	#region usings
+	#region methods
 
-	using System;
-	using System.Globalization;
-	using System.Windows.Controls;
-
-	#endregion
-
-	public class OptionsRule : ValidationRule
+	public override ValidationResult Validate( object value, CultureInfo cultureInfo )
 	{
-		#region methods
+		var str = ( string ) value;
 
-		public override ValidationResult Validate( object value, CultureInfo cultureInfo )
-		{
-			var str = ( string ) value;
-
-			if( string.IsNullOrEmpty( str ) )
-				return ValidationResult.ValidResult;
-
-			var options = str.Split( new[] { ';' } );
-
-			foreach( var option in options )
-			{
-				var keyvalue = option.Split( new[] { '=' }, StringSplitOptions.RemoveEmptyEntries );
-				if( keyvalue.Length != 2 )
-					return new ValidationResult( false, "Please specify your options separated by ';' in the scheme 'key=value'." );
-			}
-
+		if( string.IsNullOrEmpty( str ) )
 			return ValidationResult.ValidResult;
+
+		var options = str.Split( new[] { ';' } );
+
+		foreach( var option in options )
+		{
+			var keyvalue = option.Split( ['='], StringSplitOptions.RemoveEmptyEntries );
+			if( keyvalue.Length != 2 )
+				return new ValidationResult( false, "Please specify your options separated by ';' in the scheme 'key=value'." );
 		}
 
-		#endregion
+		return ValidationResult.ValidResult;
 	}
+
+	#endregion
 }

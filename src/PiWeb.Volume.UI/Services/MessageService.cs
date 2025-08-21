@@ -8,25 +8,24 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.Services
-{
-	#region usings
+namespace Zeiss.PiWeb.Volume.UI.Services;
 
-	using System.Windows;
-	using Zeiss.PiWeb.Volume.UI.Interfaces;
+#region usings
+
+using System.Windows;
+using Zeiss.PiWeb.Volume.UI.Interfaces;
+
+#endregion
+
+// ReSharper disable once ClassNeverInstantiated.Global
+public class MessageService : IMessageService
+{
+	#region interface IMessageService
+
+	public void ShowMessage( MessageBoxImage image, string message )
+	{
+		MessageBox.Show( Application.Current.MainWindow, message, string.Empty, MessageBoxButton.OK, image );
+	}
 
 	#endregion
-
-	// ReSharper disable once ClassNeverInstantiated.Global
-	public class MessageService : IMessageService
-	{
-		#region interface IMessageService
-
-		public void ShowMessage( MessageBoxImage image, string message )
-		{
-			MessageBox.Show( Application.Current.MainWindow, message, string.Empty, MessageBoxButton.OK, image );
-		}
-
-		#endregion
-	}
 }

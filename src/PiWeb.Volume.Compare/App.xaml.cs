@@ -1,34 +1,27 @@
-﻿namespace Zeiss.PiWeb.Volume.Compare
+﻿namespace Zeiss.PiWeb.Volume.Compare;
+
+using System.Windows;
+using Zeiss.PiWeb.Volume.Compare.View;
+using Zeiss.PiWeb.Volume.Compare.ViewModel;
+using Zeiss.PiWeb.Volume.UI.Services;
+
+/// <summary>
+/// Interaction logic for App.xaml
+/// </summary>
+public partial class App : Application
 {
-	using System.Windows;
-	using Unity;
-	using Zeiss.PiWeb.Volume.Compare.View;
-	using Zeiss.PiWeb.Volume.Compare.ViewModel;
-	using Zeiss.PiWeb.Volume.UI.Interfaces;
-	using Zeiss.PiWeb.Volume.UI.Services;
+	#region methods
 
-	/// <summary>
-	/// Interaction logic for App.xaml
-	/// </summary>
-	public partial class App : Application
+	/// <inheritdoc />
+	protected override void OnStartup( StartupEventArgs e )
 	{
-		#region methods
+		base.OnStartup( e );
 
-		protected override void OnStartup( StartupEventArgs e )
-		{
-			base.OnStartup( e );
+		var mainWindowViewModel = new MainViewModel( new FileService(), new MessageService(), new ViewService() );
 
-			IUnityContainer container = new UnityContainer();
-
-			container.RegisterType<IFileService, FileService>();
-			container.RegisterType<IMessageService, MessageService>();
-			container.RegisterType<IViewService, ViewService>();
-
-			var mainWindowViewModel = container.Resolve<MainViewModel>();
-			var window = new MainView { DataContext = mainWindowViewModel };
-			window.Show();
-		}
-
-		#endregion
+		var window = new MainView { DataContext = mainWindowViewModel };
+		window.Show();
 	}
+
+	#endregion
 }

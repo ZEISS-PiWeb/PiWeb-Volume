@@ -69,7 +69,7 @@ internal static class Quantization
 
 	private static bool TryGetQuantization( this IReadOnlyDictionary<string, string> options, [NotNullWhen( true )] out double[]? result )
 	{
-		result = default;
+		result = null;
 		if( !options.TryGetValue( BlockVolume.QuantizationName, out var quantizationString ) )
 			return false;
 
@@ -91,7 +91,7 @@ internal static class Quantization
 
 	private static bool TryGetDouble( this IReadOnlyDictionary<string, string> options, string name, out double value )
 	{
-		value = default;
+		value = 0;
 		return
 			options.TryGetValue( name, out var valueString ) &&
 			double.TryParse( valueString, NumberStyles.Float, CultureInfo.InvariantCulture, out value );

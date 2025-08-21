@@ -8,62 +8,64 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.Services
+namespace Zeiss.PiWeb.Volume.UI.Services;
+
+#region usings
+
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.Win32;
+using Zeiss.PiWeb.Volume.UI.Interfaces;
+
+#endregion
+
+// ReSharper disable once ClassNeverInstantiated.Global
+public class FileService : IFileService
 {
-    #region usings
+	#region constants
 
-    using Microsoft.Win32;
-    using Zeiss.PiWeb.Volume.UI.Interfaces;
+	private const string ReadableVolumeFileFilter = "All volume files|*.uint16_scv;*.uint8_scv;*.vgi;*.gom_volume;*.volx|PiWeb volumes|*.volx|Calypso volumes|*.uint16_scv;*.uint8_scv|GOM volumes|*.gom_volume|VG volumes|*.vgi";
+	private const string WritableVolumeFileFilter = "PiWeb volumes|*.volx|Calypso volumes|*.uint8_scv";
 
-    #endregion
+	#endregion
 
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class FileService : IFileService
-    {
-        #region constants
+	#region interface IFileService
 
-        private const string ReadableVolumeFileFilter = "All volume files|*.uint16_scv;*.uint8_scv;*.vgi;*.gom_volume;*.volx|PiWeb volumes|*.volx|Calypso volumes|*.uint16_scv;*.uint8_scv|GOM volumes|*.gom_volume|VG volumes|*.vgi";
-        private const string WritableVolumeFileFilter = "PiWeb volumes|*.volx|Calypso volumes|*.uint8_scv";
+	/// <inheritdoc />
+	public bool SelectOpenFileName( [NotNullWhen( true )] out string? fileName )
+	{
+		fileName = null;
 
-        #endregion
+		var dialog = new OpenFileDialog
+		{
+			Filter = ReadableVolumeFileFilter,
+			CheckFileExists = true,
+			CheckPathExists = true,
+			Multiselect = false
+		};
 
-        #region interface IFileService
+		if( dialog.ShowDialog() != true || string.IsNullOrEmpty( dialog.FileName ) )
+			return false;
 
-        public bool SelectOpenFileName( out string fileName )
-        {
-            fileName = null;
+		fileName = dialog.FileName;
+		return true;
+	}
 
-            var dialog = new OpenFileDialog
-            {
-                Filter = ReadableVolumeFileFilter,
-                CheckFileExists = true,
-                CheckPathExists = true,
-                Multiselect = false
-            };
+	/// <inheritdoc />
+	public bool SelectSaveFileName( [NotNullWhen( true )] out string? fileName )
+	{
+		fileName = null;
 
-            if( dialog.ShowDialog() != true || string.IsNullOrEmpty( dialog.FileName ) )
-                return false;
+		var dialog = new SaveFileDialog
+		{
+			Filter = WritableVolumeFileFilter
+		};
 
-            fileName = dialog.FileName;
-            return true;
-        }
+		if( dialog.ShowDialog() != true || string.IsNullOrEmpty( dialog.FileName ) )
+			return false;
 
-        public bool SelectSaveFileName( out string fileName )
-        {
-	        fileName = null;
+		fileName = dialog.FileName;
+		return true;
+	}
 
-	        var dialog = new SaveFileDialog
-	        {
-		        Filter = WritableVolumeFileFilter
-	        };
-
-	        if( dialog.ShowDialog() != true || string.IsNullOrEmpty( dialog.FileName ) )
-		        return false;
-
-	        fileName = dialog.FileName;
-	        return true;
-        }
-
-        #endregion
-    }
+	#endregion
 }

@@ -8,54 +8,53 @@
 
 #endregion
 
-namespace Zeiss.PiWeb.Volume.UI.Converters
-{
-	#region usings
+namespace Zeiss.PiWeb.Volume.UI.Converters;
 
-	using System;
-	using System.Globalization;
-	using System.Windows.Data;
+#region usings
+
+using System;
+using System.Globalization;
+using System.Windows.Data;
+
+#endregion
+
+public class MultiplicationConverter : IValueConverter
+{
+	#region properties
+
+	public double Factor { get; set; }
 
 	#endregion
 
-	public class MultiplicationConverter : IValueConverter
+	#region interface IValueConverter
+
+	public object? Convert( object? value, Type targetType, object? parameter, CultureInfo culture )
 	{
-		#region properties
+		if( value is double doubleValue )
+			return doubleValue * Factor;
 
-		public double Factor { get; set; }
+		if( value is int intValue )
+			return intValue * Factor;
 
-		#endregion
+		if( value is ushort ushortValue )
+			return ushortValue * Factor;
 
-		#region interface IValueConverter
-
-		public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
-		{
-			if( value is double doubleValue )
-				return doubleValue * Factor;
-
-			if( value is int intValue )
-				return intValue * Factor;
-
-			if( value is ushort ushortValue )
-				return ushortValue * Factor;
-
-			return value;
-		}
-
-		public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
-		{
-			if( value is double doubleValue )
-				return doubleValue / Factor;
-
-			if( value is int intValue )
-				return intValue / Factor;
-
-			if( value is ushort ushortValue )
-				return ushortValue / Factor;
-
-			return value;
-		}
-
-		#endregion
+		return value;
 	}
+
+	public object? ConvertBack( object? value, Type targetType, object? parameter, CultureInfo culture )
+	{
+		if( value is double doubleValue )
+			return doubleValue / Factor;
+
+		if( value is int intValue )
+			return intValue / Factor;
+
+		if( value is ushort ushortValue )
+			return ushortValue / Factor;
+
+		return value;
+	}
+
+	#endregion
 }

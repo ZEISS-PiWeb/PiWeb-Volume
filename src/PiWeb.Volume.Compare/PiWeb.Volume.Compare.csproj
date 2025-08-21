@@ -1,22 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0-windows10.0.22621</TargetFramework>
-    <Platforms>x64</Platforms>
-    <LangVersion>latestmajor</LangVersion>
-    <AssemblyName>PiWeb.Volume.Compare</AssemblyName>
-    <RootNamespace>Zeiss.PiWeb.Volume.Compare</RootNamespace>
-    <Copyright>Copyright © 2020 Carl Zeiss Industrielle Messtechnik GmbH</Copyright>
-    <Company>Carl Zeiss Industrielle Messtechnik GmbH</Company>
-    <Authors>$(Company)</Authors>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TargetFramework>net9.0-windows10.0.22621</TargetFramework>
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
     <IsPackable>false</IsPackable>
-    <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <Configurations>Debug;Release;Test;Pack</Configurations>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,9 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.0" NoWarn="NU1701" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" NoWarn="NU1701" />
-    <PackageReference Include="Unity" Version="5.11.10" />
   </ItemGroup>
 
 </Project>
