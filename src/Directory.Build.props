@@ -6,7 +6,6 @@
 
         <LangVersion>latestmajor</LangVersion>
         <Platform>AnyCPU</Platform>
-        <TargetFramework>net9.0-windows10.0.22621</TargetFramework>
         <RootNamespace Condition=" '$(RootNamespace)' == '' ">Zeiss.$(MSBuildProjectName)</RootNamespace>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
         <OutputPath>$(SolutionDir)\..\bin\$(Configuration)\</OutputPath>
