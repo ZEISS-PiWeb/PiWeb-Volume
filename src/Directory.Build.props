@@ -2,6 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
     <PropertyGroup>
+        <SolutionDir Condition=" '$(SolutionDir)' == '' ">$(MSBuildThisFileDirectory)</SolutionDir>
 
         <LangVersion>latestmajor</LangVersion>
         <Platform>AnyCPU</Platform>
@@ -20,7 +21,6 @@
 
         <SelfContained>false</SelfContained>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-        <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
 
         <!-- Do not add target framework to output paths since we only build one flavor -->
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
