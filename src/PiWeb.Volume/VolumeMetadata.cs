@@ -328,6 +328,7 @@ public sealed class VolumeMetadata
 		return new VolumeMetadata( sizeX, sizeY, sizeZ, resolutionX, resolutionY, resolutionZ, positionX, positionY, positionZ, properties )
 		{
 			FileVersion = fileVersion,
+			ColorScale = colorScale
 		};
 	}
 
