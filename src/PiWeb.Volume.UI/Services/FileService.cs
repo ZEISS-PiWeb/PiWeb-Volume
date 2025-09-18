@@ -23,8 +23,8 @@ public class FileService : IFileService
 {
 	#region constants
 
-	private const string ReadableVolumeFileFilter = "All volume files|*.uint16_scv;*.uint8_scv;*.vgi;*.gom_volume;*.volx|PiWeb volumes|*.volx|Calypso volumes|*.uint16_scv;*.uint8_scv|GOM volumes|*.gom_volume|VG volumes|*.vgi";
-	private const string WritableVolumeFileFilter = "PiWeb volumes|*.volx|Calypso volumes|*.uint8_scv";
+	private const string ReadableVolumeFileFilter = "All volume files|*.uint16_scv;*.uint8_scv;*.vgi;*.gom_volume;*.volx;*.img|PiWeb volumes|*.volx|Calypso volumes|*.uint16_scv;*.uint8_scv|GOM volumes|*.gom_volume|VG volumes|*.vgi|JP3D volumes|*.img";
+	private const string WritableVolumeFileFilter = "PiWeb volumes|*.volx|Calypso volumes|*.uint8_scv|JP3D volumes|*.img";
 
 	#endregion
 

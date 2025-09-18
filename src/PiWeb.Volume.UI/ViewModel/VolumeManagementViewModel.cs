@@ -14,6 +14,8 @@ namespace Zeiss.PiWeb.Volume.UI.ViewModel;
 
 using System;
 using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -122,21 +124,24 @@ public class VolumeManagementViewModel : ViewModelBase
 		if( !_FileService.SelectSaveFileName( out var fileName ) )
 			return;
 
-		await using var stream = File.Create( fileName );
 
 		switch( Path.GetExtension( fileName ).ToLower() )
 		{
 			case ".volx":
-				await SavePiWebVolume( stream );
+				await SavePiWebVolume( fileName );
 				break;
 			case ".uint8_scv":
-				await SaveCalypsoVolume( stream );
+				await SaveCalypsoVolume( fileName );
+				break;
+			case ".img":
+				await SaveJp3dVolume( fileName );
 				break;
 		}
 	}
 
-	private async Task SavePiWebVolume( Stream stream )
+	private async Task SavePiWebVolume( string fileName )
 	{
+		await using var stream = File.Create( fileName );
 		var codecViewModel = new CodecViewModel();
 
 		if( _ViewService.RequestView( codecViewModel ) != true )
@@ -167,14 +172,16 @@ public class VolumeManagementViewModel : ViewModelBase
 		IsLoading = false;
 	}
 
-	private async Task SaveCalypsoVolume( Stream stream )
+	private async Task SaveCalypsoVolume( string fileName )
 	{
-		if( VolumeViewModel is null )
-			return;
 
+		await using var stream = File.Create( fileName );
 		IsLoading = true;
 
-		var volume = VolumeViewModel.Volume;
+		var volume = VolumeViewModel?.Volume;
+		if( volume is null )
+			return;
+
 		var progress = new VolumeProgress( volume );
 
 		progress.ProgressChanged += OnProgressChanged;
@@ -192,6 +199,50 @@ public class VolumeManagementViewModel : ViewModelBase
 				stream.Write( buffer, 0, buffer.Length );
 			}
 		} );
+
+		progress.ProgressChanged -= OnProgressChanged;
+
+		ProgressMessage = null;
+		Progress = 0.0;
+
+		IsLoading = false;
+	}
+
+	private async Task SaveJp3dVolume( string fileName )
+	{
+		IsLoading = true;
+
+		var volume = VolumeViewModel?.Volume;
+		if( volume is null )
+			return;
+
+		var progress = new VolumeProgress( volume );
+
+		await using( var imgStream = File.Create( Path.ChangeExtension( fileName, ".img" ) ) )
+		await using( var writer = new StreamWriter( imgStream, Encoding.ASCII ) )
+		{
+			await writer.WriteLineAsync( "Bpp\t8" );
+			await writer.WriteLineAsync( "Color Map\t2" );
+			await writer.WriteLineAsync( $"Dimensions\t{256} {256} {256}" );
+		}
+
+		progress.ProgressChanged += OnProgressChanged;
+
+		await using( var binStream = File.Create( Path.ChangeExtension( fileName, ".bin" ) ) )
+		{
+			await Task.Run( () =>
+			{
+				var buffer = new byte[ volume.Metadata.GetSliceLength( Direction.Z ) ];
+				for( ushort z = 0; z < 256; z++ )
+				{
+					volume.GetSlice( new VolumeSliceDefinition( Direction.Z, (ushort)( z + 256 ) ), buffer, progress );
+
+					for( var y = 0; y < 256; y++ )
+						binStream.Write( buffer, ( y + 256 ) * volume.Metadata.SizeX + 256, 256 );
+				}
+			} );
+		}
+
 
 		progress.ProgressChanged -= OnProgressChanged;
 
@@ -259,9 +310,6 @@ public class VolumeManagementViewModel : ViewModelBase
 
 		try
 		{
-			if( fileName is null )
-				return;
-
 			switch( Path.GetExtension( fileName ).ToLowerInvariant() )
 			{
 				case ".volx":
@@ -276,6 +324,9 @@ public class VolumeManagementViewModel : ViewModelBase
 					break;
 				case ".gom_volume":
 					await LoadGomVolume( fileName );
+					break;
+				case ".img":
+					await LoadJp3dVolume( fileName );
 					break;
 				default:
 					FileName = null;
@@ -442,6 +493,37 @@ public class VolumeManagementViewModel : ViewModelBase
 			VolumeViewModel = new VolumeViewModel( volume, volume, 1, _Logger );
 		}
 
+		ProgressMessage = null;
+		Progress = 0.0;
+	}
+
+	private async Task LoadJp3dVolume( string filename )
+	{
+		await using var imgStream = File.OpenRead( filename );
+		await using var binStream = File.OpenRead( Path.ChangeExtension( filename, ".bin" ) );
+
+		var imgLines = await File.ReadAllLinesAsync( filename );
+		if( imgLines.Length < 3 )
+			return;
+
+		var dimensionRegex = new Regex( "Dim.*\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)" );
+		var match = dimensionRegex.Match( imgLines[ 2 ] );
+		if( !match.Success || match.Groups.Count < 4 )
+			return;
+
+		var sizex = ushort.Parse( match.Groups[ 1 ].Value );
+		var sizey = ushort.Parse( match.Groups[ 2 ].Value );
+		var sizez = ushort.Parse( match.Groups[ 3 ].Value );
+
+		var metadata = new VolumeMetadata( sizex, sizey, sizez, 1, 1, 1 );
+		var data = new byte[ sizez ][];
+		var dataReader = new BinaryReader( binStream );
+		for( var z = 0; z < sizez; z++ )
+			data[ z ] = dataReader.ReadBytes( sizex * sizey );
+
+		var volume = new UncompressedVolume( metadata, data );
+
+		VolumeViewModel = new VolumeViewModel( volume, null, 1, _Logger );
 		ProgressMessage = null;
 		Progress = 0.0;
 	}

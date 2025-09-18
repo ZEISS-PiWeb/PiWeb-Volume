@@ -77,7 +77,7 @@ internal static class DiscreteCosineTransform
 		TransformDirection( inputVectors, result, pU, nonEmptyVectors );
 	}
 
-	private static ulong TransformDirection(
+	internal static ulong TransformDirection(
 		ReadOnlySpan<Vector512<double>> inputVectors,
 		Span<double> result,
 		ReadOnlySpan<Vector512<double>> coefficients,
@@ -108,6 +108,28 @@ internal static class DiscreteCosineTransform
 		}
 
 		return nonEmptyResultVectors;
+	}
+
+	internal static void TransformDirection2D(
+		Span<Vector512<double>> inputVectors,
+		Span<double> result,
+		Span<Vector512<double>> coefficients )
+	{
+		result.Clear();
+		for( ushort p = 0; p < BlockVolume.N; p++ )
+		{
+			var input = inputVectors[ p ];
+
+			//This loop is unrolled for performance optimization
+			result[ p * BlockVolume.N + 0 ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 0 ] ) );
+			result[ p * BlockVolume.N + 1 ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 1 ] ) );
+			result[ p * BlockVolume.N + 2 ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 2 ] ) );
+			result[ p * BlockVolume.N + 3 ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 3 ] ) );
+			result[ p * BlockVolume.N + 4 ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 4 ] ) );
+			result[ p * BlockVolume.N + 5 ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 5 ] ) );
+			result[ p * BlockVolume.N + 6 ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 6 ] ) );
+			result[ p * BlockVolume.N + 7 ] = Vector512.Sum( Vector512.Multiply( input, coefficients[ 7 ] ) );
+		}
 	}
 
 	#endregion
