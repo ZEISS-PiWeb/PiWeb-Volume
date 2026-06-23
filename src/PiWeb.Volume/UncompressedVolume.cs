@@ -125,7 +125,7 @@ public sealed class UncompressedVolume : Volume
 	/// </summary>
 	/// <exception cref="VolumeException">Error during encoding</exception>
 	/// <exception cref="NotSupportedException">The volume has no decompressed data</exception>
-	private byte[] CompressDirection( Direction direction, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
+	private Blob CompressDirection( Direction direction, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
 	{
 		var sw = Stopwatch.StartNew();
 
@@ -139,10 +139,11 @@ public sealed class UncompressedVolume : Volume
 		if( error != VolumeError.Success )
 			throw new VolumeException( error, Resources.FormatResource<Volume>( "Compression_ErrorText", error ) );
 
-		var result = outputStream.ToArray();
+
 		logger?.Log( LogLevel.Debug, $"Compressed direction {direction} with encoder {options.Encoder} in {sw.ElapsedMilliseconds} ms." );
 
-		return result;
+		outputStream.Seek( 0, SeekOrigin.Begin );
+		return Blob.FromStream( outputStream );
 	}
 
 	/// <inheritdoc />
@@ -263,8 +264,20 @@ public sealed class UncompressedVolume : Volume
 		var sw = Stopwatch.StartNew();
 		try
 		{
-			var compressed = Compress( options, multiDirection, progress, logger, ct );
-			compressed.Save( stream );
+			if( options.Encoder == BlockVolume.EncoderID )
+			{
+				BlockVolume.CompressAndSave( _Slices, stream, Metadata, options, progress, logger );
+				return;
+			}
+
+			var directionMap = new DirectionMap { [ Direction.Z ] = CompressDirection( Direction.Z, options, progress, logger, ct ) };
+			if( multiDirection )
+			{
+				directionMap[ Direction.X ] = CompressDirection( Direction.X, options, progress, logger, ct );
+				directionMap[ Direction.Y ] = CompressDirection( Direction.Y, options, progress, logger, ct );
+			}
+
+			new CompressedVolume( Metadata, options, directionMap ).Save( stream, logger );
 		}
 		finally
 		{

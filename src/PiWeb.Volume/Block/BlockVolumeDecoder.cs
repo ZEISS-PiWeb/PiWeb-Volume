@@ -46,7 +46,6 @@ internal static class BlockVolumeDecoder
 		var metaData = volume.BlockVolumeMetaData;
 		var quantization = volume.InverseQuantization;
 		var blockInfos = volume.EncodedBlockInfos;
-		var data = volume.Data;
 
 		var (bcx, bcy, bcz) = metaData.GetBlockCount();
 		var layerCount = metaData.GetBlockCount( direction );
@@ -56,11 +55,12 @@ internal static class BlockVolumeDecoder
 		for( ushort layer = 0; layer < layerCount; layer++ )
 		{
 			ct.ThrowIfCancellationRequested();
+
 			if( layerPredicate?.Invoke( layer ) is false )
 				continue;
 
 			GetBlockInfoLayer( direction, layer, bcx, bcy, bcz, blockInfos, blockInfoLayer );
-			DecodeLayer( data, blockInfoLayer, direction, u, layer, quantization, blockPredicate, blockAction );
+			DecodeLayer( volume.Data, blockInfoLayer, direction, u, layer, quantization, volume.MaxBlockLength, blockPredicate, blockAction );
 
 			progress?.Report( new VolumeSliceDefinition( Direction.Z, (ushort)( layer * BlockVolume.N ) ) );
 		}
@@ -95,21 +95,22 @@ internal static class BlockVolumeDecoder
 	}
 
 	private static void DecodeLayer(
-		byte[] encodedBlocks,
+		Blob encodedBlocks,
 		BlockVolume.EncodedBlockInfo[] encodedBlockInfos,
 		Direction direction,
 		ushort stride,
 		ushort layerIndex,
 		double[] quantization,
+		int maxBlockLength,
 		BlockPredicate? blockPredicate,
 		BlockAction blockAction )
 	{
 #if DEBUG
-		var buffers = new DecodingBuffers();
+		var buffers = new DecodingBuffers( maxBlockLength );
 		for( var index = 0; index < encodedBlockInfos.Length; index++ )
 		{
 #else
-		Parallel.For( 0, encodedBlockInfos.Length, () => new DecodingBuffers(), ( index, _, buffers ) =>
+		Parallel.For( 0, encodedBlockInfos.Length, () => new DecodingBuffers( maxBlockLength ), ( index, _, buffers ) =>
 		{
 #endif
 			var blockIndex = direction switch
@@ -126,14 +127,14 @@ internal static class BlockVolumeDecoder
 #else
 				return buffers;
 #endif
-
+			var dataSpan = buffers.DataBuffer;
 			var inputSpan = buffers.InputBuffer.AsSpan( 0, BlockVolume.N3 );
 			var outputSpan = buffers.OutputBuffer.AsSpan( 0, BlockVolume.N3 );
 			var resultSpan = buffers.ResultBuffer.AsSpan( 0, BlockVolume.N3 );
 			var encodedBlockInfo = encodedBlockInfos[ index ];
 
 			//1. Dediscretization
-			ReadBlock( encodedBlocks.AsSpan(), encodedBlockInfo, inputSpan );
+			ReadBlock( encodedBlocks, dataSpan, encodedBlockInfo, inputSpan );
 
 			//2. ZigZag
 			ZigZag.Reverse( inputSpan, outputSpan );
@@ -175,10 +176,13 @@ internal static class BlockVolumeDecoder
 		return result;
 	}
 
-	private static void ReadBlock( ReadOnlySpan<byte> data, BlockVolume.EncodedBlockInfo blockInfo, Span<double> result )
+	private static void ReadBlock( Blob data, byte[] dataBuffer, BlockVolume.EncodedBlockInfo blockInfo, Span<double> result )
 	{
 		var length = blockInfo.Info.Length;
-		var encodedBlockData = data.Slice( blockInfo.StartIndex, length );
+		if( data.CopyTo( blockInfo.StartIndex, dataBuffer, 0, blockInfo.Info.Length ) != blockInfo.Info.Length )
+			throw new InvalidOperationException( $"Failed to read block data at index {blockInfo.StartIndex} with length {blockInfo.Info.Length}." );
+
+		var encodedBlockData = dataBuffer.AsSpan();
 
 		result.Clear();
 
@@ -211,14 +215,16 @@ internal static class BlockVolumeDecoder
 
 	#endregion
 
-	private readonly struct DecodingBuffers()
+	private readonly struct DecodingBuffers( int maxBlockLength )
 	{
+		public byte[] DataBuffer { get; } = ArrayPool<byte>.Shared.Rent( maxBlockLength );
 		public double[] InputBuffer { get; } = ArrayPool<double>.Shared.Rent( BlockVolume.N3 );
 		public double[] OutputBuffer { get; } = ArrayPool<double>.Shared.Rent( BlockVolume.N3 );
 		public byte[] ResultBuffer { get; } = ArrayPool<byte>.Shared.Rent( BlockVolume.N3 );
 
 		public void Return()
 		{
+			ArrayPool<byte>.Shared.Return( DataBuffer );
 			ArrayPool<double>.Shared.Return( InputBuffer );
 			ArrayPool<double>.Shared.Return( OutputBuffer );
 			ArrayPool<byte>.Shared.Return( ResultBuffer );

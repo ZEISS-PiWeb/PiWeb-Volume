@@ -17,6 +17,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 #endregion
@@ -122,7 +123,7 @@ internal static class BlockVolumeEncoder
 			resultBlocks[ i ] = new short[ BlockVolume.N3 ];
 		}
 
-		using var writer = new BinaryWriter( output );
+		using var writer = new BinaryWriter( output, Encoding.UTF8, true );
 		metadata.Write( writer );
 
 		var blockIndexZ = (ushort)0;

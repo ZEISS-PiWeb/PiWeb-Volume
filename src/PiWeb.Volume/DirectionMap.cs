@@ -20,15 +20,15 @@ internal class DirectionMap
 {
 	#region members
 
-	private byte[]? _X;
-	private byte[]? _Y;
-	private byte[]? _Z;
+	private Blob? _X;
+	private Blob? _Y;
+	private Blob? _Z;
 
 	#endregion
 
 	#region properties
 
-	internal byte[]? this[ Direction direction ]
+	internal Blob? this[ Direction direction ]
 	{
 		get =>
 			direction switch
