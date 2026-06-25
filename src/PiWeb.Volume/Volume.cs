@@ -298,7 +298,7 @@ public abstract class Volume
 			return false;
 
 		using var entryStream = dataEntry.Open();
-		directionMap[ direction ] = entryStream.StreamToArray( (int)dataEntry.Length );
+		directionMap[ direction ] = Blob.FromStream( entryStream );
 
 		return true;
 	}
@@ -318,6 +318,17 @@ public abstract class Volume
 		return metaData;
 	}
 
+	/// <summary>
+	/// Writes the metadata file to the <paramref name="zipOutput"/>
+	/// </summary>
+	protected internal static void WriteVolumeMetadata( ZipArchive zipOutput, VolumeMetadata metadata )
+	{
+		var metaDataEntry = zipOutput.CreateNormalizedEntry( "Metadata.xml", CompressionLevel.Optimal );
+
+		using var metaDataEntryStream = metaDataEntry.Open();
+		metadata.Serialize( metaDataEntryStream );
+	}
+
 	private static VolumeCompressionOptions ReadVolumeCompressionOptions( ZipArchive archive )
 	{
 		var compressionOptionsEntry = archive.GetEntry( "CompressionOptions.xml" );
@@ -327,6 +338,17 @@ public abstract class Volume
 
 		using var entryStream = compressionOptionsEntry.Open();
 		return VolumeCompressionOptions.Deserialize( entryStream );
+	}
+
+	/// <summary>
+	/// Writes the options file to the <paramref name="zipOutput"/>
+	/// </summary>
+	protected internal static void WriteVolumeCompressionOptions( ZipArchive zipOutput, VolumeCompressionOptions options )
+	{
+		var compressionOptionsEntry = zipOutput.CreateNormalizedEntry( "CompressionOptions.xml", CompressionLevel.Optimal );
+		using var optionsEntryStream = compressionOptionsEntry.Open();
+
+		options.Serialize( optionsEntryStream );
 	}
 
 	#endregion

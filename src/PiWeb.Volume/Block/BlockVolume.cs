@@ -16,7 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.IO.Compression;
+using System.Text;
 using System.Threading;
 
 #endregion
@@ -89,7 +90,7 @@ public class BlockVolume : CompressedVolume
 		Data = data;
 		BlockVolumeMetaData = BlockVolumeMetaData.Create( data );
 		InverseQuantization = Quantization.Invert( BlockVolumeMetaData.Quantization );
-		EncodedBlockInfos = ReadEncodedBlocks( data, BlockVolumeMetaData );
+		( EncodedBlockInfos, MaxBlockLength ) = ReadEncodedBlocks( data, BlockVolumeMetaData );
 	}
 
 	internal BlockVolume( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress )
@@ -104,7 +105,9 @@ public class BlockVolume : CompressedVolume
 
 	#region properties
 
-	internal byte[] Data { get; }
+	internal int MaxBlockLength { get; }
+
+	internal Blob Data { get; }
 
 	internal BlockVolumeMetaData BlockVolumeMetaData { get; }
 
@@ -116,41 +119,49 @@ public class BlockVolume : CompressedVolume
 
 	#region methods
 
-	private static EncodedBlockInfo[] ReadEncodedBlocks( byte[] data, BlockVolumeMetaData metaData )
+	private static (EncodedBlockInfo[], int) ReadEncodedBlocks( Blob data, BlockVolumeMetaData metaData )
 	{
+		using var stream = data.ToStream();
+
+		stream.Seek( BlockVolumeMetaData.HeaderLength, SeekOrigin.Begin );
+
+		using var streamReader = new BinaryReader( stream, Encoding.UTF8, true );
+
 		var (bcx, bcy, bcz) = metaData.GetBlockCount();
 
 		var result = new EncodedBlockInfo[ bcx * bcy * bcz ];
 		var layerBlockCount = bcx * bcy;
-		var position = BlockVolumeMetaData.HeaderLength;
-		var dataSpan = data.AsSpan();
+
+		var maxBlockLength = 0;
 
 		for( ushort biz = 0; biz < bcz; biz++ )
 		{
 			var encodedBlockInfoLayer = result.AsSpan().Slice( bcx * bcy * biz, bcx * bcy );
-			var layerLength = MemoryMarshal.Read<int>( dataSpan.Slice( position, sizeof( int ) ) );
-			position += sizeof( int );
+			streamReader.ReadInt32();
 
-			ReadLayer( dataSpan, position, layerBlockCount, encodedBlockInfoLayer );
-			position += layerLength;
+			maxBlockLength = Math.Max( maxBlockLength, ReadLayer( streamReader, layerBlockCount, encodedBlockInfoLayer ));
 		}
 
-		return result;
+		return (result, maxBlockLength);
 	}
 
-	private static void ReadLayer( ReadOnlySpan<byte> dataSpan, int position, int blockCount, Span<EncodedBlockInfo> encodedBlockInfos )
+	private static int ReadLayer( BinaryReader reader, int blockCount, Span<EncodedBlockInfo> encodedBlockInfos )
 	{
+		var maxBlockLength = 0;
+
 		for( var i = 0; i < blockCount; i++ )
 		{
-			var value = MemoryMarshal.Read<ushort>( dataSpan[ position.. ] );
+			var value = reader.ReadUInt16();
+			var encodedBlockInfo = new EncodedBlockInfo( reader.BaseStream.Position, BlockInfo.Create( value ) );
 
-			position += sizeof( ushort );
-
-			var encodedBlockInfo = new EncodedBlockInfo( position, BlockInfo.Create( value ) );
 			encodedBlockInfos[ i ] = encodedBlockInfo;
 
-			position += encodedBlockInfo.Info.Length;
+			maxBlockLength = Math.Max( maxBlockLength, encodedBlockInfo.Info.Length );
+
+			reader.BaseStream.Seek( encodedBlockInfo.Info.Length, SeekOrigin.Current );
 		}
+
+		return maxBlockLength;
 	}
 
 	private static DirectionMap CreateDirectionMap(
@@ -159,21 +170,20 @@ public class BlockVolume : CompressedVolume
 		VolumeCompressionOptions options,
 		IProgress<VolumeSliceDefinition>? progress )
 	{
-		var output = new MemoryStream();
+		using var output = new Blob.WriteStream();
 
 		BlockVolumeEncoder.Encode( slices, output, metadata, options, progress );
 
-		return new DirectionMap { [ Direction.Z ] = output.ToArray() };
+		return new DirectionMap { [ Direction.Z ] = output.ToBlob() };
 	}
 
 	private static DirectionMap CreateDirectionMap( Stream input, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress )
 	{
-		var estimate = ( (long)metadata.SizeX * metadata.SizeY * metadata.SizeZ ) / N2;
-		var output = new MemoryStream( (int)estimate );
+		using var output = new Blob.WriteStream();
 
 		BlockVolumeEncoder.Encode( input, output, metadata, options, progress );
 
-		return new DirectionMap { [ Direction.Z ] = output.ToArray() };
+		return new DirectionMap { [ Direction.Z ] = output.ToBlob() };
 	}
 
 	/// <inheritdoc />
@@ -264,7 +274,73 @@ public class BlockVolume : CompressedVolume
 		return $"Block volume {Metadata} [{CompressedData}]";
 	}
 
+	/// <summary>
+	/// Compresses and saves the volume on the fly without loading it into memory.
+	/// </summary>
+	public static void CompressAndSave(
+		Stream input,
+		Stream stream,
+		VolumeMetadata metadata,
+		VolumeCompressionOptions options,
+		IProgress<VolumeSliceDefinition>? progress,
+		ILogger? logger = null )
+	{
+		ArgumentNullException.ThrowIfNull( stream );
+
+		var sw = Stopwatch.StartNew();
+		try
+		{
+			using var zipOutput = new ZipArchive( stream, ZipArchiveMode.Create, true );
+
+			WriteVolumeMetadata( zipOutput, metadata );
+			WriteVolumeCompressionOptions( zipOutput, options );
+
+			var zEntry = zipOutput.CreateNormalizedEntry( "VoxelsZ.dat", CompressionLevel.Optimal );
+
+			using var entryStream = zEntry.Open();
+
+			BlockVolumeEncoder.Encode( input, entryStream, metadata, options, progress );
+		}
+		finally
+		{
+			logger?.Log( LogLevel.Info, $"Saved volume to stream in {sw.ElapsedMilliseconds} ms." );
+		}
+	}
+
+	/// <summary>
+	/// Compresses and saves the volume on the fly without loading it into memory.
+	/// </summary>
+	public static void CompressAndSave(
+		IReadOnlyList<VolumeSlice> input,
+		Stream stream,
+		VolumeMetadata metadata,
+		VolumeCompressionOptions options,
+		IProgress<VolumeSliceDefinition>? progress,
+		ILogger? logger = null )
+	{
+		ArgumentNullException.ThrowIfNull( stream );
+
+		var sw = Stopwatch.StartNew();
+		try
+		{
+			using var zipOutput = new ZipArchive( stream, ZipArchiveMode.Create, true );
+
+			WriteVolumeMetadata( zipOutput, metadata );
+			WriteVolumeCompressionOptions( zipOutput, options );
+
+			var zEntry = zipOutput.CreateNormalizedEntry( "VoxelsZ.dat", CompressionLevel.Optimal );
+
+			using var entryStream = zEntry.Open();
+
+			BlockVolumeEncoder.Encode( input, entryStream, metadata, options, progress );
+		}
+		finally
+		{
+			logger?.Log( LogLevel.Info, $"Saved volume to stream in {sw.ElapsedMilliseconds} ms." );
+		}
+	}
+
 	#endregion
 
-	internal readonly record struct EncodedBlockInfo( int StartIndex, BlockInfo Info );
+	internal readonly record struct EncodedBlockInfo( long StartIndex, BlockInfo Info );
 }

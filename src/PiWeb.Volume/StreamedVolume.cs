@@ -59,7 +59,10 @@ public sealed class StreamedVolume : Volume, IDisposable
 	/// Compresses the volume with the specified compression options.
 	/// </summary>
 	/// <exception cref="VolumeException">Error during encoding</exception>
-	public CompressedVolume Compress( VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
+	private void CompressAndSave(
+		Stream output,
+		VolumeCompressionOptions options,
+		IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
 	{
 		var sw = Stopwatch.StartNew();
 		try
@@ -67,12 +70,13 @@ public sealed class StreamedVolume : Volume, IDisposable
 			if( options.Encoder == BlockVolume.EncoderID )
 			{
 				_Stream.Seek( 0, SeekOrigin.Begin );
-				return new BlockVolume( _Stream, Metadata, options, progress );
+				BlockVolume.CompressAndSave( _Stream, output, Metadata, options, progress, logger );
 			}
-
-			var directionMap = new DirectionMap { [ Direction.Z ] = CompressDirection( options, progress, ct ) };
-
-			return new CompressedVolume( Metadata, options, directionMap );
+			else
+			{
+				var directionMap = new DirectionMap { [ Direction.Z ] = CompressDirection( options, progress, ct ) };
+				new CompressedVolume( Metadata, options, directionMap ).Save( output );
+			}
 		}
 		finally
 		{
@@ -80,7 +84,7 @@ public sealed class StreamedVolume : Volume, IDisposable
 		}
 	}
 
-	private byte[] CompressDirection( VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress = null, CancellationToken ct = default )
+	private Blob CompressDirection( VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress = null, CancellationToken ct = default )
 	{
 		_Stream.Seek( 0, SeekOrigin.Begin );
 
@@ -96,7 +100,9 @@ public sealed class StreamedVolume : Volume, IDisposable
 		if( error != VolumeError.Success )
 			throw new VolumeException( error, Resources.FormatResource<Volume>( "Compression_ErrorText", error ) );
 
-		return outputStream.ToArray();
+		outputStream.Seek( 0, SeekOrigin.Begin );
+
+		return Blob.FromStream( outputStream );
 	}
 
 	/// <inheritdoc />
@@ -133,7 +139,6 @@ public sealed class StreamedVolume : Volume, IDisposable
 	public override VolumeSliceRange GetSliceRange( VolumeSliceRangeDefinition range, IProgress<VolumeSliceDefinition>? progress = null, ILogger? logger = null, CancellationToken ct = default )
 	{
 		throw new NotImplementedException();
-
 	}
 
 	/// <inheritdoc />
@@ -230,8 +235,7 @@ public sealed class StreamedVolume : Volume, IDisposable
 		var sw = Stopwatch.StartNew();
 		try
 		{
-			var compressed = Compress( options, progress, logger, ct );
-			compressed.Save( stream );
+			CompressAndSave( stream, options, progress, logger, ct );
 		}
 		finally
 		{

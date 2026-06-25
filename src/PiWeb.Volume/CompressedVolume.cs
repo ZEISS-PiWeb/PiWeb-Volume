@@ -90,7 +90,7 @@ public class CompressedVolume : Volume
 
 		var sw = Stopwatch.StartNew();
 
-		using var input = new MemoryStream( compressedData, false );
+		using var input = compressedData.ToStream();
 		var inputWrapper = new StreamWrapper( input );
 		var previewCreator = new PreviewCreator( Metadata, minification, progress, ct );
 
@@ -104,7 +104,7 @@ public class CompressedVolume : Volume
 		return result;
 	}
 
-	private static byte[] CompressStream( Stream stream, Direction direction, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress = null )
+	private static Blob CompressStream( Stream stream, Direction direction, VolumeMetadata metadata, VolumeCompressionOptions options, IProgress<VolumeSliceDefinition>? progress = null )
 	{
 		using var outputStream = new MemoryStream();
 		GetEncodedSliceSize( metadata, direction, out var encodingSizeX, out var encodingSizeY );
@@ -117,7 +117,9 @@ public class CompressedVolume : Volume
 		if( error != VolumeError.Success )
 			throw new VolumeException( error, Resources.FormatResource<Volume>( "Compression_ErrorText", error ) );
 
-		return outputStream.ToArray();
+		stream.Seek( 0, SeekOrigin.Begin );
+
+		return Blob.FromStream( outputStream );
 	}
 
 	/// <summary>
@@ -133,7 +135,7 @@ public class CompressedVolume : Volume
 		var sw = Stopwatch.StartNew();
 		try
 		{
-			using var input = new MemoryStream( compressedDataZ );
+			using var input = compressedDataZ.ToStream();
 			var inputWrapper = new StreamWrapper( input );
 			var outputWrapper = new FullVolumeWriter( Metadata, Direction.Z, progress, ct );
 
@@ -182,7 +184,7 @@ public class CompressedVolume : Volume
 			if( CompressedData[ direction ] is not {} compressedData )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
-			using var input = new MemoryStream( compressedData, false );
+			using var input = compressedData.ToStream();
 			var inputWrapper = new StreamWrapper( input );
 			var rangeReader = new VolumeSliceRangeCollector( Metadata, direction, combinedRanges, progress, ct );
 
@@ -207,7 +209,7 @@ public class CompressedVolume : Volume
 		{
 			if( CompressedData[ range.Direction ] is {} compressedData )
 			{
-				using var input = new MemoryStream( compressedData, false );
+				using var input = compressedData.ToStream();
 				var inputWrapper = new StreamWrapper( input );
 				var rangeReader = new VolumeSliceRangeCollector( Metadata, range.Direction, [range], progress, ct );
 
@@ -221,7 +223,7 @@ public class CompressedVolume : Volume
 			if( CompressedData[ Direction.Z ] is not {} compressedDataZ )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
-			using( var input = new MemoryStream( compressedDataZ, false ) )
+			using( var input = compressedDataZ.ToStream() )
 			{
 				var inputWrapper = new StreamWrapper( input );
 				var rangeReader = new VolumeSliceRangeCollector( Metadata, Direction.Z, [range], progress, ct );
@@ -258,7 +260,7 @@ public class CompressedVolume : Volume
 		{
 			if( CompressedData[ slice.Direction ] is {} compressedData )
 			{
-				using var input = new MemoryStream( compressedData );
+				using var input = compressedData.ToStream();
 
 				var inputWrapper = new StreamWrapper( input );
 				var outputWrapper = new VolumeSliceCollector( Metadata, slice.Direction, slice, buffer, progress, ct );
@@ -272,7 +274,7 @@ public class CompressedVolume : Volume
 				if( CompressedData[ Direction.Z ] is not {} compressedDataZ )
 					throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
-				using var input = new MemoryStream( compressedDataZ );
+				using var input = compressedDataZ.ToStream();
 
 				var inputWrapper = new StreamWrapper( input );
 				var outputWrapper = new VolumeSliceCollector( Metadata, Direction.Z, slice, buffer, progress, ct );
@@ -300,41 +302,35 @@ public class CompressedVolume : Volume
 		{
 			using var zipOutput = new ZipArchive( stream, ZipArchiveMode.Create, true );
 
-			var metaDataEntry = zipOutput.CreateNormalizedEntry( "Metadata.xml", CompressionLevel.Optimal );
-			using( var metaDataEntryStream = metaDataEntry.Open() )
-			{
-				Metadata.Serialize( metaDataEntryStream );
-			}
-
-			var compressionOptionsEntry = zipOutput.CreateNormalizedEntry( "CompressionOptions.xml", CompressionLevel.Optimal );
-			using( var optionsEntryStream = compressionOptionsEntry.Open() )
-			{
-				CompressionOptions.Serialize( optionsEntryStream );
-			}
+			WriteVolumeMetadata( zipOutput, Metadata );
+			WriteVolumeCompressionOptions( zipOutput, CompressionOptions );
 
 			if( CompressedData[ Direction.Z ] is not {} compressedDataZ )
 				throw new NotSupportedException( Resources.GetResource<Volume>( "CompressedDataMissing_ErrorText" ) );
 
 			var zEntry = zipOutput.CreateNormalizedEntry( "VoxelsZ.dat", CompressionOptions.Encoder == BlockVolume.EncoderID ? CompressionLevel.Optimal : CompressionLevel.NoCompression );
 			using( var entryStream = zEntry.Open() )
+			using (var inputStream = compressedDataZ.ToStream())
 			{
-				entryStream.Write( compressedDataZ, 0, compressedDataZ.Length );
+				inputStream.CopyTo( entryStream );
 			}
 
 			if( CompressedData[ Direction.X ] is {} compressedDataX )
 			{
 				var xEntry = zipOutput.CreateNormalizedEntry( "VoxelsX.dat", CompressionLevel.NoCompression );
 				using var entryStream = xEntry.Open();
+				using var inputStream = compressedDataX.ToStream();
 
-				entryStream.Write( compressedDataX, 0, compressedDataX.Length );
+				inputStream.CopyTo( entryStream );
 			}
 
 			if( CompressedData[ Direction.Y ] is {} compressedDataY )
 			{
 				var yEntry = zipOutput.CreateNormalizedEntry( "VoxelsY.dat", CompressionLevel.NoCompression );
 				using var entryStream = yEntry.Open();
+				using var inputStream = compressedDataY.ToStream();
 
-				entryStream.Write( compressedDataY, 0, compressedDataY.Length );
+				inputStream.CopyTo( entryStream );
 			}
 		}
 		finally

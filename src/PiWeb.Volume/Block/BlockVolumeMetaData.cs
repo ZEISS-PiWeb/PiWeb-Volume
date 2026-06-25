@@ -41,10 +41,14 @@ public record BlockVolumeMetaData( uint Version, ushort SizeX, ushort SizeY, ush
 	}
 
 	/// <summary>
-	/// Reads the metadata from the specified <paramref name="data"/>
+	/// Reads the metadata from the specified <paramref name="blob"/>
 	/// </summary>
-	public static BlockVolumeMetaData Create( ReadOnlySpan<byte> data )
+	internal static BlockVolumeMetaData Create( Blob blob )
 	{
+		using var stream = blob.ToStream();
+		var dataArray = new byte[ BlockVolumeMetaData.HeaderLength ];
+		stream.ReadExactly( dataArray, 0, BlockVolumeMetaData.HeaderLength );
+		var data = dataArray.AsSpan();
 		var position = 0;
 		var header = MemoryMarshal.Read<uint>( data[ position.. ] );
 		position += sizeof( uint );
