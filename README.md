@@ -54,8 +54,8 @@ PM> Install-Package Zeiss.IMT.PiWeb.Volume
 
 Or compile the library by yourself. Requirements:
 
-- Microsoft Visual Studio 2022
-- Microsoft .NET 8.0
+- Microsoft Visual Studio 2026
+- Microsoft .NET 10 SDK
 
 ## Usage
 
