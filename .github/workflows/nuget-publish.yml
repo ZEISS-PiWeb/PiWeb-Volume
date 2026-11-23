@@ -14,18 +14,18 @@ jobs:
   nuget-publish:
 
     runs-on: windows-latest
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
     - uses: actions/checkout@v2
     - name: Check path
       run: echo ${{ github.workspace }} 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
-        source-url: https://api.nuget.org/v3/index.json
         dotnet-version: 10.0.x
-      env: 
-        NUGET_AUTH_TOKEN: ${{secrets.NUGET_FEED_PAT}}
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1.1
       with:
@@ -36,4 +36,12 @@ jobs:
     - name: Publish
       run: |
         msbuild -t:pack -p:Configuration=Pack -p:Platform=AnyCPU ${{ github.workspace }}\src\PiWeb.Volume\PiWeb.Volume.csproj 
-        dotnet nuget push ${{ github.workspace }}\bin\Pack\*.nupkg --skip-duplicate --no-symbols true --api-key ${{secrets.NUGET_FEED_PAT}}
+    - name: NuGet login
+      id: nuget-login
+      uses: NuGet/login@v1
+      with:
+        user: ${{ secrets.NUGET_USER }}
+    - name: Push packages to NuGet.org
+      env:
+        NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+      run: dotnet nuget push ${{ github.workspace }}\bin\Pack\*.nupkg --skip-duplicate --no-symbols true --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
