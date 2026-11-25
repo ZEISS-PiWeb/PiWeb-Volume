@@ -1,4 +1,4 @@
-[logo]: docs/img/logo_128x128.png "Zeiss IQS Logo"
+[logo]: docs/logo_128x128.png "Zeiss IQS Logo"
 [classes]: docs/img/classdiagram.png "Class diagram"
 [multi]: docs/img/multi.png "multi"
 [previewExtraction]: docs/img/previewExtraction.png "PreviewExtraction"
@@ -20,6 +20,7 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [Testing](#testing)
+- [Contributing](#contributing)
 - [License](#license)
 
 ## Introduction
@@ -154,3 +155,11 @@ In the solution, you'll find a project named `PiWeb.Volume.UI` which is a small 
 7. Zoom in and out with the mouse wheel and pan with the right mouse button pressed
 
 ![Testing UI][testingUI]
+
+## Contributing
+
+Please read the [contribution guidelines](CONTRIBUTING.md) and
+[Code of Conduct](CODE_OF_CONDUCT.md) before contributing. Contributions
+require a signed [individual](docs/CONTRIBUTOR-AGREEMENT-INDIVIDUAL.txt) or
+[corporate](docs/CONTRIBUTOR-AGREEMENT-CORPORATE.txt) Contributor License
+Agreement. See [SECURITY.md](SECURITY.md) for reporting security issues.
