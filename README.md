@@ -21,6 +21,7 @@
 - [Usage](#usage)
 - [Testing](#testing)
 - [Contributing](#contributing)
+- [NuGet trusted publishing](#nuget-trusted-publishing)
 - [License](#license)
 
 ## Introduction
@@ -163,3 +164,18 @@ Please read the [contribution guidelines](CONTRIBUTING.md) and
 require a signed [individual](docs/CONTRIBUTOR-AGREEMENT-INDIVIDUAL.txt) or
 [corporate](docs/CONTRIBUTOR-AGREEMENT-CORPORATE.txt) Contributor License
 Agreement. See [SECURITY.md](SECURITY.md) for reporting security issues.
+
+## NuGet trusted publishing
+
+The `nuget-publish.yml` workflow publishes `Zeiss.PiWeb.Volume` to nuget.org
+using GitHub Actions OIDC. Configure a NuGet
+[trusted-publishing policy](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing)
+for `ZEISS-PiWeb/PiWeb-Volume`, with workflow filename `nuget-publish.yml`
+and no environment (the publishing job does not use a GitHub Actions
+environment). The policy must permit publishing the `Zeiss.PiWeb.Volume`
+package.
+
+Set the repository or organization secret `NUGET_USER` to the NuGet profile
+name used to own the package. The manually triggered `create-release.yml`
+workflow also requires `PUSH_TO_GITHUB_REPO_PAT` to push release branches and
+tags.
