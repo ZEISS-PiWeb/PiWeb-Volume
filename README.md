@@ -1,11 +1,11 @@
-[logo]: docs/img/logo_128x128.png "Zeiss IQS Logo"
+[logo]: docs/logo_128x128.png "Zeiss IQS Logo"
 [classes]: docs/img/classdiagram.png "Class diagram"
 [multi]: docs/img/multi.png "multi"
 [previewExtraction]: docs/img/previewExtraction.png "PreviewExtraction"
 [sliceExtraction]: docs/img/sliceExtraction.png "SliceExtraction"
 [testingUI]: docs/img/testing_ui.jpg "TestingUI"
 
-[![Build](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/build.yml)
+[![Build](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/develop.yml/badge.svg?branch=develop)](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/develop.yml)
 [![NuGet](https://img.shields.io/nuget/v/Zeiss.PiWeb.Volume?logo=nuget)](https://www.nuget.org/packages/Zeiss.PiWeb.Volume/)
 
 # PiWeb Volume Library
@@ -20,6 +20,8 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [Testing](#testing)
+- [Contributing](#contributing)
+- [NuGet trusted publishing](#nuget-trusted-publishing)
 - [License](#license)
 
 ## Introduction
@@ -54,8 +56,8 @@ PM> Install-Package Zeiss.IMT.PiWeb.Volume
 
 Or compile the library by yourself. Requirements:
 
-- Microsoft Visual Studio 2022
-- Microsoft .NET 8.0
+- Microsoft Visual Studio 2026
+- Microsoft .NET 10 SDK
 
 ## Usage
 
@@ -154,3 +156,30 @@ In the solution, you'll find a project named `PiWeb.Volume.UI` which is a small 
 7. Zoom in and out with the mouse wheel and pan with the right mouse button pressed
 
 ![Testing UI][testingUI]
+
+## Contributing
+
+Please read the [contribution guidelines](CONTRIBUTING.md) and
+[Code of Conduct](CODE_OF_CONDUCT.md) before contributing. Contributions
+require a signed [individual](docs/CONTRIBUTOR-AGREEMENT-INDIVIDUAL.txt) or
+[corporate](docs/CONTRIBUTOR-AGREEMENT-CORPORATE.txt) Contributor License
+Agreement. See [SECURITY.md](SECURITY.md) for reporting security issues.
+
+## NuGet trusted publishing
+
+Build, test, pack, and release workflows call reusable workflows from
+[ZEISS-PiWeb/github-actions](https://github.com/ZEISS-PiWeb/github-actions).
+NuGet authentication and publishing remain in this repository and use GitHub
+Actions OIDC. Configure NuGet
+[trusted-publishing policy](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing)
+for `ZEISS-PiWeb/PiWeb-Volume` for each publishing workflow:
+`develop.yml`, `create-release.yml`, and `create-support-release.yml`. Use the
+workflow filename only and leave the environment unset. The policy must permit
+publishing `Zeiss.PiWeb.Volume`.
+
+Set the repository or organization secret `NUGET_USER` to the NuGet profile
+name used to own the package. The release workflows also require
+`PUSH_TO_GITHUB_REPO_PAT` to push release branches and tags. Dispatch
+`create-release.yml` from `develop`; the shared workflow calculates the
+semantic version. Dispatch `create-support-release.yml` from a `support/*`
+branch for patch releases.
