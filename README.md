@@ -5,7 +5,7 @@
 [sliceExtraction]: docs/img/sliceExtraction.png "SliceExtraction"
 [testingUI]: docs/img/testing_ui.jpg "TestingUI"
 
-[![Build](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/build.yml)
+[![Build](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/develop.yml/badge.svg?branch=develop)](https://github.com/ZEISS-PiWeb/PiWeb-Volume/actions/workflows/develop.yml)
 [![NuGet](https://img.shields.io/nuget/v/Zeiss.PiWeb.Volume?logo=nuget)](https://www.nuget.org/packages/Zeiss.PiWeb.Volume/)
 
 # PiWeb Volume Library
@@ -167,15 +167,19 @@ Agreement. See [SECURITY.md](SECURITY.md) for reporting security issues.
 
 ## NuGet trusted publishing
 
-The `nuget-publish.yml` workflow publishes `Zeiss.PiWeb.Volume` to nuget.org
-using GitHub Actions OIDC. Configure a NuGet
+Build, test, pack, and release workflows call reusable workflows from
+[ZEISS-PiWeb/github-actions](https://github.com/ZEISS-PiWeb/github-actions).
+NuGet authentication and publishing remain in this repository and use GitHub
+Actions OIDC. Configure NuGet
 [trusted-publishing policy](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing)
-for `ZEISS-PiWeb/PiWeb-Volume`, with workflow filename `nuget-publish.yml`
-and no environment (the publishing job does not use a GitHub Actions
-environment). The policy must permit publishing the `Zeiss.PiWeb.Volume`
-package.
+for `ZEISS-PiWeb/PiWeb-Volume` for each publishing workflow:
+`develop.yml`, `create-release.yml`, and `create-support-release.yml`. Use the
+workflow filename only and leave the environment unset. The policy must permit
+publishing `Zeiss.PiWeb.Volume`.
 
 Set the repository or organization secret `NUGET_USER` to the NuGet profile
-name used to own the package. The manually triggered `create-release.yml`
-workflow also requires `PUSH_TO_GITHUB_REPO_PAT` to push release branches and
-tags.
+name used to own the package. The release workflows also require
+`PUSH_TO_GITHUB_REPO_PAT` to push release branches and tags. Dispatch
+`create-release.yml` from `develop`; the shared workflow calculates the
+semantic version. Dispatch `create-support-release.yml` from a `support/*`
+branch for patch releases.
